@@ -95,7 +95,7 @@
             transition: all 0.2s;
         }
 
-        /* Área das Mensagens (Texto rola por trás da barra) */
+        /* Área das Mensagens (Onde o texto rola por trás) */
         .chat-messages {
             flex: 1;
             padding: 20px;
@@ -106,7 +106,7 @@
             background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             background-blend-mode: overlay;
             background-color: var(--bg-color);
-            padding-bottom: 110px; /* Garante espaço para sumir atrás da barra */
+            padding-bottom: 110px; /* Garante que os textos passem por trás da barra fixa */
         }
 
         /* Balões de Texto */
@@ -220,7 +220,7 @@
             </div>
 
             <div class="msg-bubble received">
-                Antigamente, as coisas eram feitas para durar — os casamentos, os empregos nas empresas e até os objetos que a gente comprava. Hoje, tudo virou "líquido", ou seja, não tem uma forma fixa e muda o tempo todo. A gente vive na correria, consome tudo muito rápido e, infelizmente, acaba tratando os sentimentos e as pessoas da mesma maneira. Na internet, por exemplo, a gente coleciona centenas de amigos virtuais, mas, na hora do aperto, percebe que muitos desses laços são superficiais e frágeis.
+                Antigamente, as coisas eram feitas para durar — os casamentos, os empregos nas empresas e até os objetos que a gente comprava. Hoje, tudo virou "liquido", ou seja, não tem uma forma fixa e muda o tempo todo. A gente vive na correria, consome tudo muito rápido e, infelizmente, acaba tratando os sentimentos e as pessoas da mesma maneira. Na internet, por exemplo, a gente coleciona centenas de amigos virtuais, mas, na hora do aperto, percebe que muitos desses laços são superficiais e frágeis.
             </div>
 
             <div class="msg-bubble received">
@@ -244,23 +244,24 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-        // Sua configuração do Firebase fornecida
+        // Suas novas credenciais fornecidas
         const firebaseConfig = {
-            apiKey: "AIzaSyC93vebMOn-9efBrYIvRXg_cXeCsPd10Nc",
-            authDomain: "estudar-9652d.firebaseapp.com",
-            projectId: "estudar-9652d",
-            storageBucket: "estudar-9652d.firebasestorage.app",
-            messagingSenderId: "599920019176",
-            appId: "1:599920019176:web:65ac17f59f258bea0c6b5d",
-            measurementId: "G-YJ8SY01XKL"
+            apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
+            authDomain: "dddua-81207.firebaseapp.com",
+            databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com",
+            projectId: "dddua-81207",
+            storageBucket: "dddua-81207.firebasestorage.app",
+            messagingSenderId: "844138746278",
+            appId: "1:844138746278:web:341f704f22c106473d7f67",
+            measurementId: "G-F4SC83V4KB"
         };
 
-        // Inicializa o Firebase e o banco de dados Firestore
+        // Inicializa o Firebase e o Banco de Dados Realtime
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const mensagensRef = collection(db, "mensagens_chat");
+        const db = getDatabase(app);
+        const mensagensRef = ref(db, "mensagens_site");
 
         const chatMessages = document.getElementById('chatMessages');
         const dynamicMessages = document.getElementById('dynamicMessages');
@@ -269,56 +270,53 @@
         const sendBtn = document.getElementById('sendBtn');
         const themeToggle = document.getElementById('themeToggle');
 
-        // Fazer a rolagem iniciar lá embaixo
+        // Garante que inicie a rolagem no fim da página
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        // Função para Enviar Mensagem para o Firebase
-        async function enviarMensagem() {
+        // Função para salvar o texto enviado no banco de dados
+        function enviarMensagem() {
             const texto = messageInput.value.trim();
             const chave = keyInput.value.trim().toLowerCase();
 
             if (texto === "") return;
 
-            // Validação da Chave de Acesso cobrada
+            // Validação da Chave "lua"
             if (chave !== "lua") {
                 alert("Chave de acesso incorreta! Digite a chave certa para poder enviar.");
                 return;
             }
 
-            try {
-                // Salva o texto enviado direto no banco de dados
-                await addDoc(mensagensRef, {
-                    texto: texto,
-                    timestamp: serverTimestamp()
-                });
-                
-                messageInput.value = ""; // Limpa a caixa de digitação
-            } catch (error) {
-                console.error("Erro ao salvar mensagem: ", error);
-                alert("Ocorreu um erro ao enviar para o Firebase. Verifique as regras do seu banco.");
-            }
+            // Envia o dado para a árvore "mensagens_site" do Realtime Database
+            push(mensagensRef, {
+                texto: texto
+            }).then(() => {
+                messageInput.value = ""; // Limpa o campo
+            }).catch((error) => {
+                console.error("Erro ao salvar:", error);
+                alert("Erro ao conectar com o Firebase. Verifique se as Regras (Rules) do seu Realtime Database estão públicas.");
+            });
         }
 
-        // Carrega e atualiza as mensagens em tempo real vindo do Firebase
-        const q = query(mensagensRef, orderBy("timestamp", "asc"));
-        onSnapshot(q, (snapshot) => {
-            dynamicMessages.innerHTML = ""; // Limpa os balões antigos dinâmicos
+        // Puxa os dados do banco e mantém aparecendo na tela em tempo real
+        onValue(mensagensRef, (snapshot) => {
+            dynamicMessages.innerHTML = ""; // Limpa para atualizar
             
-            snapshot.forEach((doc) => {
-                const dados = doc.data();
-                if(dados.texto) {
-                    const novoBalao = document.createElement('div');
-                    novoBalao.className = 'msg-bubble sent'; // Estilo balão enviado (verde)
-                    novoBalao.textContent = dados.texto;
-                    dynamicMessages.appendChild(novoBalao);
-                }
-            });
-
-            // Rola a tela de forma automática sempre que chegar texto novo
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const dados = childSnapshot.val();
+                    if (dados.texto) {
+                        const novoBalao = document.createElement('div');
+                        novoBalao.className = 'msg-bubble sent'; // Balão verde no lado direito
+                        novoBalao.textContent = dados.texto;
+                        dynamicMessages.appendChild(novoBalao);
+                    }
+                });
+            }
+            // Faz a tela rolar para baixo automaticamente com o texto novo
             chatMessages.scrollTop = chatMessages.scrollHeight;
         });
 
-        // Eventos dos botões
+        // Eventos de clique e envio
         sendBtn.addEventListener('click', enviarMensagem);
 
         messageInput.addEventListener('keypress', function(e) {
