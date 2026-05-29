@@ -7,7 +7,7 @@
     <style>
         /* Variáveis de Cores para os Modos */
         :root {
-            --bg-color: #efeae2; /* Fundo clássico do WhatsApp */
+            --bg-color: #efeae2;
             --container-bg: #ffffff;
             --text-color: #2c3e50;
             --chat-bg: #ffffff;
@@ -21,7 +21,7 @@
         }
 
         [data-theme="dark"] {
-            --bg-color: #0b141a; /* Fundo escuro do WhatsApp */
+            --bg-color: #0b141a;
             --container-bg: #111b21;
             --text-color: #e9edef;
             --chat-bg: #111b21;
@@ -62,7 +62,7 @@
             position: relative;
         }
 
-        /* Barra de Cima (Header) */
+        /* Barra do Topo */
         .chat-header {
             background-color: var(--header-bg);
             color: var(--header-text);
@@ -83,7 +83,7 @@
             opacity: 0.8;
         }
 
-        /* Botão Alternar Tema */
+        /* Botão Tema */
         .theme-btn {
             background: transparent;
             border: 1px solid var(--header-text);
@@ -94,11 +94,8 @@
             font-size: 12px;
             transition: all 0.2s;
         }
-        .theme-btn:hover {
-            opacity: 0.9;
-        }
 
-        /* Área das Mensagens (Onde o texto rola) */
+        /* Área das Mensagens (Texto rola por trás da barra) */
         .chat-messages {
             flex: 1;
             padding: 20px;
@@ -106,13 +103,13 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Padrão sutil do WhatsApp */
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
             background-blend-mode: overlay;
             background-color: var(--bg-color);
-            padding-bottom: 90px; /* Garante que o texto suma por trás da barra fixa */
+            padding-bottom: 110px; /* Garante espaço para sumir atrás da barra */
         }
 
-        /* Estilo dos Balões de Texto */
+        /* Balões de Texto */
         .msg-bubble {
             max-width: 85%;
             padding: 12px 16px;
@@ -141,7 +138,7 @@
             color: #c0392b;
         }
 
-        /* Barra Fixa de Baixo (Input) */
+        /* Barra Fixa de Digitação Embaixo */
         .chat-footer {
             position: absolute;
             bottom: 0;
@@ -162,7 +159,7 @@
         }
 
         .key-input {
-            width: 120px;
+            width: 125px;
             padding: 8px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
@@ -230,6 +227,8 @@
                 O grande xis da questão que o Bauman traz é esse individualismo. Como tudo é passageiro, as pessoas tendem a focar mais em si mesmas e menos no coletivo. É por isso que, às vezes, falta tanta empatia na sociedade para resolver problemas sérios, já que cada um acaba olhando só para o próprio umbigo. Entender a modernidade líquida é um estalo para a gente perceber que, em um mundo onde tudo flui e desaparece rápido, o que é real e tem valor de verdade precisa de tempo e cuidado para ser construído.
             </div>
 
+            <div id="dynamicMessages" style="display: contents;"></div>
+
         </div>
 
         <div class="chat-footer">
@@ -243,8 +242,28 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+        // Sua configuração do Firebase fornecida
+        const firebaseConfig = {
+            apiKey: "AIzaSyC93vebMOn-9efBrYIvRXg_cXeCsPd10Nc",
+            authDomain: "estudar-9652d.firebaseapp.com",
+            projectId: "estudar-9652d",
+            storageBucket: "estudar-9652d.firebasestorage.app",
+            messagingSenderId: "599920019176",
+            appId: "1:599920019176:web:65ac17f59f258bea0c6b5d",
+            measurementId: "G-YJ8SY01XKL"
+        };
+
+        // Inicializa o Firebase e o banco de dados Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const mensagensRef = collection(db, "mensagens_chat");
+
         const chatMessages = document.getElementById('chatMessages');
+        const dynamicMessages = document.getElementById('dynamicMessages');
         const messageInput = document.getElementById('messageInput');
         const keyInput = document.getElementById('keyInput');
         const sendBtn = document.getElementById('sendBtn');
@@ -253,38 +272,55 @@
         // Fazer a rolagem iniciar lá embaixo
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        // Função para Adicionar Nova Mensagem
-        function enviarMensagem() {
+        // Função para Enviar Mensagem para o Firebase
+        async function enviarMensagem() {
             const texto = messageInput.value.trim();
             const chave = keyInput.value.trim().toLowerCase();
 
             if (texto === "") return;
 
-            // Validação da Chave de Segurança
+            // Validação da Chave de Acesso cobrada
             if (chave !== "lua") {
                 alert("Chave de acesso incorreta! Digite a chave certa para poder enviar.");
                 return;
             }
 
-            // Cria o balão de envio (estilo enviado)
-            const novoBalao = document.createElement('div');
-            novoBalao.className = 'msg-bubble sent';
-            novoBalao.textContent = texto;
-
-            // Adiciona no chat
-            chatMessages.appendChild(novoBalao);
-
-            // Limpa o campo de texto
-            messageInput.value = "";
-
-            // Rola automaticamente para mostrar a nova mensagem
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            try {
+                // Salva o texto enviado direto no banco de dados
+                await addDoc(mensagensRef, {
+                    texto: texto,
+                    timestamp: serverTimestamp()
+                });
+                
+                messageInput.value = ""; // Limpa a caixa de digitação
+            } catch (error) {
+                console.error("Erro ao salvar mensagem: ", error);
+                alert("Ocorreu um erro ao enviar para o Firebase. Verifique as regras do seu banco.");
+            }
         }
+
+        // Carrega e atualiza as mensagens em tempo real vindo do Firebase
+        const q = query(mensagensRef, orderBy("timestamp", "asc"));
+        onSnapshot(q, (snapshot) => {
+            dynamicMessages.innerHTML = ""; // Limpa os balões antigos dinâmicos
+            
+            snapshot.forEach((doc) => {
+                const dados = doc.data();
+                if(dados.texto) {
+                    const novoBalao = document.createElement('div');
+                    novoBalao.className = 'msg-bubble sent'; // Estilo balão enviado (verde)
+                    novoBalao.textContent = dados.texto;
+                    dynamicMessages.appendChild(novoBalao);
+                }
+            });
+
+            // Rola a tela de forma automática sempre que chegar texto novo
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
 
         // Eventos dos botões
         sendBtn.addEventListener('click', enviarMensagem);
 
-        // Permitir enviar apertando "Enter" dentro do input
         messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 enviarMensagem();
@@ -303,6 +339,5 @@
             }
         });
     </script>
-
 </body>
 </html>
