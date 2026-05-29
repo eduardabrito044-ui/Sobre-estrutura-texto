@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modernidade Líquida - Chat</title>
+    <style>
+        /* Variáveis de Cores para os Modos */
+        :root {
+            --bg-color: #efeae2; /* Fundo clássico do WhatsApp */
+            --container-bg: #ffffff;
+            --text-color: #2c3e50;
+            --chat-bg: #ffffff;
+            --header-bg: #075e54;
+            --header-text: #ffffff;
+            --footer-bg: #f0f0f0;
+            --input-bg: #ffffff;
+            --bubble-received: #ffffff;
+            --bubble-sent: #d9fdd3;
+            --border-color: #ddd;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0b141a; /* Fundo escuro do WhatsApp */
+            --container-bg: #111b21;
+            --text-color: #e9edef;
+            --chat-bg: #111b21;
+            --header-bg: #202c33;
+            --header-text: #e9edef;
+            --footer-bg: #202c33;
+            --input-bg: #2a3942;
+            --bubble-received: #202c33;
+            --bubble-sent: #005c4b;
+            --border-color: #222e35;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Estrutura Principal do App */
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--chat-bg);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Barra de Cima (Header) */
+        .chat-header {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chat-title h1 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .chat-title p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Botão Alternar Tema */
+        .theme-btn {
+            background: transparent;
+            border: 1px solid var(--header-text);
+            color: var(--header-text);
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .theme-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Área das Mensagens (Onde o texto rola) */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Padrão sutil do WhatsApp */
+            background-blend-mode: overlay;
+            background-color: var(--bg-color);
+            padding-bottom: 90px; /* Garante que o texto suma por trás da barra fixa */
+        }
+
+        /* Estilo dos Balões de Texto */
+        .msg-bubble {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14.5px;
+            line-height: 1.5;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            word-wrap: break-word;
+        }
+
+        .received {
+            background-color: var(--bubble-received);
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+
+        .sent {
+            background-color: var(--bubble-sent);
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+
+        .quote-style {
+            font-style: italic;
+            font-weight: bold;
+            color: #c0392b;
+        }
+
+        /* Barra Fixa de Baixo (Input) */
+        .chat-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--footer-bg);
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .security-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .key-input {
+            width: 120px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .send-btn {
+            background-color: #00a884;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .send-btn:hover {
+            background-color: #008f72;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-title">
+                <h1>Zygmunt Bauman</h1>
+                <p>Sociologia • Online</p>
+            </div>
+            <button class="theme-btn" id="themeToggle">Modo Escuro</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            
+            <div class="msg-bubble received">
+                Sabe quando você para pra pensar em como as coisas hoje em dia mudam num piscar de olhos? É exatamente sobre isso que o sociólogo Zygmunt Bauman falava quando criou o termo "Modernidade Líquida". Ele explicava que o mundo atual perdeu a solidez, e a frase mais famosa dele resume tudo: <span class="quote-style">"as relações escorrem entre os dedos"</span>.
+            </div>
+
+            <div class="msg-bubble received">
+                Antigamente, as coisas eram feitas para durar — os casamentos, os empregos nas empresas e até os objetos que a gente comprava. Hoje, tudo virou "líquido", ou seja, não tem uma forma fixa e muda o tempo todo. A gente vive na correria, consome tudo muito rápido e, infelizmente, acaba tratando os sentimentos e as pessoas da mesma maneira. Na internet, por exemplo, a gente coleciona centenas de amigos virtuais, mas, na hora do aperto, percebe que muitos desses laços são superficiais e frágeis.
+            </div>
+
+            <div class="msg-bubble received">
+                O grande xis da questão que o Bauman traz é esse individualismo. Como tudo é passageiro, as pessoas tendem a focar mais em si mesmas e menos no coletivo. É por isso que, às vezes, falta tanta empatia na sociedade para resolver problemas sérios, já que cada um acaba olhando só para o próprio umbigo. Entender a modernidade líquida é um estalo para a gente perceber que, em um mundo onde tudo flui e desaparece rápido, o que é real e tem valor de verdade precisa de tempo e cuidado para ser construído.
+            </div>
+
+        </div>
+
+        <div class="chat-footer">
+            <div class="security-row">
+                <input type="password" id="keyInput" class="key-input" placeholder="Chave de acesso">
+            </div>
+            <div class="input-row">
+                <input type="text" id="messageInput" class="message-input" placeholder="Digite seu texto aqui...">
+                <button class="send-btn" id="sendBtn">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const keyInput = document.getElementById('keyInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Fazer a rolagem iniciar lá embaixo
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Função para Adicionar Nova Mensagem
+        function enviarMensagem() {
+            const texto = messageInput.value.trim();
+            const chave = keyInput.value.trim().toLowerCase();
+
+            if (texto === "") return;
+
+            // Validação da Chave de Segurança
+            if (chave !== "lua") {
+                alert("Chave de acesso incorreta! Digite a chave certa para poder enviar.");
+                return;
+            }
+
+            // Cria o balão de envio (estilo enviado)
+            const novoBalao = document.createElement('div');
+            novoBalao.className = 'msg-bubble sent';
+            novoBalao.textContent = texto;
+
+            // Adiciona no chat
+            chatMessages.appendChild(novoBalao);
+
+            // Limpa o campo de texto
+            messageInput.value = "";
+
+            // Rola automaticamente para mostrar a nova mensagem
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Eventos dos botões
+        sendBtn.addEventListener('click', enviarMensagem);
+
+        // Permitir enviar apertando "Enter" dentro do input
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                enviarMensagem();
+            }
+        });
+
+        // Alternador de Modo Claro / Escuro
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.body.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.body.removeAttribute('data-theme');
+                themeToggle.textContent = 'Modo Escuro';
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = 'Modo Claro';
+            }
+        });
+    </script>
+
+</body>
+</html>
