@@ -2,192 +2,273 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Nosso Mundo - Jogo de Convivência</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #2c3e50;
+            background-color: #1a1a24;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             color: white;
             overflow: hidden;
+            user-select: none;
         }
 
         #jogo-container {
+            position: relative;
             text-align: center;
         }
 
         canvas {
-            border: 4px solid #fff;
-            background-color: #7bed9f; 
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-            image-rendering: pixelated; /* Mantém o pixel art nítido */
+            border: 6px solid #4a3b32;
+            border-radius: 8px;
+            background-color: #55b67e; 
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.7);
+            image-rendering: pixelated;
+            max-width: 95vw;
+            max-height: 60vh;
         }
 
-        .controles-info {
-            margin-top: 10px;
+        /* Controles Virtuais para Celular */
+        #controles-celular {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .D-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            grid-template-rows: repeat(3, 50px);
+            gap: 5px;
+        }
+
+        .btn-game {
+            background: #4a3b32;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px #2c211a;
+        }
+
+        .btn-game:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 #2c211a;
+        }
+
+        .btn-cima { grid-column: 2; grid-row: 1; }
+        .btn-esquerda { grid-column: 1; grid-row: 2; }
+        .btn-baixo { grid-column: 2; grid-row: 2; }
+        .btn-direita { grid-column: 3; grid-row: 2; }
+
+        .botoes-acao {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-acao {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
             font-size: 14px;
-            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
     <div id="jogo-container">
-        <h2>Nosso Mundo: Simulador Co-op</h2>
-        <canvas id="telaJogo" width="800" height="600"></canvas>
-        <div class="controles-info">Use as setas ou WASD para mover o personagem</div>
+        <h2 style="margin-bottom: 10px; text-shadow: 2px 2px #000;">Nosso Mundo</h2>
+        <canvas id="telaJogo" width="800" height="500"></canvas>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <div id="controles-celular">
+        <div class="D-pad">
+            <button class="btn-game btn-cima" id="btn-w">↑</button>
+            <button class="btn-game btn-esquerda" id="btn-a">←</button>
+            <button class="btn-game btn-baixo" id="btn-s">↓</button>
+            <button class="btn-game btn-direita" id="btn-d">→</button>
+        </div>
+        <div class="botoes-acao">
+            <button class="btn-game btn-acao" id="btn-pulo" style="background: #2980b9;">PULAR</button>
+            <button class="btn-game btn-acao" id="btn-usar" style="background: #27ae60;">PEGAR</button>
+        </div>
+    </div>
 
     <script>
-        // ==========================================
-        // 1. CONFIGURAÇÃO DO JOGO & CANVAS
-        // ==========================================
         const canvas = document.getElementById("telaJogo");
         const ctx = canvas.getContext("2d");
 
-        // Carregar as folhas de sprites inteiras
         const imgJogador1 = new Image();
         imgJogador1.src = "jogador1.png"; 
-
         const imgJogador2 = new Image();
         imgJogador2.src = "jogador2.png"; 
 
-        // ==========================================
-        // 2. DIMENSÕES DO RECORTE (Ajuste se necessário)
-        // Cada bonequinho na folha tem um tamanho fixo de recorte
-        // ==========================================
-        const LARGURA_SPRITE = 48; // Largura de cada "quadrado" do boneco na imagem
-        const ALTURA_SPRITE = 96;  // Altura de cada "quadrado" do boneco na imagem
+        // AJUSTE DOS RECORTES (Pula o título da imagem)
+        const LARGURA_SPRITE = 48; 
+        const ALTURA_SPRITE = 90;  
+        const OFFSET_Y = 120; // Pula os textos "COZY AVATAR" do topo da imagem
 
-        // Mapeamento das linhas da imagem para as direções
-        const DIRECOES = {
-            FRENTE: 0,
-            COSTAS: 1,
-            ESQUERDA: 2,
-            DIREITA: 3
-        };
+        const DIRECOES = { FRENTE: 0, COSTAS: 1, ESQUERDA: 2, DIREITA: 3 };
 
-        // ==========================================
-        // 3. ESTRUTURA DOS JOGADORES
-        // ==========================================
+        // Estrutura do Jogador 1 com Física de Pulo e Gravidade
         const jogador1 = {
-            x: 350,
+            x: 200,
             y: 300,
-            velocidade: 3,
-            larguraTela: 48,  // Tamanho final no jogo
-            alturaTela: 96,
-            direcao: DIRECOES.FRENTE, // Linha atual do sprite
-            frameAtual: 0,            // Coluna atual do sprite (para bater as pernas)
-            contadorAnimacao: 0,      // Controla a velocidade dos passos
-            andando: false
+            z: 0,               // Altura do pulo (eixo Z falso)
+            velY_pulo: 0,       // Velocidade vertical do pulo
+            gravidade: 0.6,
+            velocidade: 4,
+            larguraTela: 55,
+            alturaTela: 100,
+            direcao: DIRECOES.FRENTE,
+            frameAtual: 0,
+            contadorAnimacao: 0,
+            andando: false,
+            estaPulando: false,
+            escalaLeve: 1       // Para o efeito de respiração leve (idle)
         };
 
         const jogador2 = {
-            x: 450,
+            x: 400,
             y: 300,
-            larguraTela: 48,
-            alturaTela: 96,
+            z: 0,
+            larguraTela: 55,
+            alturaTela: 100,
             direcao: DIRECOES.FRENTE,
             frameAtual: 0,
-            andando: false
+            andando: false,
+            escalaLeve: 1
         };
 
-        // Capturar teclado
-        const teclas = {};
-        window.addEventListener("keydown", (e) => { teclas[e.key.toLowerCase()] = true; });
-        window.addEventListener("keyup", (e) => { teclas[e.key.toLowerCase()] = false; });
+        // Inputs (Teclado + Celular)
+        const botoes = { w: false, a: false, s: false, d: false, pulo: false };
 
-        // ==========================================
-        // 4. FUNÇÃO PARA DESENHAR O SPRITE RECORTADO
-        // ==========================================
+        // Eventos Teclado
+        window.addEventListener("keydown", (e) => { mapearTeclado(e.key.toLowerCase(), true); });
+        window.addEventListener("keyup", (e) => { mapearTeclado(e.key.toLowerCase(), false); });
+
+        function mapearTeclado(tecla, status) {
+            if (tecla === "arrowup" || tecla === "w") botoes.w = status;
+            if (tecla === "arrowdown" || tecla === "s") botoes.s = status;
+            if (tecla === "arrowleft" || tecla === "a") botoes.a = status;
+            if (tecla === "arrowright" || tecla === "d") botoes.d = status;
+            if (tecla === " " || tecla === "spacebar") botoes.pulo = status;
+        }
+
+        // Eventos Celular (Toque na tela)
+        const configurarBotaoCelular = (id, propriedade) => {
+            const el = document.getElementById(id);
+            el.addEventListener("touchstart", (e) => { e.preventDefault(); botoes[propriedade] = true; });
+            el.addEventListener("touchend", (e) => { e.preventDefault(); botoes[propriedade] = false; });
+        };
+        configurarBotaoCelular("btn-w", "w");
+        configurarBotaoCelular("btn-s", "s");
+        configurarBotaoCelular("btn-a", "a");
+        configurarBotaoCelular("btn-d", "d");
+        configurarBotaoCelular("btn-pulo", "pulo");
+
         function desenharPersonagem(img, dados) {
             if (img.complete) {
-                // Calcula a posição X e Y exata do recorte dentro da imagem grande
                 let clipX = dados.frameAtual * LARGURA_SPRITE;
-                let clipY = dados.direcao * ALTURA_SPRITE;
+                // Aplica o OFFSET_Y para ignorar o título escrito na imagem
+                let clipY = OFFSET_Y + (dados.direcao * ALTURA_SPRITE);
 
+                ctx.save();
+                // Efeito visual de pulo: desloca o desenho para cima com base no "z"
+                ctx.translate(dados.x, dados.y - dados.z);
+                
+                // Inventação/respiração leve: Altera levemente a escala de altura quando parado
                 ctx.drawImage(
                     img,
-                    clipX, clipY, LARGURA_SPRITE, ALTURA_SPRITE, // Onde recortar na imagem
-                    dados.x, dados.y, dados.larguraTela, dados.alturaTela // Onde desenhar na tela
+                    clipX, clipY, LARGURA_SPRITE, ALTURA_SPRITE,
+                    0, 0, dados.larguraTela, dados.alturaTela * dados.escalaLeve
                 );
-            } else {
-                // Desenho temporário caso a imagem falhe
-                ctx.fillStyle = "#8B4513";
-                ctx.fillRect(dados.x, dados.y, dados.larguraTela, dados.alturaTela);
+                ctx.restore();
             }
         }
 
-        // ==========================================
-        // 5. LOOP PRINCIPAL
-        // ==========================================
         function atualizarJogo() {
             jogador1.andando = false;
 
-            // Movimentação e definição de direção do Jogador 1
-            if (teclas["arrowup"] || teclas["w"]) {
-                jogador1.y -= jogador1.velocidade;
-                jogador1.direcao = DIRECOES.COSTAS;
-                jogador1.andando = true;
-            }
-            else if (teclas["arrowdown"] || teclas["s"]) {
-                jogador1.y += jogador1.velocidade;
-                jogador1.direcao = DIRECOES.FRENTE;
-                jogador1.andando = true;
-            }
-            
-            if (teclas["arrowleft"] || teclas["a"]) {
-                jogador1.x -= jogador1.velocidade;
-                jogador1.direcao = DIRECOES.ESQUERDA;
-                jogador1.andando = true;
-            }
-            else if (teclas["arrowright"] || teclas["d"]) {
-                jogador1.x += jogador1.velocidade;
-                jogador1.direcao = DIRECOES.DIREITA;
-                jogador1.andando = true;
+            // Movimento
+            if (botoes.w) { jogador1.y -= jogador1.velocidade; jogador1.direcao = DIRECOES.COSTAS; jogador1.andando = true; }
+            else if (botoes.s) { jogador1.y += jogador1.velocidade; jogador1.direcao = DIRECOES.FRENTE; jogador1.andando = true; }
+            if (botoes.a) { jogador1.x -= jogador1.velocidade; jogador1.direcao = DIRECOES.ESQUERDA; jogador1.andando = true; }
+            else if (botoes.d) { jogador1.x += jogador1.velocidade; jogador1.direcao = DIRECOES.DIREITA; jogador1.andando = true; }
+
+            // Lógica do Pulo (Física básica)
+            if (botoes.pulo && !jogador1.estaPulando) {
+                jogador1.velY_pulo = -10; // Força do pulo
+                jogador1.estaPulando = true;
             }
 
-            // Controle da Animação dos Passos (Troca de colunas na imagem)
+            if (jogador1.estaPulando) {
+                jogador1.z -= jogador1.velY_pulo;
+                jogador1.velY_pulo += jogador1.gravidade; // Aplica gravidade
+
+                if (jogador1.z <= 0) { // Tocou o chão
+                    jogador1.z = 0;
+                    jogador1.estaPulando = false;
+                }
+            }
+
+            // Animação de Passos vs Respiração Leve (Idle)
+            jogador1.contadorAnimacao++;
             if (jogador1.andando) {
-                jogador1.contadorAnimacao++;
-                if (jogador1.contadorAnimacao >= 10) { // Velocidade da troca de passos
-                    jogador1.frameAtual = (jogador1.frameAtual + 1) % 4; // Alterna entre as colunas 0, 1, 2, 3
+                if (jogador1.contadorAnimacao >= 8) {
+                    jogador1.frameAtual = (jogador1.frameAtual + 1) % 4;
                     jogador1.contadorAnimacao = 0;
                 }
+                jogador1.escalaLeve = 1;
             } else {
-                jogador1.frameAtual = 0; // Se parar, fica no frame neutro (em pé de frente/costas/lado)
+                jogador1.frameAtual = 0;
+                // Efeito fofo de "respirar" bem devagar usando Seno
+                jogador1.escalaLeve = 1 + Math.sin(Date.now() * 0.004) * 0.02;
             }
 
-            // Limites do mapa
+            // Efeito idle para jogador 2 também
+            jogador2.escalaLeve = 1 + Math.sin(Date.now() * 0.003) * 0.02;
+
+            // Limites da tela
             if (jogador1.x < 0) jogador1.x = 0;
-            if (jogador1.y < 0) jogador1.y = 0;
+            if (jogador1.y < 100) jogador1.y = 100; // Impede sumir no topo
             if (jogador1.x > canvas.width - jogador1.larguraTela) jogador1.x = canvas.width - jogador1.larguraTela;
             if (jogador1.y > canvas.height - jogador1.alturaTela) jogador1.y = canvas.height - jogador1.alturaTela;
 
-            // Renderização gráfica
+            // Renderizar Cenário
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Chão
-            ctx.fillStyle = "#7bed9f";
+            ctx.fillStyle = "#55b67e"; // Grama bonita
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Desenhar os dois avatares com recorte automático
+            // Sombra dos personagens (Dá profundidade e deixa lindo)
+            ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+            ctx.beginPath();
+            ctx.ellipse(jogador1.x + 28, jogador1.y + 95, 20, 8, 0, 0, Math.PI * 2);
+            ctx.ellipse(jogador2.x + 28, jogador2.y + 95, 20, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Desenhar bonecos
             desenharPersonagem(imgJogador1, jogador1);
             desenharPersonagem(imgJogador2, jogador2);
 
             requestAnimationFrame(atualizarJogo);
         }
 
-        // Iniciar
         atualizarJogo();
     </script>
 </body>
