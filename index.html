@@ -1,502 +1,194 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vitrine de Habilidades</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#f5f7fb;color:#333}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Mundo - Jogo de Convivência</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
 
-/* Tela de Login */
-#tela-login {
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(135deg, #6366f1, #10b981);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-.login-box {
-    background: white;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    text-align: center;
-    max-width: 400px;
-    width: 90%;
-}
-.login-box h1 { font-size: 32px; margin-bottom: 10px; color: #6366f1; }
-.login-box h1 span { color: #10b981; }
-.login-box p { color: #666; margin-bottom: 20px; }
+        #jogo-container {
+            text-align: center;
+        }
 
-/* Conteúdo Principal */
-#conteudo-principal { display: none; }
+        canvas {
+            border: 4px solid #fff;
+            background-color: #7bed9f; 
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+            image-rendering: pixelated; /* Mantém o pixel art nítido */
+        }
 
-header{background:#6366f1;color:white;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
-.logo{font-size:26px;font-weight:bold}
-.logo span{color:#10b981}
-nav a{color:white;text-decoration:none;margin-left:20px;font-weight:500}
-.hero{background:linear-gradient(135deg,#6366f1,#10b981);padding:50px 20px;color:white;text-align:center}
-.hero h1{font-size:36px;margin-bottom:10px}
-.search-container{max-width:500px;margin:20px auto 0 auto;display:flex;gap:10px}
-.search-input{padding:12px;border:none;border-radius:8px;width:100%;font-size:16px}
-section{padding:30px 25px;max-width:1200px;margin:0 auto}
-h2 { color: #312e81; display: flex; align-items: center; gap: 10px; font-size: 22px; }
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:15px}
-.card,.perfil-card,.solicitacao{background:white;padding:20px;border-radius:14px;box-shadow:0 4px 6px rgba(0,0,0,.05);transition:transform 0.2s;display:flex;flex-direction:column;justify-content:space-between}
-.card:hover{transform:translateY(-5px)}
-.card-icon{font-size:36px;margin-bottom:10px}
-.price{font-weight:bold;color:#10b981;font-size:16px;margin:8px 0}
-.btn{padding:10px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:opacity 0.2s}
-.btn:hover{opacity:0.9}
-.primary{background:#10b981;color:white;width:100%;margin-top:10px}
-.chat{background:#6366f1;color:white;width:100%;margin-top:5px}
-.badge{background:red;color:white;padding:3px 8px;border-radius:50%;font-size:12px;vertical-align:middle;margin-left:5px}
-#perfil{background:#f0f2ff;max-width:100%}
-.perfil-content{max-width:1200px;margin:0 auto}
-.perfil-topo{display:flex;align-items:center;gap:20px;margin-bottom:20px}
-.avatar{width:80px;height:80px;border-radius:50%;background:#6366f1;color:white;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;text-transform:uppercase}
-input{width:100%;padding:12px;margin-top:10px;border:1px solid #ccc;border-radius:8px;font-size:14px}
-footer{background:#312e81;color:white;text-align:center;padding:20px;font-size:14px}
-.solicitacao{margin-bottom:15px;border-left:5px solid #10b981}
-
-/* JANELA DE CHAT */
-.chat-window {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 350px;
-    height: 450px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-    z-index: 500;
-    flex-direction: column;
-}
-.chat-header {
-    background: #6366f1;
-    color: white;
-    padding: 15px;
-    border-radius: 12px 12px 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.chat-messages {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: #f8fafc;
-}
-.msg { padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 14px; word-break: break-word; }
-.msg.enviada { background: #6366f1; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-.msg.recebida { background: #e2e8f0; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
-.chat-input-area { padding: 10px; display: flex; gap: 8px; border-top: 1px solid #e2e8f0; }
-.chat-input-area input { margin-top: 0; padding: 8px; }
-.chat-item { cursor: pointer; margin-bottom: 10px; padding: 12px; background:#f8fafc; border-radius:8px; border-left: 5px solid #6366f1; }
-.chat-item:hover { background: #eef2ff; }
-.btn-logout { background: #dc2626; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; border: none; cursor: pointer; margin-top: 5px; }
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200}
-.modal-box{background:white;max-width:400px;margin:150px auto;padding:25px;border-radius:12px;text-align:center}
-</style>
+        .controles-info {
+            margin-top: 10px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
 
-<div id="tela-login">
-    <div class="login-box">
-        <h1>Vitrine<span>+</span></h1>
-        <p>Bem-vindo à Vitrine de Habilidades! Identifique-se para entrar.</p>
-        <input type="text" id="login-nome" placeholder="Seu Nome Completo">
-        <input type="email" id="login-email" placeholder="Seu E-mail ou Gmail">
-        <button class="btn primary" style="margin-top:20px; padding:12px;" onclick="realizarLogin()">Entrar na Vitrine</button>
-    </div>
-</div>
-
-<div id="conteudo-principal">
-    <header>
-        <div class="logo">Vitrine<span>de Habilidades</span></div>
-        <nav>
-            <a href="#aprender">Aprender</a>
-            <a href="#habilidades">Habilidades</a>
-            <a href="#objetos">Objetos</a>
-            <a href="#perfil">Meu Painel <span id="notif-badge" class="badge" style="display:none;">0</span></a>
-        </nav>
-    </header>
-
-    <div class="hero">
-        <h1>Vitrine Exclusiva de Habilidades</h1>
-        <p>Encontre soluções educacionais, services especializados e locações diretamente comigo.</p>
-        <div class="search-container">
-            <input type="text" id="busca" class="search-input" placeholder="🔍 O que você precisa hoje?" oninput="filtrarItens()">
-        </div>
+    <div id="jogo-container">
+        <h2>Nosso Mundo: Simulador Co-op</h2>
+        <canvas id="telaJogo" width="800" height="600"></canvas>
+        <div class="controles-info">Use as setas ou WASD para mover o personagem</div>
     </div>
 
-    <section id="aprender">
-        <h2>📚 Aprender (Aulas e Mentorias)</h2>
-        <div class="cards" id="aprenderLista"></div>
-    </section>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-    <hr style="border: 0; border-top: 1px solid #e2e8f0;">
+    <script>
+        // ==========================================
+        // 1. CONFIGURAÇÃO DO JOGO & CANVAS
+        // ==========================================
+        const canvas = document.getElementById("telaJogo");
+        const ctx = canvas.getContext("2d");
 
-    <section id="habilidades">
-        <h2>🛠️ Habilidades e Serviços Disponíveis</h2>
-        <div class="cards" id="habilidadesLista"></div>
-    </section>
+        // Carregar as folhas de sprites inteiras
+        const imgJogador1 = new Image();
+        imgJogador1.src = "jogador1.png"; 
 
-    <hr style="border: 0; border-top: 1px solid #e2e8f0;">
+        const imgJogador2 = new Image();
+        imgJogador2.src = "jogador2.png"; 
 
-    <section id="objetos">
-        <h2>📦 Objetos para Alugar</h2>
-        <div class="cards" id="objetosLista"></div>
-    </section>
+        // ==========================================
+        // 2. DIMENSÕES DO RECORTE (Ajuste se necessário)
+        // Cada bonequinho na folha tem um tamanho fixo de recorte
+        // ==========================================
+        const LARGURA_SPRITE = 48; // Largura de cada "quadrado" do boneco na imagem
+        const ALTURA_SPRITE = 96;  // Altura de cada "quadrado" do boneco na imagem
 
-    <section id="perfil">
-        <div class="perfil-content">
-            <h2>👤 Meu Painel Individual</h2><br>
-            <div class="perfil-topo">
-                <div class="avatar" id="perf-avatar">--</div>
-                <div>
-                    <h3 id="perf-nome">Carregando...</h3>
-                    <p id="perf-email">E-mail...</p>
-                    <button class="btn-logout" onclick="logout()">Sair da Conta</button>
-                </div>
-            </div>
+        // Mapeamento das linhas da imagem para as direções
+        const DIRECOES = {
+            FRENTE: 0,
+            COSTAS: 1,
+            ESQUERDA: 2,
+            DIREITA: 3
+        };
 
-            <div id="area-notificacoes-vendedor" style="display: none; margin-top: 20px;">
-                <h3 style="color: #312e81; margin-bottom: 15px;">🔔 Solicitações de Clientes Recebidas</h3>
-                <div id="lista-solicitacoes"></div>
-            </div>
+        // ==========================================
+        // 3. ESTRUTURA DOS JOGADORES
+        // ==========================================
+        const jogador1 = {
+            x: 350,
+            y: 300,
+            velocidade: 3,
+            larguraTela: 48,  // Tamanho final no jogo
+            alturaTela: 96,
+            direcao: DIRECOES.FRENTE, // Linha atual do sprite
+            frameAtual: 0,            // Coluna atual do sprite (para bater as pernas)
+            contadorAnimacao: 0,      // Controla a velocidade dos passos
+            andando: false
+        };
 
-            <br><br>
-            <h3>💬 Minhas Mensagens Ativas</h3><br>
-            <div id="lista-conversas"></div>
-        </div>
-    </section>
+        const jogador2 = {
+            x: 450,
+            y: 300,
+            larguraTela: 48,
+            alturaTela: 96,
+            direcao: DIRECOES.FRENTE,
+            frameAtual: 0,
+            andando: false
+        };
 
-    <footer>
-        © 2026 Vitrine de Habilidades • Conectando Soluções Inteligentes
-    </footer>
-</div>
+        // Capturar teclado
+        const teclas = {};
+        window.addEventListener("keydown", (e) => { teclas[e.key.toLowerCase()] = true; });
+        window.addEventListener("keyup", (e) => { teclas[e.key.toLowerCase()] = false; });
 
-<div id="janela-chat" class="chat-window">
-    <div class="chat-header">
-        <span id="chat-titulo-item" style="font-weight: bold; font-size: 13px; max-width: 85%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Chat</span>
-        <button onclick="fecharChat()" style="background: none; border: none; color: white; cursor: pointer; font-size: 18px; font-weight: bold;">✕</button>
-    </div>
-    <div id="chat-mensagens" class="chat-messages"></div>
-    <div class="chat-input-area">
-        <input type="text" id="chat-input-msg" placeholder="Digite sua proposta..." onkeypress="verificarEnterChat(event)">
-        <button class="btn primary" style="width: auto; margin-top: 0; padding: 8px 15px;" onclick="enviarMensagem()">Enviar</button>
-    </div>
-</div>
+        // ==========================================
+        // 4. FUNÇÃO PARA DESENHAR O SPRITE RECORTADO
+        // ==========================================
+        function desenharPersonagem(img, dados) {
+            if (img.complete) {
+                // Calcula a posição X e Y exata do recorte dentro da imagem grande
+                let clipX = dados.frameAtual * LARGURA_SPRITE;
+                let clipY = dados.direcao * ALTURA_SPRITE;
 
-<div id="modal" class="modal">
-    <div class="modal-box">
-        <p id="texto"></p><br>
-        <button class="btn primary" style="width: auto; padding: 10px 30px;" onclick="fechar()">Fechar</button>
-    </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
-  import { getDatabase, ref, push, set, onChildAdded, off } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyD3jp-N19gnDIzCClGQohx_5crwfopM3uM",
-    authDomain: "aluga-a35b3.firebaseapp.com",
-    databaseURL: "https://aluga-a35b3-default-rtdb.firebaseio.com",
-    projectId: "aluga-a35b3",
-    storageBucket: "aluga-a35b3.firebasestorage.app",
-    messagingSenderId: "604833955818",
-    appId: "1:604833955818:web:ad0aa07aa264c52c143c93",
-    measurementId: "G-Y471JENWTG"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-
-  const EMAIL_DONO_VITRINE = "agusttavo697@gmail.com"; 
-
-  let usuarioAtual = { nome: "", email: "" };
-  let salaChatAtual = ""; 
-  let contagemNotificacoes = 0;
-
-  const itensFixos = [
-    { tipo: "Aprender", titulo: "Mentoria para organização dos estudos", emoji: "📅", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Mentoria para o ENEM", emoji: "📝", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Aulas de reforço de Matemática", emoji: "📐", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Aulas de reforço de Português", emoji: "📖", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Aulas de reforço de Inglês", emoji: "🇺🇸", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Ajuda em redação", emoji: "✍️", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Correção de redações", emoji: "🔍", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Técnicas de memorização", emoji: "🧠", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Resolução de exercícios", emoji: "🧮", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Grupo de estudos guiado", emoji: "👥", acao: "Contratar" },
-    { tipo: "Aprender", titulo: "Preparação para apresentações escolares", emoji: "🎤", acao: "Contratar" },
-    
-    { tipo: "Habilidade", titulo: "Criação de slides", emoji: "📊", acao: "Contratar" },
-    { tipo: "Habilidade", titulo: "Edição de vídeos", emoji: "🎬", acao: "Contratar" },
-    { tipo: "Habilidade", titulo: "Design no Canva", emoji: "🎨", acao: "Contratar" },
-    { tipo: "Habilidade", titulo: "Criação de currículos", emoji: "💼", acao: "Contratar" },
-    { tipo: "Habilidade", titulo: "Programação básica", emoji: "💻", acao: "Contratar" },
-    { tipo: "Habilidade", titulo: "Montagem de sites simples", emoji: "🌐", acao: "Contratar" },
-    { tipo: "Habilidade", titulo: "Digitação de trabalhos", emoji: "⌨️", acao: "Contratar" },
-    { tipo: "Habilidade", titulo: "Formatação de documentos", emoji: "📄", acao: "Contratar" },
-    
-    { tipo: "Objeto", titulo: "Pendrive", emoji: "💾", acao: "Alugar" },
-    { tipo: "Objeto", titulo: "Fone de ouvido", emoji: "🎧", acao: "Alugar" },
-    { tipo: "Objeto", titulo: "Microfone", emoji: "🎙️", acao: "Alugar" },
-    { tipo: "Objeto", titulo: "Régua", emoji: "📏", acao: "Alugar" },
-    { tipo: "Objeto", titulo: "Compasso", emoji: "🧭", acao: "Alugar" },
-    { tipo: "Objeto", titulo: "Transferidor", emoji: "📐", acao: "Alugar" },
-    { tipo: "Objeto", titulo: "Dicionário", emoji: "📕", acao: "Alugar" },
-    { tipo: "Objeto", titulo: "Rádio portátil", emoji: "📻", acao: "Alugar" }
-  ];
-
-  window.addEventListener('DOMContentLoaded', () => {
-      const nomeSalvo = localStorage.getItem('vitrine_nome');
-      const emailSalvo = localStorage.getItem('vitrine_email');
-      if(nomeSalvo && emailSalvo) {
-          logarUsuario(nomeSalvo, emailSalvo);
-      }
-  });
-
-  window.realizarLogin = function() {
-    let nome = document.getElementById('login-nome').value.trim();
-    let email = document.getElementById('login-email').value.trim().toLowerCase();
-
-    if(!nome || !email) {
-        window.aviso("Por favor, preencha seu nome e e-mail para entrar.");
-        return;
-    }
-    
-    localStorage.setItem('vitrine_nome', nome);
-    localStorage.setItem('vitrine_email', email);
-    logarUsuario(nome, email);
-  }
-
-  function logarUsuario(nome, email) {
-    usuarioAtual.nome = nome;
-    usuarioAtual.email = email;
-
-    document.getElementById('perf-nome').innerText = nome;
-    document.getElementById('perf-email').innerText = email;
-    document.getElementById('perf-avatar').innerText = nome.substring(0, 2);
-
-    // Esconde a tela de login e mostra o site principal de imediato
-    document.getElementById('tela-login').style.display = 'none';
-    document.getElementById('conteudo-principal').style.display = 'block';
-
-    if(usuarioAtual.email === EMAIL_DONO_VITRINE.toLowerCase()) {
-        document.getElementById('area-notificacoes-vendedor').style.display = 'block';
-    }
-
-    // Renderiza a interface e só depois puxa os dados assíncronos do banco
-    renderizarVitrineFixa();
-    inicializarEscutasBanco();
-  }
-
-  window.logout = function() {
-      localStorage.clear();
-      window.location.reload();
-  }
-
-  function renderizarVitrineFixa() {
-      const containers = {
-          Aprender: document.getElementById('aprenderLista'),
-          Habilidade: document.getElementById('habilidadesLista'),
-          Objeto: document.getElementById('objetosLista')
-      };
-
-      containers.Aprender.innerHTML = "";
-      containers.Habilidade.innerHTML = "";
-      containers.Objeto.innerHTML = "";
-
-      itensFixos.forEach(item => {
-          let botaoHTML = "";
-          
-          if(usuarioAtual.email === EMAIL_DONO_VITRINE.toLowerCase()) {
-              botaoHTML = `<button class="btn" style="width:100%; background:#ccc; cursor:not-allowed;" disabled>Seu Item</button>`;
-          } else {
-              botaoHTML = `
-                <button class="btn primary" onclick="solicitarServico('${item.titulo}', '${item.acao}')">✨ ${item.acao}</button>
-                <button class="btn chat" onclick="abrirConversa('${item.titulo}', '${EMAIL_DONO_VITRINE}', 'Administrador', '${usuarioAtual.email}', '${usuarioAtual.nome}')">💬 Conversar</button>
-              `;
-          }
-
-          let cardHtml = `
-            <div class="card" data-nome="${item.titulo.toLowerCase()}">
-                <div>
-                    <div class="card-icon">${item.emoji}</div>
-                    <h3>${item.titulo}</h3>
-                    <p style="font-size:12px; color:#666; margin-top:4px;">Disponível por: Administrador</p>
-                </div>
-                <div style="margin-top:15px;">
-                    <p class="price">Consulte Valores</p>
-                    ${botaoHTML}
-                </div>
-            </div>`;
-
-          containers[item.tipo].insertAdjacentHTML('beforeend', cardHtml);
-      });
-  }
-
-  window.solicitarServico = function(tituloItem, acao) {
-      const solicitacoesRef = ref(db, 'solicitacoes_vitrine');
-      const novaSolRef = push(solicitacoesRef);
-
-      set(novaSolRef, {
-          item: tituloItem,
-          acao: acao,
-          clienteNome: usuarioAtual.nome,
-          clienteEmail: usuarioAtual.email,
-          timestamp: Date.now()
-      }).then(() => {
-          window.aviso(`Solicitação de ${acao} enviada com sucesso! O administrador foi notificado.`);
-      });
-  }
-
-  window.abrirConversa = function(item, emailVendedor, nomeVendedor, emailCliente, nomeCliente) {
-    if (salaChatAtual) {
-        off(ref(db, 'mensagens/' + salaChatAtual));
-    }
-
-    let idLimpo = (item + "_" + emailVendedor + "_" + emailCliente).replace(/[.#$\[\]]/g, "-");
-    salaChatAtual = idLimpo;
-
-    const chatMetaRef = ref(db, 'chats_ativos/' + salaChatAtual);
-    set(chatMetaRef, {
-        item: item,
-        vendedorEmail: emailVendedor,
-        vendedorNome: nomeVendedor,
-        clienteEmail: emailCliente,
-        clienteNome: nomeCliente
-    });
-
-    let interlocutor = (usuarioAtual.email === emailVendedor.toLowerCase()) ? nomeCliente : nomeVendedor;
-    
-    document.getElementById('chat-titulo-item').innerText = item + " c/ " + interlocutor;
-    document.getElementById('chat-mensagens').innerHTML = "";
-    document.getElementById('janela-chat').style.display = 'flex';
-
-    escutarMensagensDaSala(salaChatAtual);
-  }
-
-  window.enviarMensagem = function() {
-    let input = document.getElementById('chat-input-msg');
-    let texto = input.value.trim();
-    if(!texto || !salaChatAtual) return;
-
-    const msgsRef = ref(db, 'mensagens/' + salaChatAtual);
-    const novaMsgRef = push(msgsRef);
-
-    set(novaMsgRef, {
-        remetente: usuarioAtual.email,
-        nome: usuarioAtual.nome,
-        texto: texto,
-        timestamp: Date.now()
-    }).then(() => {
-        input.value = "";
-    });
-  }
-
-  function escutarMensagensDaSala(salaId) {
-    onChildAdded(ref(db, 'mensagens/' + salaId), (snapshot) => {
-        if (salaChatAtual !== salaId) return; 
-        const msg = snapshot.val();
-        let classeRemetente = (msg.remetente === usuarioAtual.email) ? 'enviada' : 'recebida';
-
-        let msgHtml = `<div class="msg ${classeRemetente}"><strong>${msg.nome}:</strong><br>${msg.texto}</div>`;
-        let container = document.getElementById('chat-mensagens');
-        container.insertAdjacentHTML('beforeend', msgHtml);
-        container.scrollTop = container.scrollHeight; 
-    });
-  }
-
-  window.fecharChat = function() {
-    if (salaChatAtual) {
-        off(ref(db, 'mensagens/' + salaChatAtual));
-    }
-    document.getElementById('janela-chat').style.display = 'none';
-    salaChatAtual = "";
-  }
-
-  function inicializarEscutasBanco() {
-    onChildAdded(ref(db, 'solicitacoes_vitrine'), (snapshot) => {
-        const dados = snapshot.val();
-        
-        if(usuarioAtual.email === EMAIL_DONO_VITRINE.toLowerCase()) {
-            contagemNotificacoes++;
-            const badge = document.getElementById('notif-badge');
-            badge.innerText = contagemNotificacoes;
-            badge.style.display = "inline-block";
-
-            let solHtml = `
-            <div class="solicitacao">
-                <h4>🔔 Nova Solicitação de: ${dados.acao}</h4>
-                <p style="margin-top:5px;"><strong>Item/Serviço:</strong> ${dados.item}</p>
-                <p><strong>Cliente:</strong> ${dados.clienteNome} (${dados.clienteEmail})</p>
-                <button class="btn chat" style="width:auto; padding:6px 12px; margin-top:10px;" onclick="abrirConversa('${dados.item}', '${EMAIL_DONO_VITRINE}', 'Administrador', '${dados.clienteEmail}', '${dados.clienteNome}')">💬 Abrir Chat com Cliente</button>
-            </div>`;
-
-            document.getElementById('lista-solicitacoes').insertAdjacentHTML('beforeend', solHtml);
+                ctx.drawImage(
+                    img,
+                    clipX, clipY, LARGURA_SPRITE, ALTURA_SPRITE, // Onde recortar na imagem
+                    dados.x, dados.y, dados.larguraTela, dados.alturaTela // Onde desenhar na tela
+                );
+            } else {
+                // Desenho temporário caso a imagem falhe
+                ctx.fillStyle = "#8B4513";
+                ctx.fillRect(dados.x, dados.y, dados.larguraTela, dados.alturaTela);
+            }
         }
-    });
 
-    onChildAdded(ref(db, 'chats_ativos'), (snapshot) => {
-        const chat = snapshot.val();
-        
-        if(chat.vendedorEmail.toLowerCase() === usuarioAtual.email || chat.clienteEmail.toLowerCase() === usuarioAtual.email) {
-            let outroNome = (usuarioAtual.email === chat.vendedorEmail.toLowerCase()) ? chat.clienteNome : chat.vendedorNome;
-            let tipoTag = (usuarioAtual.email === chat.vendedorEmail.toLowerCase()) ? "Cliente" : "Atendente";
+        // ==========================================
+        // 5. LOOP PRINCIPAL
+        // ==========================================
+        function atualizarJogo() {
+            jogador1.andando = false;
 
-            let itemChatHtml = `
-            <div class="chat-item" onclick="abrirConversa('${chat.item}', '${chat.vendedorEmail}', '${chat.vendedorNome}', '${chat.clienteEmail}', '${chat.clienteNome}')">
-                <h4>🤝 Item: ${chat.item}</h4>
-                <p style="margin-top: 5px; font-size: 13px; color: #555;"><strong>${tipoTag}:</strong> ${outroNome}</p>
-            </div>`;
+            // Movimentação e definição de direção do Jogador 1
+            if (teclas["arrowup"] || teclas["w"]) {
+                jogador1.y -= jogador1.velocidade;
+                jogador1.direcao = DIRECOES.COSTAS;
+                jogador1.andando = true;
+            }
+            else if (teclas["arrowdown"] || teclas["s"]) {
+                jogador1.y += jogador1.velocidade;
+                jogador1.direcao = DIRECOES.FRENTE;
+                jogador1.andando = true;
+            }
+            
+            if (teclas["arrowleft"] || teclas["a"]) {
+                jogador1.x -= jogador1.velocidade;
+                jogador1.direcao = DIRECOES.ESQUERDA;
+                jogador1.andando = true;
+            }
+            else if (teclas["arrowright"] || teclas["d"]) {
+                jogador1.x += jogador1.velocidade;
+                jogador1.direcao = DIRECOES.DIREITA;
+                jogador1.andando = true;
+            }
 
-            document.getElementById('lista-conversas').insertAdjacentHTML('beforeend', itemChatHtml);
+            // Controle da Animação dos Passos (Troca de colunas na imagem)
+            if (jogador1.andando) {
+                jogador1.contadorAnimacao++;
+                if (jogador1.contadorAnimacao >= 10) { // Velocidade da troca de passos
+                    jogador1.frameAtual = (jogador1.frameAtual + 1) % 4; // Alterna entre as colunas 0, 1, 2, 3
+                    jogador1.contadorAnimacao = 0;
+                }
+            } else {
+                jogador1.frameAtual = 0; // Se parar, fica no frame neutro (em pé de frente/costas/lado)
+            }
+
+            // Limites do mapa
+            if (jogador1.x < 0) jogador1.x = 0;
+            if (jogador1.y < 0) jogador1.y = 0;
+            if (jogador1.x > canvas.width - jogador1.larguraTela) jogador1.x = canvas.width - jogador1.larguraTela;
+            if (jogador1.y > canvas.height - jogador1.alturaTela) jogador1.y = canvas.height - jogador1.alturaTela;
+
+            // Renderização gráfica
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Chão
+            ctx.fillStyle = "#7bed9f";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Desenhar os dois avatares com recorte automático
+            desenharPersonagem(imgJogador1, jogador1);
+            desenharPersonagem(imgJogador2, jogador2);
+
+            requestAnimationFrame(atualizarJogo);
         }
-    });
-  }
 
-  // FUNÇÕES AUXILIARES QUE ESTAVAM FALTANDO NO SEU SCRIPT ORIGINAL:
-  window.filtrarItens = function() {
-      let termo = document.getElementById('busca').value.toLowerCase();
-      let cards = document.querySelectorAll('.card');
-      
-      cards.forEach(card => {
-          let nomeItem = card.getAttribute('data-nome');
-          if(nomeItem.includes(termo)) {
-              card.style.display = "flex";
-          } else {
-              card.style.display = "none";
-          }
-      });
-  }
-
-  window.aviso = function(texto) {
-      document.getElementById('texto').innerText = texto;
-      document.getElementById('modal').style.display = 'block';
-  }
-
-  window.fechar = function() {
-      document.getElementById('modal').style.display = 'none';
-  }
-
-  window.verificarEnterChat = function(event) {
-      if(event.key === 'Enter') {
-          enviarMensagem();
-      }
-  }
-</script>
-
+        // Iniciar
+        atualizarJogo();
+    </script>
 </body>
 </html>
