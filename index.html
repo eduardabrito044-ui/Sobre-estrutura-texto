@@ -7,71 +7,154 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
-            background-color: #1a1a24;
+            padding: 10px;
+            background-color: #15151c;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             font-family: 'Courier New', Courier, monospace;
             color: white;
-            overflow: hidden;
+            overflow-x: hidden;
+            box-sizing: border-box;
             user-select: none;
+        }
+
+        h2 {
+            margin: 5px 0 15px 0;
+            text-shadow: 2px 2px #000;
+            font-size: 28px;
+        }
+
+        /* Container Principal que divide Tela do Jogo e Menu da Loja */
+        #conteudo-principal {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            #conteudo-principal {
+                flex-direction: column;
+                align-items: center;
+            }
         }
 
         #jogo-container {
             position: relative;
-            text-align: center;
-            background-color: #55b67e; 
-            border: 6px solid #4a3b32;
-            border-radius: 8px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.7);
+            background-color: #387a56; 
+            border: 5px solid #2e241f;
+            border-radius: 12px;
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.6);
         }
 
         canvas {
             display: block;
             background-color: #55b67e; 
             image-rendering: pixelated;
-            max-width: 95vw;
-            max-height: 60vh;
-            /* Remove os quadrados cinzas e brancos do fundo automaticamente */
-            mix-blend-mode: multiply; 
+            max-width: 100%;
+            width: 550px;
+            height: 380px;
         }
 
-        /* Controles Virtuais para Celular */
-        #controles-celular {
+        /* --- SISTEMA DA LOJA --- */
+        #loja-container {
+            background: #1e1e26;
+            border: 4px solid #3a3a4a;
+            border-radius: 12px;
+            width: 380px;
+            padding: 15px;
+            box-sizing: border-box;
+            box-shadow: 0px 8px 20px rgba(0,0,0,0.5);
+        }
+
+        .topo-loja {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3a3a4a;
+            padding-bottom: 10px;
+        }
+
+        .contador-moedas {
+            background: #ffd700;
+            color: #111;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 3px 0 #b89200;
+        }
+
+        .abas-loja {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .aba-item {
+            background: #2a2a35;
+            border: 2px solid #444;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: bold;
+            transition: 0.2s;
+            font-size: 15px;
+        }
+
+        .aba-item:hover {
+            background: #353545;
+            border-color: #ffd700;
+        }
+
+        .aba-icone {
+            font-size: 20px;
+        }
+
+        /* --- CONTROLES VIRTUAIS --- */
+        #paineis-controle {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            max-width: 800px;
-            padding: 15px;
+            max-width: 950px;
+            margin-top: 20px;
+            padding: 0 10px;
             box-sizing: border-box;
         }
 
         .D-pad {
             display: grid;
-            grid-template-columns: repeat(3, 50px);
-            grid-template-rows: repeat(3, 50px);
-            gap: 5px;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 8px;
         }
 
         .btn-game {
-            background: #4a3b32;
+            background: #3e322a;
             border: 2px solid #fff;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 22px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px #2c211a;
+            box-shadow: 0 5px #251c17;
+            cursor: pointer;
         }
 
         .btn-game:active {
             transform: translateY(4px);
-            box-shadow: 0 0 #2c211a;
+            box-shadow: 0 1px #251c17;
         }
 
         .btn-cima { grid-column: 2; grid-row: 1; }
@@ -82,25 +165,53 @@
         .botoes-acao {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
         }
 
         .btn-acao {
-            width: 65px;
-            height: 65px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            font-size: 14px;
+            font-size: 15px;
+            font-family: inherit;
         }
     </style>
 </head>
 <body>
 
-    <h2 style="margin-bottom: 10px; text-shadow: 2px 2px #000;">Nosso Mundo</h2>
-    <div id="jogo-container">
-        <canvas id="telaJogo" width="800" height="500"></canvas>
+    <h2>Nosso Mundo</h2>
+
+    <div id="conteudo-principal">
+        <div id="jogo-container">
+            <canvas id="telaJogo" width="800" height="550"></canvas>
+        </div>
+
+        <div id="loja-container">
+            <div class="topo-loja">
+                <span style="font-weight: bold; color: #ffd700;">LOJA VIRTUAL</span>
+                <div class="contador-moedas" id="txt-moedas">54 G$ 🪙</div>
+            </div>
+            <div class="abas-loja">
+                <div class="aba-item" onclick="comprarItem('Casa')">
+                    <span class="aba-icone">🏠</span> <span>CASAS</span>
+                </div>
+                <div class="aba-item" onclick="comprarItem('Animal')">
+                    <span class="aba-icone">🐶</span> <span>ANIMAIS</span>
+                </div>
+                <div class="aba-item" onclick="comprarItem('Móvel')">
+                    <span class="aba-icone">🪑</span> <span>MÓVEIS</span>
+                </div>
+                <div class="aba-item" onclick="comprarItem('Cerca')">
+                    <span class="aba-icone">🪟</span> <span>CERCAS</span>
+                </div>
+                <div class="aba-item" onclick="comprarItem('Estrada')">
+                    <span class="aba-icone">🛣️</span> <span>ESTRADAS</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="controles-celular">
+    <div id="paineis-controle">
         <div class="D-pad">
             <button class="btn-game btn-cima" id="btn-w">↑</button>
             <button class="btn-game btn-esquerda" id="btn-a">←</button>
@@ -117,51 +228,34 @@
         const canvas = document.getElementById("telaJogo");
         const ctx = canvas.getContext("2d");
 
-        // Carregando as imagens direto dos links das artes oficiais que aprovamos!
+        let moedas = 54;
+
+        // Gerando os Avatares em formato de Código de Vetor Seguro (SVG) para evitar bugs de carregamento de imagem externa
+        const avatarBonecaSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><circle cx="50" cy="40" r="22" fill="%235c3a21"/><circle cx="50" cy="38" r="16" fill="%237c5236"/><circle cx="43" cy="35" r="3" fill="black"/><circle cx="57" cy="35" r="3" fill="black"/><path d="M 44 46 Q 50 50 56 46" stroke="black" stroke-width="2" fill="none"/><path d="M 25 15 Q 50 -5 75 15 Q 85 40 75 80 Q 50 60 25 80 Q 15 40 25 15" fill="%231a1a1a"/><path d="M 30 70 L 70 70 L 75 115 L 25 115 Z" fill="%231a4cb0"/><rect x="38" y="115" width="8" height="20" fill="%237c5236"/><rect x="54" y="115" width="8" height="20" fill="%237c5236"/><rect x="35" y="130" width="12" height="8" rx="4" fill="white"/><rect x="53" y="130" width="12" height="8" rx="4" fill="white"/></svg>`;
+
+        const avatarMeninoSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><circle cx="50" cy="40" r="17" fill="%231a1a1a"/><circle cx="50" cy="42" r="15" fill="%236e472b"/><circle cx="42" cy="40" r="4" stroke="%232980b9" stroke-width="2" fill="none"/><circle cx="58" cy="40" r="4" stroke="%232980b9" stroke-width="2" fill="none"/><line x1="46" y1="40" x2="54" y2="40" stroke="%232980b9" stroke-width="2"/><path d="M 45 50 Q 50 53 55 50" stroke="black" stroke-width="1.5" fill="none"/><rect x="30" y="65" width="40" height="40" fill="white"/><rect x="33" y="105" width="14" height="20" fill="%23c2b280"/><rect x="53" y="105" width="14" height="20" fill="%23c2b280"/><rect x="31" y="125" width="16" height="10" rx="4" fill="%2356a0d3"/><rect x="51" y="125" width="16" height="10" rx="4" fill="%2356a0d3"/></svg>`;
+
         const imgJogador1 = new Image();
-        imgJogador1.crossOrigin = "anonymous";
-        imgJogador1.src = "https://lh3.googleusercontent.com/d/1O9mB6r0p10g47Y-Qcl_69HovIunF7gKq"; // Link da Boneca Azul
+        imgJogador1.src = avatarBonecaSVG;
 
         const imgJogador2 = new Image();
-        imgJogador2.crossOrigin = "anonymous";
-        imgJogador2.src = "https://lh3.googleusercontent.com/d/1BfVlshWv7_W2rFasf8v9K7X8wGgq6k-P"; // Link do Menino de Óculos
+        imgJogador2.src = avatarMeninoSVG;
 
-        // Medidas exatas para recortar as imagens horizontais
-        const LARGURA_SPRITE = 256;  
-        const ALTURA_SPRITE = 430;   
-        const OFFSET_Y = 110; // Pula os títulos da imagem
-
-        // Mapeamento das direções baseado na ordem das imagens (Frente, Direita, Costas, Esquerda)
-        const DIRECOES = { FRENTE: 0, DIREITA: 1, COSTAS: 2, ESQUERDA: 3 };
+        // Lista de construções colocadas no mapa
+        const construcoesNoMapa = [];
 
         const jogador1 = {
-            x: 200,
-            y: 200,
-            z: 0,               
-            velY_pulo: 0,       
-            gravidade: 0.6,
-            velocidade: 5,
-            larguraTela: 70,    
-            alturaTela: 120,    
-            direcao: DIRECOES.FRENTE,
-            andando: false,
-            estaPulando: false,
-            escalaLeve: 1       
+            x: 220, y: 260, z: 0, velY_pulo: 0, gravidade: 0.6, velocidade: 5,
+            largura: 65, altura: 110, andando: false, estaPulando: false, escalaLeve: 1
         };
 
         const jogador2 = {
-            x: 450,
-            y: 200,
-            z: 0,
-            larguraTela: 70,
-            alturaTela: 120,
-            direcao: DIRECOES.FRENTE,
-            andando: false,
-            escalaLeve: 1
+            x: 480, y: 250, z: 0, largura: 65, altura: 110, andando: false, escalaLeve: 1
         };
 
         const botoes = { w: false, a: false, s: false, d: false, pulo: false };
 
+        // Controles Teclado
         window.addEventListener("keydown", (e) => { mapearTeclado(e.key.toLowerCase(), true); });
         window.addEventListener("keyup", (e) => { mapearTeclado(e.key.toLowerCase(), false); });
 
@@ -173,6 +267,7 @@
             if (tecla === " " || tecla === "spacebar") botoes.pulo = status;
         }
 
+        // Toques celulares
         const configurarBotaoCelular = (id, propriedade) => {
             const el = document.getElementById(id);
             if(el) {
@@ -186,31 +281,38 @@
         configurarBotaoCelular("btn-d", "d");
         configurarBotaoCelular("btn-pulo", "pulo");
 
-        function desenharPersonagem(img, dados) {
-            if (img.complete && img.naturalWidth !== 0) {
-                // Multiplica o tamanho do bloco pela direção para andar horizontalmente na folha de sprites
-                let clipX = dados.direcao * LARGURA_SPRITE;
-                let clipY = OFFSET_Y;
+        // Sistema para comprar itens na loja e spawnar no cenário
+        function comprarItem(tipo) {
+            if (moedas >= 10) {
+                moedas -= 10;
+                document.getElementById("txt-moedas").innerText = `${moedas} G$ 🪙`;
+                
+                // Define o emoji visual do item comprado
+                let icone = "🏠";
+                if(tipo === "Animal") icone = "🐶";
+                if(tipo === "Móvel") icone = "🪑";
+                if(tipo === "Cerca") icone = "🪵";
+                if(tipo === "Estrada") icone = "🛣️";
 
-                ctx.save();
-                ctx.translate(dados.x, dados.y - dados.z);
-
-                ctx.drawImage(
-                    img,
-                    clipX, clipY, LARGURA_SPRITE, ALTURA_SPRITE,
-                    0, 0, dados.larguraTela, dados.alturaTela * dados.escalaLeve
-                );
-                ctx.restore();
+                // Coloca o item em uma posição aleatória perto do centro do mapa
+                construcoesNoMapa.push({
+                    x: 150 + Math.random() * 450,
+                    y: 100 + Math.random() * 300,
+                    tipo: tipo,
+                    emoji: icone
+                });
+            } else {
+                alert("Moedas insuficientes!");
             }
         }
 
         function atualizarJogo() {
             jogador1.andando = false;
 
-            if (botoes.w) { jogador1.y -= jogador1.velocidade; jogador1.direcao = DIRECOES.COSTAS; jogador1.andando = true; }
-            else if (botoes.s) { jogador1.y += jogador1.velocidade; jogador1.direcao = DIRECOES.FRENTE; jogador1.andando = true; }
-            if (botoes.a) { jogador1.x -= jogador1.velocidade; jogador1.direcao = DIRECOES.ESQUERDA; jogador1.andando = true; }
-            else if (botoes.d) { Float32Array; jogador1.x += jogador1.velocidade; jogador1.direcao = DIRECOES.DIREITA; jogador1.andando = true; }
+            if (botoes.w) { jogador1.y -= jogador1.velocidade; jogador1.andando = true; }
+            else if (botoes.s) { jogador1.y += jogador1.velocidade; jogador1.andando = true; }
+            if (botoes.a) { jogador1.x -= jogador1.velocidade; jogador1.andando = true; }
+            else if (botoes.d) { jogador1.x += jogador1.velocidade; jogador1.andando = true; }
 
             if (botoes.pulo && !jogador1.estaPulando) {
                 jogador1.velY_pulo = -10; 
@@ -220,38 +322,56 @@
             if (jogador1.estaPulando) {
                 jogador1.z -= jogador1.velY_pulo;
                 jogador1.velY_pulo += jogador1.gravidade; 
-
-                if (jogador1.z <= 0) { 
-                    jogador1.z = 0;
-                    jogador1.estaPulando = false;
-                }
+                if (jogador1.z <= 0) { jogador1.z = 0; jogador1.estaPulando = false; }
             }
 
+            // Animação Fofa de Respiração
             if (!jogador1.andando) {
-                jogador1.escalaLeve = 1 + Math.sin(Date.now() * 0.004) * 0.02;
+                jogador1.escalaLeve = 1 + Math.sin(Date.now() * 0.005) * 0.02;
             } else {
                 jogador1.escalaLeve = 1;
             }
-            jogador2.escalaLeve = 1 + Math.sin(Date.now() * 0.003) * 0.02;
+            jogador2.escalaLeve = 1 + Math.sin(Date.now() * 0.004) * 0.02;
 
+            // Restrição de limites da tela
             if (jogador1.x < 0) jogador1.x = 0;
-            if (jogador1.y < 50) jogador1.y = 50; 
-            if (jogador1.x > canvas.width - jogador1.larguraTela) jogador1.x = canvas.width - jogador1.larguraTela;
-            if (jogador1.y > canvas.height - jogador1.alturaTela) jogador1.y = canvas.height - jogador1.alturaTela;
+            if (jogador1.y < 40) jogador1.y = 40; 
+            if (jogador1.x > canvas.width - jogador1.largura) jogador1.x = canvas.width - jogador1.largura;
+            if (jogador1.y > canvas.height - jogador1.altura) jogador1.y = canvas.height - jogador1.altura;
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Renderizar fundo limpo de grama
             ctx.fillStyle = "#55b67e"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Sombra dos personagens
-            ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+            // Desenhar os itens comprados da loja no chão
+            ctx.font = "45px Arial";
+            ctx.textAlign = "center";
+            construcoesNoMapa.forEach(item => {
+                ctx.fillText(item.emoji, item.x, item.y);
+            });
+
+            // Sombras realistas embaixo dos bonecos
+            ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
             ctx.beginPath();
-            ctx.ellipse(jogador1.x + (jogador1.larguraTela/2), jogador1.y + jogador1.alturaTela - 5, 22, 7, 0, 0, Math.PI * 2);
-            ctx.ellipse(jogador2.x + (jogador2.larguraTela/2), jogador2.y + jogador2.alturaTela - 5, 22, 7, 0, 0, Math.PI * 2);
+            ctx.ellipse(jogador1.x + (jogador1.largura/2), jogador1.y + jogador1.altura - 2, 24, 7, 0, 0, Math.PI * 2);
+            ctx.ellipse(jogador2.x + (jogador2.largura/2), jogador2.y + jogador2.altura - 2, 24, 7, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            desenharPersonagem(imgJogador1, jogador1);
-            desenharPersonagem(imgJogador2, jogador2);
+            // Desenhar Personagem 1 (Boneca) com efeito Z do Pulo
+            if (imgJogador1.complete) {
+                ctx.save();
+                ctx.translate(jogador1.x, jogador1.y - jogador1.z);
+                ctx.drawImage(imgJogador1, 0, 0, jogador1.largura, jogador1.altura * jogador1.escalaLeve);
+                ctx.restore();
+            }
+
+            // Desenhar Personagem 2 (Menino)
+            if (imgJogador2.complete) {
+                ctx.save();
+                ctx.translate(jogador2.x, jogador2.y - jogador2.z);
+                ctx.drawImage(imgJogador2, 0, 0, jogador2.largura, jogador2.altura * jogador2.escalaLeve);
+                ctx.restore();
+            }
 
             requestAnimationFrame(atualizarJogo);
         }
