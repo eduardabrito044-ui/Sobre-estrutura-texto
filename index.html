@@ -2,381 +2,972 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Nosso Mundo - Jogo de Convivência</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Casal - Nosso Mundo</title>
     <style>
+        /* 1. ARQUITETURA DE LAYOUT E ESTILO GERAL */
         body {
             margin: 0;
-            padding: 10px;
-            background-color: #15151c;
+            padding: 0;
+            background-color: #1a1a24;
+            /* Fundo quadriculado cinza escuro/preto */
+            background-image:
+                linear-gradient(45deg, #111 25%, transparent 25%),
+                linear-gradient(-45deg, #111 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #111 75%),
+                linear-gradient(-45deg, transparent 75%, #111 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            min-height: 100vh;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            user-select: none; /* Evita seleção de texto no jogo */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Estética dos Painéis */
+        .painel {
+            background-color: rgba(30, 30, 38, 0.9);
+            border: 4px solid #3a3a4a;
+            border-radius: 12px;
+            box-shadow: 0px 8px 0px #111;
+            box-sizing: border-box;
+            padding: 15px;
+            margin: 10px;
+        }
+
+        .titulo-painel {
+            font-size: 0.9em;
+            margin: -10px -10px 10px -10px;
+            background-color: #3a3a4a;
+            padding: 5px 10px;
+            border-radius: 8px 8px 0 0;
+            color: #ccc;
+        }
+
+        /* Responsividade CSS Grid */
+        #main-container {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr;
+            grid-template-areas: "quiz progresso temas";
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #pnl-quiz { grid-area: quiz; }
+        #pnl-centro { grid-area: progresso; display: flex; flex-direction: column; }
+        #pnl-temas-ext { grid-area: temas; }
+
+        @media (max-width: 1100px) {
+            #main-container {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "quiz"
+                    "progresso"
+                    "temas";
+            }
+            #pnl-centro { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .col-centro { flex: 1; min-width: 300px; }
+        }
+
+        /* 2. PAINEL PRINCIPAL DO QUIZ */
+        #header-quiz {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #titulo-principal {
+            font-size: 2em;
+            margin: 0;
+            color: white;
+            text-shadow: 3px 3px 0 #000;
+        }
+
+        #sub-titulo {
+            font-size: 1.2em;
+            margin: 5px 0;
+            color: #ccc;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        #quadro-jogo {
+            aspect-ratio: 16 / 9;
+            background-color: #387a56; /* Verde grama */
+            border: 10px solid #5c3e32; /* Bordas marrons grossas */
+            border-radius: 16px;
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+        }
+
+        #caixa-pergunta {
+            background-color: white;
+            color: black;
+            padding: 15px;
+            border-radius: 10px;
+            border: 4px solid #5c3e32;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            width: 80%;
+            margin-bottom: 10px;
+        }
+
+        #cronometro {
+            font-size: 1.3em;
             color: white;
-            overflow-x: hidden;
-            box-sizing: border-box;
-            user-select: none;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
 
-        h2 {
-            margin: 5px 0 15px 0;
-            text-shadow: 2px 2px #000;
-            font-size: 28px;
-        }
-
-        /* Container Principal que divide Tela do Jogo e Menu da Loja */
-        #conteudo-principal {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            max-width: 1200px;
+        /* Plano de fundo interno avatares neon */
+        #neon-background {
+            position: absolute;
             width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: flex-end;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        #silhueta-ela, #silhueta-ele {
+            width: 150px;
+            height: 250px;
+            background-color: #111;
+            margin: 0 50px;
+            position: relative;
+        }
+
+        .neon-coracao {
+            position: absolute;
+            top: -50px;
+            left: -25px;
+            width: 200px;
+            height: 200px;
+            border: 6px solid transparent;
+            border-top-color: #ff6b81;
+            border-radius: 50% 50% 0 0;
+            transform: rotate(-45deg);
+            filter: drop-shadow(0 0 5px #ff6b81) drop-shadow(0 0 10px #ff6b81);
+            animation: pulsacaoNeon 1.5s infinite alternate ease-in-out;
+        }
+
+        .neon-coracao.externo {
+            width: 220px; height: 220px; top: -60px; left: -35px;
+        }
+
+        @keyframes pulsacaoNeon {
+            from { opacity: 0.5; filter: drop-shadow(0 0 3px #ff6b81); }
+            to { opacity: 1; filter: drop-shadow(0 0 8px #ff6b81) drop-shadow(0 0 15px #ff6b81); }
+        }
+
+        /* Painéis de resposta duplos */
+        #zona-respostas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            position: relative;
+            z-index: 2; /* Acima do neon */
+        }
+
+        .pnl-resposta {
+            background-color: #fce4ec; /* Rosa pastel */
+            border-radius: 12px;
+            border: 4px solid #5c3e32;
+            padding: 10px;
+            box-sizing: border-box;
+            color: black;
+            position: relative;
+        }
+
+        .mini-avatar-circulo {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #111;
+            top: -15px;
+            border: 3px solid #5c3e32;
+        }
+
+        #pnl-ela .mini-avatar-circulo { left: 10px; background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="40" fill="%235c3e32" /%3E%3Ccircle cx="50" cy="40" r="20" fill="%23fce4ec" /%3E%3Cpath d="M 20,80 Q 50,60 80,80" fill="%23fce4ec" stroke="%23fce4ec" /%3E%3C/svg%3E'); background-size: cover; }
+        #pnl-ele .mini-avatar-circulo { right: 10px; background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="40" fill="%235c3e32" /%3E%3Ccircle cx="50" cy="40" r="20" fill="%23d1c4e9" /%3E%3Cpath d="M 20,80 Q 50,60 80,80" fill="%23d1c4e9" stroke="%23d1c4e9" /%3E%3C/svg%3E'); background-size: cover; }
+
+        .lista-opcoes {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .btn-opcao {
+            background-color: white;
+            color: black;
+            border: 3px solid #ccc;
+            border-radius: 20px;
+            padding: 8px 15px;
+            text-align: left;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: border-color 0.1s;
+            position: relative;
+        }
+
+        .btn-opcao:hover {
+            border-color: #999;
+        }
+
+        .btn-opcao.selecionado {
+            border-color: #ffd700 !important; /* Borda amarela de destaque */
+            box-shadow: 0 0 5px #ffd700;
+        }
+
+        .icone-indicativo {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1em;
+        }
+
+        /* 3. PAINÉIS DE STATUS E PROGRESSO */
+        .grid-conquistas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .pnl-insignia {
+            background-color: #2a2a35;
+            border: 3px solid #4a4a5a;
+            border-radius: 8px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .insignia-icone {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .estrela-contador {
+            color: #ffd700; /* Dourado */
+            font-size: 0.9em;
+        }
+
+        /* Painel Controle Crítico */
+        #pnl-controle {
+            background-color: #fce4ec; /* Rosa suave */
+            color: black;
+        }
+
+        #pnl-controle .titulo-painel {
+            background-color: #f48fb1;
+            color: white;
+        }
+
+        .lista-critica {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .item-critico {
+            font-size: 1.8em;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Painel Pontos Bônus */
+        #pnl-bonus {
+            background: linear-gradient(to bottom, #ffd700, #b8860b);
+            border: 4px solid #111;
+            color: black;
+            text-align: center;
+            padding: 10px;
+        }
+
+        #pnl-bonus .titulo-painel { display: none; }
+
+        #txt-bonus {
+            font-size: 1.8em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .coracao-pisca {
+            font-size: 0.8em;
+            animation: piscaBonus 1s infinite alternate ease-in-out;
+        }
+
+        @keyframes piscaBonus {
+            from { color: #f48fb1; opacity: 1; }
+            to { color: #fff; opacity: 0.5; }
+        }
+
+        /* 4. PLACARES E MENU DE TEMAS */
+        .rank-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .rank-pts { color: #ffd700; }
+
+        .item-destaque {
+            color: #ffd700 !important;
+            font-weight: bold;
+            font-size: 1.1em;
+            border-top: 2px dashed #4a4a5a;
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+
+        /* Menu de temas */
+        .menu-temas {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-tema {
+            background: linear-gradient(to bottom, #d81b60, #ad1457);
+            color: white;
+            border: 4px solid #3a3a4a;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0px 5px 0px #111;
+            position: relative;
+            transition: box-shadow 0.1s, transform 0.1s;
+        }
+
+        .btn-tema:active {
+            box-shadow: 0px 2px 0px #111;
+            transform: translateY(3px);
+        }
+
+        .btn-tema::after {
+            content: '>';
+            position: absolute;
+            right: 15px;
+        }
+
+        /* 5. CONTROLES VIRTUAIS INFERIORES */
+        #controles-inferiores {
+            grid-column: 1 / span 3; /* Ocupa toda a largura */
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 20px;
+            background-color: #2a2a35;
+            border-top: 6px solid #3a3a4a;
+            box-shadow: 0px -5px 15px rgba(0,0,0,0.5);
+            width: 100%;
+            box-sizing: border-box;
         }
 
         @media (max-width: 900px) {
-            #conteudo-principal {
-                flex-direction: column;
-                align-items: center;
-            }
+            #controles-inferiores { flex-direction: column; gap: 20px; }
         }
 
-        #jogo-container {
-            position: relative;
-            background-color: #387a56; 
-            border: 5px solid #2e241f;
-            border-radius: 12px;
-            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.6);
-        }
-
-        canvas {
-            display: block;
-            background-color: #55b67e; 
-            image-rendering: pixelated;
-            max-width: 100%;
-            width: 550px;
-            height: 380px;
-        }
-
-        /* --- SISTEMA DA LOJA --- */
-        #loja-container {
-            background: #1e1e26;
-            border: 4px solid #3a3a4a;
-            border-radius: 12px;
-            width: 380px;
-            padding: 15px;
-            box-sizing: border-box;
-            box-shadow: 0px 8px 20px rgba(0,0,0,0.5);
-        }
-
-        .topo-loja {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #3a3a4a;
-            padding-bottom: 10px;
-        }
-
-        .contador-moedas {
-            background: #ffd700;
-            color: #111;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 3px 0 #b89200;
-        }
-
-        .abas-loja {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .aba-item {
-            background: #2a2a35;
-            border: 2px solid #444;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
+        /* D-pad Virtual */
+        #zona-dpad {
             display: flex;
             align-items: center;
             gap: 15px;
-            font-weight: bold;
-            transition: 0.2s;
-            font-size: 15px;
+            color: #ccc;
         }
 
-        .aba-item:hover {
-            background: #353545;
-            border-color: #ffd700;
-        }
-
-        .aba-icone {
-            font-size: 20px;
-        }
-
-        /* --- CONTROLES VIRTUAIS --- */
-        #paineis-controle {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            max-width: 950px;
-            margin-top: 20px;
-            padding: 0 10px;
-            box-sizing: border-box;
-        }
-
-        .D-pad {
+        .dpad-cruz {
             display: grid;
-            grid-template-columns: repeat(3, 60px);
-            grid-template-rows: repeat(3, 60px);
-            gap: 8px;
+            grid-template-columns: repeat(3, 40px);
+            grid-template-rows: repeat(3, 40px);
+            gap: 5px;
         }
 
-        .btn-game {
-            background: #3e322a;
-            border: 2px solid #fff;
-            border-radius: 10px;
+        .btn-seta {
+            background-color: #5c3e32;
             color: white;
+            border: 3px solid #111;
+            font-size: 1.2em;
             font-weight: bold;
-            font-size: 22px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 5px #251c17;
             cursor: pointer;
+            box-shadow: 0 3px 0 #111;
         }
 
-        .btn-game:active {
-            transform: translateY(4px);
-            box-shadow: 0 1px #251c17;
+        .btn-seta:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #111;
         }
 
-        .btn-cima { grid-column: 2; grid-row: 1; }
-        .btn-esquerda { grid-column: 1; grid-row: 2; }
-        .btn-baixo { grid-column: 2; grid-row: 2; }
-        .btn-direita { grid-column: 3; grid-row: 2; }
+        .seta-cima { grid-column: 2; grid-row: 1; }
+        .seta-baixo { grid-column: 2; grid-row: 3; }
+        .seta-esq { grid-column: 1; grid-row: 2; }
+        .seta-dir { grid-column: 3; grid-row: 2; }
 
-        .botoes-acao {
+        /* Botões de Ação de Comando */
+        #zona-acoes {
             display: flex;
-            align-items: center;
-            gap: 20px;
+            gap: 30px;
         }
 
-        .btn-acao {
-            width: 80px;
-            height: 80px;
+        .btn-comando {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            font-size: 15px;
-            font-family: inherit;
+            color: white;
+            border: 5px solid #111;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #111;
+            transition: box-shadow 0.1s, transform 0.1s;
         }
+
+        .btn-comando:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #111;
+        }
+
+        #btn-confirmar { background-color: #2980b9; } /* Azul brilhante */
+        #btn-confirmar:hover { background-color: #3498db; }
+
+        #btn-pista { background-color: #27ae60; } /* Verde vibrante */
+        #btn-pista:hover { background-color: #2ecc71; }
+
     </style>
 </head>
 <body>
 
-    <h2>Nosso Mundo</h2>
-
-    <div id="conteudo-principal">
-        <div id="jogo-container">
-            <canvas id="telaJogo" width="800" height="550"></canvas>
-        </div>
-
-        <div id="loja-container">
-            <div class="topo-loja">
-                <span style="font-weight: bold; color: #ffd700;">LOJA VIRTUAL</span>
-                <div class="contador-moedas" id="txt-moedas">54 G$ 🪙</div>
+    <div id="main-container">
+        
+        <div id="pnl-quiz">
+            <div id="header-quiz">
+                <h1 id="titulo-principal">QUIZ DE CASAL - NOSSO MUNDO</h1>
+                <h2 id="sub-titulo">PONTUACAO ATUAL</h2>
             </div>
-            <div class="abas-loja">
-                <div class="aba-item" onclick="comprarItem('Casa')">
-                    <span class="aba-icone">🏠</span> <span>CASAS</span>
+            
+            <div id="quadro-jogo">
+                <div id="caixa-pergunta">CARREGANDO PERGUNTA...</div>
+                
+                <div id="cronometro">TEMPO RESTANTE: <span id="tempo">15S</span></div>
+                
+                <div id="neon-background">
+                    <div id="silhueta-ela">
+                        <div class="neon-coracao"></div>
+                        <div class="neon-coracao externo"></div>
+                    </div>
+                    <div id="silhueta-ele">
+                        <div class="neon-coracao"></div>
+                        <div class="neon-coracao externo"></div>
+                    </div>
                 </div>
-                <div class="aba-item" onclick="comprarItem('Animal')">
-                    <span class="aba-icone">🐶</span> <span>ANIMAIS</span>
-                </div>
-                <div class="aba-item" onclick="comprarItem('Móvel')">
-                    <span class="aba-icone">🪑</span> <span>MÓVEIS</span>
-                </div>
-                <div class="aba-item" onclick="comprarItem('Cerca')">
-                    <span class="aba-icone">🪟</span> <span>CERCAS</span>
-                </div>
-                <div class="aba-item" onclick="comprarItem('Estrada')">
-                    <span class="aba-icone">🛣️</span> <span>ESTRADAS</span>
+                
+                <div id="zona-respostas">
+                    <div class="pnl-resposta" id="pnl-ela">
+                        <div class="mini-avatar-circulo"></div>
+                        <div class="lista-opcoes" id="opcoes-ela">
+                            </div>
+                    </div>
+                    
+                    <div class="pnl-resposta" id="pnl-ele">
+                        <div class="mini-avatar-circulo"></div>
+                        <div class="lista-opcoes" id="opcoes-ele">
+                            </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div id="paineis-controle">
-        <div class="D-pad">
-            <button class="btn-game btn-cima" id="btn-w">↑</button>
-            <button class="btn-game btn-esquerda" id="btn-a">←</button>
-            <button class="btn-game btn-baixo" id="btn-s">↓</button>
-            <button class="btn-game btn-direita" id="btn-d">→</button>
+        <div id="pnl-centro">
+            <div class="col-centro">
+                <div class="painel" id="pnl-categoria">
+                    <div class="titulo-painel">CATEGORIA: CURIOSIDADES</div>
+                    <div class="grid-conquistas">
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">💖</span>
+                            <span class="estrela-contador">★ x<span id="star-romance">0</span></span>
+                        </div>
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">🎭</span>
+                            <span class="estrela-contador">★ x<span id="star-diversao">0</span></span>
+                        </div>
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">🧠</span>
+                            <span class="estrela-contador">★ x<span id="star-memoria">0</span></span>
+                        </div>
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">✈️</span>
+                            <span class="estrela-contador">★ x<span id="star-futuro">0</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="painel" id="pnl-progresso">
+                    <div class="titulo-painel">NOSSO PROGRESSO</div>
+                    <div class="grid-conquistas">
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">💖</span>
+                            <span class="estrela-contador">★ x<span id="star-p-romance">0</span></span>
+                        </div>
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">🎭</span>
+                            <span class="estrela-contador">★ x<span id="star-p-diversao">0</span></span>
+                        </div>
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">🧠</span>
+                            <span class="estrela-contador">★ x<span id="star-p-memoria">0</span></span>
+                        </div>
+                        <div class="pnl-insignia">
+                            <span class="insignia-icone">✈️</span>
+                            <span class="estrela-contador">★ x<span id="star-p-futuro">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-centro">
+                <div class="painel" id="pnl-controle">
+                    <div class="titulo-painel">CONTROLE CRITICO</div>
+                    <div class="lista-critica">
+                        <div class="item-critico">💖🎭🧠✈️✨</div>
+                        <div class="item-critico">🍝🍕🍲🍔🍟</div>
+                        <div class="item-critico">⭐✨🌟🐶🐱🐾</div>
+                    </div>
+                </div>
+
+                <div class="painel" id="pnl-bonus">
+                    <div class="titulo-painel">PONTOS BONUS</div>
+                    <div id="txt-bonus">
+                        <span class="coracao-pisca">💖</span>
+                        <span id="vlr-bonus">12 PB</span>
+                        <span class="coracao-pisca">💖</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="botoes-acao">
-            <button class="btn-game btn-acao" id="btn-pulo" style="background: #2980b9;">PULAR</button>
-            <button class="btn-game btn-acao" id="btn-usar" style="background: #27ae60;">PEGAR</button>
+
+        <div id="pnl-temas-ext">
+            <div class="painel" id="pnl-leaderboard">
+                <div class="titulo-painel">TEMAS DO JOGO / LEADERBOARD</div>
+                <div id="rank-lista">
+                    <div class="rank-item"><span>CASAL 1:</span> <span class="rank-pts">125 PTS</span></div>
+                    <div class="rank-item"><span>CASAL 1:</span> <span class="rank-pts">125 PTS</span></div>
+                    <div class="rank-item"><span>CASAL 2:</span> <span class="rank-pts">98 PTS</span></div>
+                    <div class="rank-item item-destaque"><span>NOS:</span> <span class="rank-pts" id="pts-nos">78 PTS</span></div>
+                </div>
+            </div>
+
+            <div class="painel" id="pnl-menu-temas">
+                <div class="titulo-painel">MENU DE TEMAS</div>
+                <div class="menu-temas">
+                    <button class="btn-tema" id="btn-tema-1">1. ROMANCE 💖</button>
+                    <button class="btn-tema" id="btn-tema-2">2. DIVERSAO 🎭</button>
+                    <button class="btn-tema" id="btn-tema-3">3. MEMORIA 🧠</button>
+                    <button class="btn-tema" id="btn-tema-4">4. FUTURO ✈️</button>
+                    <button class="btn-tema" id="btn-tema-5">5. ESPECIAIS ✨</button>
+                </div>
+            </div>
         </div>
+
+        <div id="controles-inferiores">
+            <div id="zona-dpad">
+                <div class="dpad-cruz">
+                    <button class="btn-seta seta-cima">↑</button>
+                    <button class="btn-seta seta-esq">←</button>
+                    <button class="btn-seta seta-baixo">↓</button>
+                    <button class="btn-seta seta-dir">→</button>
+                </div>
+                <span id="txt-navegar">NAVEGAR</span>
+            </div>
+
+            <div id="zona-acoes">
+                <button class="btn-comando" id="btn-confirmar">CONFIRMAR RESPOSTA</button>
+                <button class="btn-comando" id="btn-pista">USAR PISTA</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        const canvas = document.getElementById("telaJogo");
-        const ctx = canvas.getContext("2d");
+        // 6. LOGICA E DINAMICA DE JOGO
 
-        let moedas = 54;
-
-        // Gerando os Avatares em formato de Código de Vetor Seguro (SVG) para evitar bugs de carregamento de imagem externa
-        const avatarBonecaSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><circle cx="50" cy="40" r="22" fill="%235c3a21"/><circle cx="50" cy="38" r="16" fill="%237c5236"/><circle cx="43" cy="35" r="3" fill="black"/><circle cx="57" cy="35" r="3" fill="black"/><path d="M 44 46 Q 50 50 56 46" stroke="black" stroke-width="2" fill="none"/><path d="M 25 15 Q 50 -5 75 15 Q 85 40 75 80 Q 50 60 25 80 Q 15 40 25 15" fill="%231a1a1a"/><path d="M 30 70 L 70 70 L 75 115 L 25 115 Z" fill="%231a4cb0"/><rect x="38" y="115" width="8" height="20" fill="%237c5236"/><rect x="54" y="115" width="8" height="20" fill="%237c5236"/><rect x="35" y="130" width="12" height="8" rx="4" fill="white"/><rect x="53" y="130" width="12" height="8" rx="4" fill="white"/></svg>`;
-
-        const avatarMeninoSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150"><circle cx="50" cy="40" r="17" fill="%231a1a1a"/><circle cx="50" cy="42" r="15" fill="%236e472b"/><circle cx="42" cy="40" r="4" stroke="%232980b9" stroke-width="2" fill="none"/><circle cx="58" cy="40" r="4" stroke="%232980b9" stroke-width="2" fill="none"/><line x1="46" y1="40" x2="54" y2="40" stroke="%232980b9" stroke-width="2"/><path d="M 45 50 Q 50 53 55 50" stroke="black" stroke-width="1.5" fill="none"/><rect x="30" y="65" width="40" height="40" fill="white"/><rect x="33" y="105" width="14" height="20" fill="%23c2b280"/><rect x="53" y="105" width="14" height="20" fill="%23c2b280"/><rect x="31" y="125" width="16" height="10" rx="4" fill="%2356a0d3"/><rect x="51" y="125" width="16" height="10" rx="4" fill="%2356a0d3"/></svg>`;
-
-        const imgJogador1 = new Image();
-        imgJogador1.src = avatarBonecaSVG;
-
-        const imgJogador2 = new Image();
-        imgJogador2.src = avatarMeninoSVG;
-
-        // Lista de construções colocadas no mapa
-        const construcoesNoMapa = [];
-
-        const jogador1 = {
-            x: 220, y: 260, z: 0, velY_pulo: 0, gravidade: 0.6, velocidade: 5,
-            largura: 65, altura: 110, andando: false, estaPulando: false, escalaLeve: 1
+        // Banco de Dados de Perguntas
+        const perguntas = {
+            1: [ // ROMANCE
+                { p: "Qual é o prato favorito do seu parceiro?", r: "A", o: ["LASANHA 🍝", "PIZZA 🍕", "STROGONOFF 🍲", "HAMBÚRGUER 🍔"] },
+                { p: "Onde foi o primeiro encontro?", r: "C", o: ["CINEMA 🎬", "PARQUE 🌳", "RESTAURANTE 🍽️", "PRAIA 🏖️"] }
+            ],
+            2: [ // DIVERSÃO
+                { p: "Qual filme vocês mais assistiram juntos?", r: "B", o: ["VINGADORES 🎬", "STAR WARS 🚀", "HARRY POTTER ✨", "SHREK 💚"] },
+                { p: "Qual o jogo de videogame favorito do parceiro?", r: "D", o: ["MARIO 🍄", "ZELDA ⚔️", "FIFA ⚽", "MINECRAFT 🧱"] }
+            ],
+            3: [ // MEMÓRIA
+                { p: "Quem é mais propenso a esquecer aniversários?", r: "A", o: ["ELA 👸", "ELE 👨", "AMBOS 🤷‍♂️🤷‍♀️", "NENHUM 🧠"] },
+                { p: "Qual é o apelido de infância do parceiro?", r: "B", o: ["GABY 🎀", "BETINHO 👶", "DU ✌️", "CACÁ 🍫"] }
+            ],
+            4: [ // FUTURO
+                { p: "Qual é o próximo destino de viagem dos sonhos?", r: "C", o: ["PARIS 🥐", "JAPÃO ⛩️", "MALDIVAS 🏝️", "NEW YORK 🗽"] },
+                { p: "Quantos filhos o parceiro gostaria de ter?", r: "A", o: ["UM 👶", "DOIS 🧒🧒", "TRES 🧑🧑🧑", "NENHUM 🐶"] }
+            ],
+            5: [ // ESPECIAIS
+                { p: "Qual é a maior virtude do seu parceiro?", r: "D", o: ["PACIÊNCIA 😌", "SINCERIDADE ✨", "INTELIGÊNCIA 🧠", "SENSO DE HUMOR 😂"] },
+                { p: "Qual hábito do parceiro você acha mais fofo?", r: "C", o: ["MANEIRA DE RIR 😂", "FALAR DORMINDO 💤", "JEITO DE ESPREGUIÇAR 🦁", "CONTARE HISTÓRIAS 💬"] }
+            ]
         };
 
-        const jogador2 = {
-            x: 480, y: 250, z: 0, largura: 65, altura: 110, andando: false, escalaLeve: 1
-        };
+        const categoriasNomes = { 1: "ROMANCE", 2: "DIVERSÃO", 3: "MEMÓRIA", 4: "FUTURO", 5: "ESPECIAIS" };
+        const categoriasÍcones = { 1: "💖", 2: "🎭", 3: "🧠", 4: "✈️", 5: "✨" };
 
-        const botoes = { w: false, a: false, s: false, d: false, pulo: false };
+        let categoriaAtual = 1;
+        let perguntaIndice = 0;
+        let tempoRestante = 15;
+        let timerInterval;
+        let pontosNos = 78;
+        let pontosBonus = 12;
+        let pistaUsadaNaRodada = false;
 
-        // Controles Teclado
-        window.addEventListener("keydown", (e) => { mapearTeclado(e.key.toLowerCase(), true); });
-        window.addEventListener("keyup", (e) => { mapearTeclado(e.key.toLowerCase(), false); });
+        // Elementos DOM
+        const elCaixaPergunta = document.getElementById("caixa-pergunta");
+        const elTempo = document.getElementById("tempo");
+        const elOpcoesEla = document.getElementById("opcoes-ela");
+        const elOpcoesEle = document.getElementById("opcoes-ele");
+        const elPontosNos = document.getElementById("pts-nos");
+        const elPontosBonus = document.getElementById("vlr-bonus");
+        const elCategoriaTitulo = document.querySelector("#pnl-categoria .titulo-painel");
 
-        function mapearTeclado(tecla, status) {
-            if (tecla === "arrowup" || tecla === "w") botoes.w = status;
-            if (tecla === "arrowdown" || tecla === "s") botoes.s = status;
-            if (tecla === "arrowleft" || tecla === "a") botoes.a = status;
-            if (tecla === "arrowright" || tecla === "d") botoes.d = status;
-            if (tecla === " " || tecla === "spacebar") botoes.pulo = status;
+        // Mecânica Síncrona Local
+        function renderizarPergunta() {
+            pistaUsadaNaRodada = false;
+            document.getElementById("btn-pista").disabled = false;
+            document.getElementById("btn-pista").style.opacity = 1;
+
+            const dados = perguntas[categoriaAtual][perguntaIndice];
+            if (!dados) return; // Erro de carregamento
+
+            elCaixaPergunta.textContent = dados.p.toUpperCase();
+            elOpcoesEla.innerHTML = "";
+            elOpcoesEle.innerHTML = "";
+
+            const alternativas = ["A", "B", "C", "D"];
+
+            for (let i = 0; i < 4; i++) {
+                // Renderizar para ELA
+                const btnEla = document.createElement("button");
+                btnEla.className = "btn-opcao";
+                btnEla.id = `opcao-ela-${alternativas[i]}`;
+                btnEla.textContent = `${alternativas[i]}) ${dados.o[i]}`;
+                btnEla.onclick = () => selecionarOpcao('ela', alternativas[i]);
+                elOpcoesEla.appendChild(btnEla);
+
+                // Renderizar para ELE
+                const btnEle = document.createElement("button");
+                btnEle.className = "btn-opcao";
+                btnEle.id = `opcao-ele-${alternativas[i]}`;
+                btnEle.textContent = `${alternativas[i]}) ${dados.o[i]}`;
+                btnEle.onclick = () => selecionarOpcao('ele', alternativas[i]);
+                elOpcoesEle.appendChild(btnEle);
+            }
+
+            elCategoriaTitulo.textContent = `CATEGORIA: ${categoriasNomes[categoriaAtual]}`;
+            atualizarContadoresCategoria();
+            resetTimer();
         }
 
-        // Toques celulares
-        const configurarBotaoCelular = (id, propriedade) => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.addEventListener("touchstart", (e) => { e.preventDefault(); botoes[propriedade] = true; });
-                el.addEventListener("touchend", (e) => { e.preventDefault(); botoes[propriedade] = false; });
-            }
-        };
-        configurarBotaoCelular("btn-w", "w");
-        configurarBotaoCelular("btn-s", "s");
-        configurarBotaoCelular("btn-a", "a");
-        configurarBotaoCelular("btn-d", "d");
-        configurarBotaoCelular("btn-pulo", "pulo");
+        let opcaoSelecionadaEla = null;
+        let opcaoSelecionadaEle = null;
 
-        // Sistema para comprar itens na loja e spawnar no cenário
-        function comprarItem(tipo) {
-            if (moedas >= 10) {
-                moedas -= 10;
-                document.getElementById("txt-moedas").innerText = `${moedas} G$ 🪙`;
-                
-                // Define o emoji visual do item comprado
-                let icone = "🏠";
-                if(tipo === "Animal") icone = "🐶";
-                if(tipo === "Móvel") icone = "🪑";
-                if(tipo === "Cerca") icone = "🪵";
-                if(tipo === "Estrada") icone = "🛣️";
-
-                // Coloca o item em uma posição aleatória perto do centro do mapa
-                construcoesNoMapa.push({
-                    x: 150 + Math.random() * 450,
-                    y: 100 + Math.random() * 300,
-                    tipo: tipo,
-                    emoji: icone
-                });
+        function selecionarOpcao(jogador, alternativa) {
+            // Desmarcar anterior
+            if (jogador === 'ela') {
+                if (opcaoSelecionadaEla) document.getElementById(`opcao-ela-${opcaoSelecionadaEla}`).classList.remove("selecionado");
+                opcaoSelecionadaEla = alternativa;
             } else {
-                alert("Moedas insuficientes!");
+                if (opcaoSelecionadaEle) document.getElementById(`opcao-ele-${opcaoSelecionadaEle}`).classList.remove("selecionado");
+                opcaoSelecionadaEle = alternativa;
             }
+
+            // Marcar novo
+            document.getElementById(`opcao-${jogador}-${alternativa}`).classList.add("selecionado");
+            
+            // Feedback visual D-pad (Apenas visual, sem mecânica associada)
+            const dpad = document.querySelector(".dpad-cruz");
+            dpad.style.borderColor = (jogador === 'ela') ? '#ff6b81' : '#d1c4e9'; // Rosa p/ ela, Roxo p/ ele
+            setTimeout(() => dpad.style.borderColor = '#111', 150);
         }
 
-        function atualizarJogo() {
-            jogador1.andando = false;
-
-            if (botoes.w) { jogador1.y -= jogador1.velocidade; jogador1.andando = true; }
-            else if (botoes.s) { jogador1.y += jogador1.velocidade; jogador1.andando = true; }
-            if (botoes.a) { jogador1.x -= jogador1.velocidade; jogador1.andando = true; }
-            else if (botoes.d) { jogador1.x += jogador1.velocidade; jogador1.andando = true; }
-
-            if (botoes.pulo && !jogador1.estaPulando) {
-                jogador1.velY_pulo = -10; 
-                jogador1.estaPulando = true;
+        // Validação de Afinidade
+        document.getElementById("btn-confirmar").onclick = function() {
+            if (!opcaoSelecionadaEla || !opcaoSelecionadaEle) {
+                alert("OS DOIS PRECISAM SELECIONAR UMA RESPOSTA!");
+                return;
             }
 
-            if (jogador1.estaPulando) {
-                jogador1.z -= jogador1.velY_pulo;
-                jogador1.velY_pulo += jogador1.gravidade; 
-                if (jogador1.z <= 0) { jogador1.z = 0; jogador1.estaPulando = false; }
-            }
+            confirmarResposta();
+        };
 
-            // Animação Fofa de Respiração
-            if (!jogador1.andando) {
-                jogador1.escalaLeve = 1 + Math.sin(Date.now() * 0.005) * 0.02;
+        function confirmarResposta() {
+            clearInterval(timerInterval);
+
+            // Verifica se as escolhas são iguais
+            if (opcaoSelecionadaEla === opcaoSelecionadaEle) {
+                // Acerto: Somas pontos e progressos
+                somarPontos();
+                animacaoSucesso();
             } else {
-                jogador1.escalaLeve = 1;
+                // Erro: Feedback visual negativo
+                animacaoErro();
             }
-            jogador2.escalaLeve = 1 + Math.sin(Date.now() * 0.004) * 0.02;
 
-            // Restrição de limites da tela
-            if (jogador1.x < 0) jogador1.x = 0;
-            if (jogador1.y < 40) jogador1.y = 40; 
-            if (jogador1.x > canvas.width - jogador1.largura) jogador1.x = canvas.width - jogador1.largura;
-            if (jogador1.y > canvas.height - jogador1.altura) jogador1.y = canvas.height - jogador1.altura;
+            resetSelecoes();
+            setTimeout(proximaPergunta, 1500); // Aguarda animação
+        }
 
-            // Renderizar fundo limpo de grama
-            ctx.fillStyle = "#55b67e"; 
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        function somarPontos() {
+            pontosNos += 10;
+            pontosBonus += 2;
+            elPontosNos.textContent = `${pontosNos} PTS`;
+            elPontosBonus.textContent = `${pontosBonus} PB`;
+            
+            // Incrementa contadores de estrela na categoria e progresso
+            incrementarEstrelas();
+        }
 
-            // Desenhar os itens comprados da loja no chão
-            ctx.font = "45px Arial";
-            ctx.textAlign = "center";
-            construcoesNoMapa.forEach(item => {
-                ctx.fillText(item.emoji, item.x, item.y);
+        function animacaoSucesso() {
+            elCaixaPergunta.style.color = "#27ae60"; // Verde
+            elCaixaPergunta.textContent = "ACERTARAM! +10 PONTOS!";
+            
+            // Corações concêntricos neon piscam mais rápido
+            document.querySelectorAll(".neon-coracao").forEach(el => {
+                el.style.animationDuration = '0.5s';
+            });
+            
+            // Sombra do verde grama pisca
+            document.getElementById("quadro-jogo").style.boxShadow = "0 0 20px #2ecc71";
+
+            setTimeout(() => {
+                elCaixaPergunta.style.color = "black";
+                document.querySelectorAll(".neon-coracao").forEach(el => { el.style.animationDuration = '1.5s'; });
+                document.getElementById("quadro-jogo").style.boxShadow = "none";
+            }, 1000);
+        }
+
+        function animacaoErro() {
+            elCaixaPergunta.style.color = "#e74c3c"; // Vermelho suave
+            elCaixaPergunta.textContent = `DIVIRGIRAM! ELA: ${opcaoSelecionadaEla}, ELE: ${opcaoSelecionadaEle}`;
+
+            // Sombra do verde grama pisca vermelho
+            document.getElementById("quadro-jogo").style.boxShadow = "0 0 20px #e74c3c";
+
+            setTimeout(() => {
+                elCaixaPergunta.style.color = "black";
+                document.getElementById("quadro-jogo").style.boxShadow = "none";
+            }, 1000);
+        }
+
+        // Sistema de Pistas
+        document.getElementById("btn-pista").onclick = function() {
+            if (pistaUsadaNaRodada) return; // Limite de 1 por rodada
+
+            usarPista();
+        };
+
+        function usarPista() {
+            pistaUsadaNaRodada = true;
+            document.getElementById("btn-pista").disabled = true;
+            document.getElementById("btn-pista").style.opacity = 0.5;
+
+            const dados = perguntas[categoriaAtual][perguntaIndice];
+            const alternativas = ["A", "B", "C", "D"];
+            
+            // Identifica as alternativas incorretas
+            const incorretas = alternativas.filter(alt => alt !== dados.r);
+            
+            // Embaralha incorretas e pega as duas primeiras
+            const incorretasParaEliminar = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
+
+            // Elimina (esconde) visualmente em ambos os painéis
+            incorretasParaEliminar.forEach(alt => {
+                const btnEla = document.getElementById(`opcao-ela-${alt}`);
+                const btnEle = document.getElementById(`opcao-ele-${alt}`);
+                if (btnEla) {
+                    btnEla.style.opacity = 0.2;
+                    btnEla.disabled = true;
+                    btnEla.classList.remove("selecionado");
+                    if (opcaoSelecionadaEla === alt) opcaoSelecionadaEla = null;
+                }
+                if (btnEle) {
+                    btnEle.style.opacity = 0.2;
+                    btnEle.disabled = true;
+                    btnEle.classList.remove("selecionado");
+                    if (opcaoSelecionadaEle === alt) opcaoSelecionadaEle = null;
+                }
             });
 
-            // Sombras realistas embaixo dos bonecos
-            ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
-            ctx.beginPath();
-            ctx.ellipse(jogador1.x + (jogador1.largura/2), jogador1.y + jogador1.altura - 2, 24, 7, 0, 0, Math.PI * 2);
-            ctx.ellipse(jogador2.x + (jogador2.largura/2), jogador2.y + jogador2.altura - 2, 24, 7, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Desenhar Personagem 1 (Boneca) com efeito Z do Pulo
-            if (imgJogador1.complete) {
-                ctx.save();
-                ctx.translate(jogador1.x, jogador1.y - jogador1.z);
-                ctx.drawImage(imgJogador1, 0, 0, jogador1.largura, jogador1.altura * jogador1.escalaLeve);
-                ctx.restore();
-            }
-
-            // Desenhar Personagem 2 (Menino)
-            if (imgJogador2.complete) {
-                ctx.save();
-                ctx.translate(jogador2.x, jogador2.y - jogador2.z);
-                ctx.drawImage(imgJogador2, 0, 0, jogador2.largura, jogador2.altura * jogador2.escalaLeve);
-                ctx.restore();
-            }
-
-            requestAnimationFrame(atualizarJogo);
+            // Feedback visual botão pista
+            document.getElementById("btn-pista").style.boxShadow = "0 0 10px #2ecc71";
+            setTimeout(() => document.getElementById("btn-pista").style.boxShadow = "0 8px 0 #111", 300);
         }
 
-        atualizarJogo();
+        // Temporizador Ativo
+        function resetTimer() {
+            clearInterval(timerInterval);
+            tempoRestante = 15;
+            elTempo.textContent = `${tempoRestante}S`;
+            elTempo.style.color = "white";
+
+            timerInterval = setInterval(() => {
+                tempoRestante--;
+                elTempo.textContent = `${tempoRestante}S`;
+
+                // Urgência visual nos últimos segundos
+                if (tempoRestante <= 5) {
+                    elTempo.style.color = "#e74c3c";
+                    if (tempoRestante % 2 === 0) elTempo.style.visibility = "hidden";
+                    else elTempo.style.visibility = "visible";
+                }
+
+                if (tempoRestante <= 0) {
+                    clearInterval(timerInterval);
+                    elTempo.style.visibility = "visible";
+                    // Se o tempo esgotar, processa como divergência automática
+                    if (!opcaoSelecionadaEla || !opcaoSelecionadaEle) {
+                        opcaoSelecionadaEla = "N/A"; // Gambiarra p/ divergência
+                        opcaoSelecionadaEle = "TEMPO"; 
+                    }
+                    confirmarResposta();
+                }
+            }, 1000);
+        }
+
+        // Interatividade Total
+        document.querySelectorAll(".btn-tema").forEach((btn, index) => {
+            btn.onclick = () => mudarTema(index + 1);
+        });
+
+        function mudarTema(index) {
+            categoriaAtual = index;
+            perguntaIndice = 0; // Reinicia o índice para o novo tema
+            
+            // Feedback visual de clique D-pad
+            const dpad = document.querySelector(".dpad-cruz");
+            dpad.style.borderColor = '#ffd700'; // Amarelo tema
+            setTimeout(() => dpad.style.borderColor = '#111', 150);
+
+            resetSelecoes();
+            renderizarPergunta();
+        }
+
+        // Navegação D-pad visual feedback apenas
+        document.querySelectorAll(".btn-seta").forEach(btn => {
+            btn.onclick = () => {
+                const dpad = document.querySelector(".dpad-cruz");
+                dpad.style.borderColor = '#ccc';
+                setTimeout(() => dpad.style.borderColor = '#111', 150);
+            };
+        });
+
+        // Funções Auxiliares
+        function proximaPergunta() {
+            perguntaIndice++;
+            // Verifica se acabou as perguntas do tema atual
+            if (perguntaIndice >= perguntas[categoriaAtual].length) {
+                // Passa para próximo tema ou cicla
+                perguntaIndice = 0;
+                categoriaAtual++;
+                if (categoriaAtual > 5) categoriaAtual = 1;
+            }
+            renderizarPergunta();
+        }
+
+        function resetSelecoes() {
+            opcaoSelecionadaEla = null;
+            opcaoSelecionadaEle = null;
+            document.querySelectorAll(".btn-opcao").forEach(btn => btn.classList.remove("selecionado"));
+        }
+
+        // Contadores de Estrela
+        const estrelasCategoria = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        const estrelasProgresso = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+        const idsCategoria = { 1: "romance", 2: "diversao", 3: "memoria", 4: "futuro" };
+        const idsProgresso = { 1: "p-romance", 2: "p-diversao", 3: "p-memoria", 4: "p-futuro" };
+
+        function incrementarEstrelas() {
+            // Categoria (reinicia a cada tema/pergunta mas incrementa o total acumulado)
+            estrelasCategoria[categoriaAtual]++;
+            // Progresso (acumulado do jogo)
+            estrelasProgresso[categoriaAtual]++;
+
+            atualizarContadoresCategoria();
+            atualizarContadoresProgresso();
+        }
+
+        function atualizarContadoresCategoria() {
+            // Categoria só mostra p/ temas 1-4. Especial (5) não mostra.
+            if (categoriaAtual <= 4) {
+                const id = idsCategoria[categoriaAtual];
+                document.getElementById(`star-${id}`).textContent = estrelasCategoria[categoriaAtual];
+                
+                // Reinicia os outros contadores visuais da categoria p/ 0
+                for (let cat = 1; cat <= 4; cat++) {
+                    if (cat !== categoriaAtual) {
+                        const otherId = idsCategoria[cat];
+                        document.getElementById(`star-${otherId}`).textContent = 0;
+                    }
+                }
+            } else {
+                // Se tema for especial, todos zerados visualmente na categoria
+                for (let cat = 1; cat <= 4; cat++) {
+                    const otherId = idsCategoria[cat];
+                    document.getElementById(`star-${otherId}`).textContent = 0;
+                }
+            }
+        }
+
+        function atualizarContadoresProgresso() {
+             // Progresso só mostra p/ temas 1-4. Especial (5) não acumula estrela visual.
+            if (categoriaAtual <= 4) {
+                const id = idsProgresso[categoriaAtual];
+                document.getElementById(`star-${id}`).textContent = estrelasProgresso[categoriaAtual];
+            }
+        }
+
+        // Inicialização
+        renderizarPergunta();
+
     </script>
 </body>
 </html>
