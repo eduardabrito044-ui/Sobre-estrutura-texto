@@ -23,16 +23,20 @@
         #jogo-container {
             position: relative;
             text-align: center;
+            background-color: #55b67e; 
+            border: 6px solid #4a3b32;
+            border-radius: 8px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.7);
         }
 
         canvas {
-            border: 6px solid #4a3b32;
-            border-radius: 8px;
+            display: block;
             background-color: #55b67e; 
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.7);
             image-rendering: pixelated;
             max-width: 95vw;
             max-height: 60vh;
+            /* Remove os quadrados cinzas e brancos do fundo automaticamente */
+            mix-blend-mode: multiply; 
         }
 
         /* Controles Virtuais para Celular */
@@ -91,8 +95,8 @@
 </head>
 <body>
 
+    <h2 style="margin-bottom: 10px; text-shadow: 2px 2px #000;">Nosso Mundo</h2>
     <div id="jogo-container">
-        <h2 style="margin-bottom: 10px; text-shadow: 2px 2px #000;">Nosso Mundo</h2>
         <canvas id="telaJogo" width="800" height="500"></canvas>
     </div>
 
@@ -113,52 +117,51 @@
         const canvas = document.getElementById("telaJogo");
         const ctx = canvas.getContext("2d");
 
+        // Carregando as imagens direto dos links das artes oficiais que aprovamos!
         const imgJogador1 = new Image();
-        imgJogador1.src = "jogador1.png"; 
+        imgJogador1.crossOrigin = "anonymous";
+        imgJogador1.src = "https://lh3.googleusercontent.com/d/1O9mB6r0p10g47Y-Qcl_69HovIunF7gKq"; // Link da Boneca Azul
+
         const imgJogador2 = new Image();
-        imgJogador2.src = "jogador2.png"; 
+        imgJogador2.crossOrigin = "anonymous";
+        imgJogador2.src = "https://lh3.googleusercontent.com/d/1BfVlshWv7_W2rFasf8v9K7X8wGgq6k-P"; // Link do Menino de Óculos
 
-        // AJUSTE DOS RECORTES (Pula o título da imagem)
-        const LARGURA_SPRITE = 48; 
-        const ALTURA_SPRITE = 90;  
-        const OFFSET_Y = 120; // Pula os textos "COZY AVATAR" do topo da imagem
+        // Medidas exatas para recortar as imagens horizontais
+        const LARGURA_SPRITE = 256;  
+        const ALTURA_SPRITE = 430;   
+        const OFFSET_Y = 110; // Pula os títulos da imagem
 
-        const DIRECOES = { FRENTE: 0, COSTAS: 1, ESQUERDA: 2, DIREITA: 3 };
+        // Mapeamento das direções baseado na ordem das imagens (Frente, Direita, Costas, Esquerda)
+        const DIRECOES = { FRENTE: 0, DIREITA: 1, COSTAS: 2, ESQUERDA: 3 };
 
-        // Estrutura do Jogador 1 com Física de Pulo e Gravidade
         const jogador1 = {
             x: 200,
-            y: 300,
-            z: 0,               // Altura do pulo (eixo Z falso)
-            velY_pulo: 0,       // Velocidade vertical do pulo
+            y: 200,
+            z: 0,               
+            velY_pulo: 0,       
             gravidade: 0.6,
-            velocidade: 4,
-            larguraTela: 55,
-            alturaTela: 100,
+            velocidade: 5,
+            larguraTela: 70,    
+            alturaTela: 120,    
             direcao: DIRECOES.FRENTE,
-            frameAtual: 0,
-            contadorAnimacao: 0,
             andando: false,
             estaPulando: false,
-            escalaLeve: 1       // Para o efeito de respiração leve (idle)
+            escalaLeve: 1       
         };
 
         const jogador2 = {
-            x: 400,
-            y: 300,
+            x: 450,
+            y: 200,
             z: 0,
-            larguraTela: 55,
-            alturaTela: 100,
+            larguraTela: 70,
+            alturaTela: 120,
             direcao: DIRECOES.FRENTE,
-            frameAtual: 0,
             andando: false,
             escalaLeve: 1
         };
 
-        // Inputs (Teclado + Celular)
         const botoes = { w: false, a: false, s: false, d: false, pulo: false };
 
-        // Eventos Teclado
         window.addEventListener("keydown", (e) => { mapearTeclado(e.key.toLowerCase(), true); });
         window.addEventListener("keyup", (e) => { mapearTeclado(e.key.toLowerCase(), false); });
 
@@ -170,11 +173,12 @@
             if (tecla === " " || tecla === "spacebar") botoes.pulo = status;
         }
 
-        // Eventos Celular (Toque na tela)
         const configurarBotaoCelular = (id, propriedade) => {
             const el = document.getElementById(id);
-            el.addEventListener("touchstart", (e) => { e.preventDefault(); botoes[propriedade] = true; });
-            el.addEventListener("touchend", (e) => { e.preventDefault(); botoes[propriedade] = false; });
+            if(el) {
+                el.addEventListener("touchstart", (e) => { e.preventDefault(); botoes[propriedade] = true; });
+                el.addEventListener("touchend", (e) => { e.preventDefault(); botoes[propriedade] = false; });
+            }
         };
         configurarBotaoCelular("btn-w", "w");
         configurarBotaoCelular("btn-s", "s");
@@ -183,16 +187,14 @@
         configurarBotaoCelular("btn-pulo", "pulo");
 
         function desenharPersonagem(img, dados) {
-            if (img.complete) {
-                let clipX = dados.frameAtual * LARGURA_SPRITE;
-                // Aplica o OFFSET_Y para ignorar o título escrito na imagem
-                let clipY = OFFSET_Y + (dados.direcao * ALTURA_SPRITE);
+            if (img.complete && img.naturalWidth !== 0) {
+                // Multiplica o tamanho do bloco pela direção para andar horizontalmente na folha de sprites
+                let clipX = dados.direcao * LARGURA_SPRITE;
+                let clipY = OFFSET_Y;
 
                 ctx.save();
-                // Efeito visual de pulo: desloca o desenho para cima com base no "z"
                 ctx.translate(dados.x, dados.y - dados.z);
-                
-                // Inventação/respiração leve: Altera levemente a escala de altura quando parado
+
                 ctx.drawImage(
                     img,
                     clipX, clipY, LARGURA_SPRITE, ALTURA_SPRITE,
@@ -205,64 +207,49 @@
         function atualizarJogo() {
             jogador1.andando = false;
 
-            // Movimento
             if (botoes.w) { jogador1.y -= jogador1.velocidade; jogador1.direcao = DIRECOES.COSTAS; jogador1.andando = true; }
             else if (botoes.s) { jogador1.y += jogador1.velocidade; jogador1.direcao = DIRECOES.FRENTE; jogador1.andando = true; }
             if (botoes.a) { jogador1.x -= jogador1.velocidade; jogador1.direcao = DIRECOES.ESQUERDA; jogador1.andando = true; }
-            else if (botoes.d) { jogador1.x += jogador1.velocidade; jogador1.direcao = DIRECOES.DIREITA; jogador1.andando = true; }
+            else if (botoes.d) { Float32Array; jogador1.x += jogador1.velocidade; jogador1.direcao = DIRECOES.DIREITA; jogador1.andando = true; }
 
-            // Lógica do Pulo (Física básica)
             if (botoes.pulo && !jogador1.estaPulando) {
-                jogador1.velY_pulo = -10; // Força do pulo
+                jogador1.velY_pulo = -10; 
                 jogador1.estaPulando = true;
             }
 
             if (jogador1.estaPulando) {
                 jogador1.z -= jogador1.velY_pulo;
-                jogador1.velY_pulo += jogador1.gravidade; // Aplica gravidade
+                jogador1.velY_pulo += jogador1.gravidade; 
 
-                if (jogador1.z <= 0) { // Tocou o chão
+                if (jogador1.z <= 0) { 
                     jogador1.z = 0;
                     jogador1.estaPulando = false;
                 }
             }
 
-            // Animação de Passos vs Respiração Leve (Idle)
-            jogador1.contadorAnimacao++;
-            if (jogador1.andando) {
-                if (jogador1.contadorAnimacao >= 8) {
-                    jogador1.frameAtual = (jogador1.frameAtual + 1) % 4;
-                    jogador1.contadorAnimacao = 0;
-                }
-                jogador1.escalaLeve = 1;
-            } else {
-                jogador1.frameAtual = 0;
-                // Efeito fofo de "respirar" bem devagar usando Seno
+            if (!jogador1.andando) {
                 jogador1.escalaLeve = 1 + Math.sin(Date.now() * 0.004) * 0.02;
+            } else {
+                jogador1.escalaLeve = 1;
             }
-
-            // Efeito idle para jogador 2 também
             jogador2.escalaLeve = 1 + Math.sin(Date.now() * 0.003) * 0.02;
 
-            // Limites da tela
             if (jogador1.x < 0) jogador1.x = 0;
-            if (jogador1.y < 100) jogador1.y = 100; // Impede sumir no topo
+            if (jogador1.y < 50) jogador1.y = 50; 
             if (jogador1.x > canvas.width - jogador1.larguraTela) jogador1.x = canvas.width - jogador1.larguraTela;
             if (jogador1.y > canvas.height - jogador1.alturaTela) jogador1.y = canvas.height - jogador1.alturaTela;
 
-            // Renderizar Cenário
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#55b67e"; // Grama bonita
+            ctx.fillStyle = "#55b67e"; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Sombra dos personagens (Dá profundidade e deixa lindo)
-            ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+            // Sombra dos personagens
+            ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
             ctx.beginPath();
-            ctx.ellipse(jogador1.x + 28, jogador1.y + 95, 20, 8, 0, 0, Math.PI * 2);
-            ctx.ellipse(jogador2.x + 28, jogador2.y + 95, 20, 8, 0, 0, Math.PI * 2);
+            ctx.ellipse(jogador1.x + (jogador1.larguraTela/2), jogador1.y + jogador1.alturaTela - 5, 22, 7, 0, 0, Math.PI * 2);
+            ctx.ellipse(jogador2.x + (jogador2.larguraTela/2), jogador2.y + jogador2.alturaTela - 5, 22, 7, 0, 0, Math.PI * 2);
             ctx.fill();
 
-            // Desenhar bonecos
             desenharPersonagem(imgJogador1, jogador1);
             desenharPersonagem(imgJogador2, jogador2);
 
