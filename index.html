@@ -165,9 +165,6 @@
             border: 1px dashed rgba(255, 255, 255, 0.1);
         }
 
-        /* ==========================================================================
-           RECORTE TRADICIONAL DE QUEBRA-CABEÇA
-           ========================================================================== */
         .puzzle-piece {
             cursor: grab;
             background-repeat: no-repeat;
@@ -242,6 +239,7 @@
         <div id="game-screen" class="hidden">
             <div id="room-info" class="pixel-window">
                 <span>Modo de Jogo: <strong id="display-difficulty">Fácil</strong></span>
+                <button id="btn-reset-game" class="pixel-btn" style="font-size:18px; padding:4px 10px; margin-left:15px; background-color:#d35400;">Nova Imagem</button>
             </div>
             
             <div id="board-layout">
@@ -264,7 +262,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-        // Insira os seus dados do Firebase aqui:
+        // Substitua ESTAS credenciais pelas chaves do seu console do Firebase!
         const firebaseConfig = {
             apiKey: "SUA_API_KEY",
             authDomain: "SEU_PROJETO.firebaseapp.com",
@@ -275,10 +273,14 @@
             appId: "SEU_APP_ID"
         };
 
+        // Alerta de proteção caso esqueça de configurar as chaves do banco
+        if (firebaseConfig.apiKey === "SUA_API_KEY") {
+            alert("Atenção! Você precisa colar as chaves do seu Firebase dentro do código no bloco 'firebaseConfig' para o botão funcionar.");
+        }
+
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // A sala agora é única e fixa para vocês dois jogarem juntos direto
         const NOSSA_SALA_FIXA = "NOSSA_PARTIDA_COOP";
         let myPlayerId = null; 
         let currentTurn = null;
@@ -297,8 +299,8 @@
         const piecesContainer = document.getElementById('pieces-container');
         const turnOverlay = document.getElementById('turn-overlay');
         const overlayMessage = document.getElementById('overlay-message');
+        const btnReset = document.getElementById('btn-reset-game');
 
-        // Escuta os botões "ELE" e "ELA"
         document.querySelectorAll('.identity-container button').forEach(button => {
             button.addEventListener('click', (e) => {
                 myPlayerId = e.target.getAttribute('data-player');
@@ -306,23 +308,41 @@
             });
         });
 
+        btnReset.addEventListener('click', () => {
+            resetarPartidaCompleta(selectDifficulty.value);
+        });
+
         async function conectarAoJogo() {
-            const diff = selectDifficulty.value;
-            const snapshot = await get(ref(db, 'partidas/' + NOSSA_SALA_FIXA));
-            const partidaAtiva = snapshot.val();
+            try {
+                const diff = selectDifficulty.value;
+                const snapshot = await get(ref(db, 'partidas/' + NOSSA_SALA_FIXA));
+                const partidaAtiva = snapshot.val();
 
-            // Se for "ELE" (Player 1) ou se a partida ainda não existir no banco, cria/reseta o jogo
-            if (myPlayerId === "player_1" || !partidaAtiva) {
-                const randomImage = ImagensAnimaisFofos[diff][Math.floor(Math.random() * 33)];
-                let tamanhoGrade = diff === "facil" ? 4 : (diff === "medio" ? 5 : 6);
+                // Se a partida não existir no Firebase, força a criação inicial automática
+                if (!partidaAtiva) {
+                    await resetarPartidaCompleta(diff);
+                }
 
-                await set(ref(db, 'partidas/' + NOSSA_SALA_FIXA), {
-                    id: NOSSA_SALA_FIXA, imagem: randomImage, dificuldade: diff,
-                    tamanho_grade: tamanhoGrade, turno_atual: "player_1", status: "jogando", pecas_encaixadas: {}
-                });
+                setupGameSession();
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao conectar ao Firebase. Verifique suas credenciais e regras do banco de dados!");
             }
+        }
 
-            setupGameSession();
+        async function resetarPartidaCompleta(diff) {
+            const randomImage = ImagensAnimaisFofos[diff][Math.floor(Math.random() * 33)];
+            let tamanhoGrade = diff === "facil" ? 4 : (diff === "medio" ? 5 : 6);
+
+            await set(ref(db, 'partidas/' + NOSSA_SALA_FIXA), {
+                id: NOSSA_SALA_FIXA, 
+                imagem: randomImage, 
+                dificuldade: diff,
+                tamanho_grade: tamanhoGrade, 
+                turno_atual: "player_1", 
+                status: "jogando", 
+                pecas_encaixadas: {}
+            });
         }
 
         function setupGameSession() {
