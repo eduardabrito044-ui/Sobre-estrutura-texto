@@ -286,7 +286,7 @@
                 <div style="font-size: 0.8em; line-height: 1.6; text-align: center;">
                     CASAL 1: <span style="color:#ffd700">125 PTS</span><br>
                     CASAL 2: <span style="color:#ffd700">98 PTS</span><br>
-                    NOSSO PLACAR: <span id="pts-nos" style="color:#2ecc71">78 PTS</span>
+                    NOSSO PLACAR: <span id="pts-nos" style="color:#2ecc71">100% SINTONIA</span>
                 </div>
             </div>
         </div>
@@ -297,7 +297,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-        // CREDENCIAIS DO SEU FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
             authDomain: "dddua-81207.firebaseapp.com",
@@ -317,22 +316,113 @@
             1: [
                 { p: "Qual o melhor lugar para um encontro perfeito?", o: ["Jantar à luz de velas 🕯️", "Piquenique no parque 🌳", "Ir ao cinema 🎬", "Ficar em casa vendo série 🍿"] },
                 { p: "Quem demonstrou interesse primeiro?", o: ["Ela 👸", "Ele 🧔", "Os dois juntos ⚡", "Foi por mensagem 📱"] },
-                { p: "Qual o apelido carinhoso mais usado?", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] }
+                { p: "Qual o apelido carinhoso mais usado?", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] },
+                { p: "Qual o abraço perfeito?", o: ["Demorado e apertado 🤗", "Espontâneo de surpresa ⚡", "Acolhedor antes de dormir 🛌", "Andando na rua 🗺️"] },
+                { p: "O que mais une vocês dois no dia a dia?", o: ["O senso de humor 😂", "As conversas profundas 🗣️", "O carinho constante 🥰", "Os planos futuros ✈️"] },
+                { p: "Qual música define melhor vocês?", o: ["Uma balada romântica 🎵", "Uma música animada 💃", "A de um filme que viram 🍿", "Ainda não escolhemos uma 🎼"] },
+                { p: "Se pudessem parar o tempo juntos, onde seria?", o: ["Num final de semana relaxante 💆", "No momento do primeiro beijo 💋", "Em uma viagem especial 🗺️", "No sofá de casa jogando conversa fora 🛋️"] },
+                { p: "Qual a melhor forma de demonstrar amor?", o: ["Palavras de apoio 🗣️", "Dar presentes significativos 🎁", "Gestos de serviço diários 🛠️", "Tempo de qualidade juntos ⏳"] },
+                { p: "Como seria o domingo de manhã perfeito?", o: ["Dormir até tarde 💤", "Café da manhã caprichado na cama ☕", "Sair para passear cedo ☀️", "Assistir desenhos/séries antigos 📺"] },
+                { p: "Qual detalhe físico você mais repara no outro?", o: ["O sorriso 😾", "O olhar/olhos 👀", "O cabelo 💇", "As mãos 🤝"] },
+                { p: "Quem é mais propenso a planejar surpresas?", o: ["Ela 👸", "Ele 🧔", "Nenhum dos dois é muito fã 🤷", "Os dois tentam igualmente ⚡"] },
+                { p: "O que não pode faltar em uma noite de filmes?", o: ["Pipoca salgada clássica 🍿", "Doces e chocolates 🍫", "Cobertores e frio ❄️", "Pauses eternos para conversar 💬"] },
+                { p: "Qual presente tem mais valor sentimental?", o: ["Uma carta feita à mão ✉️", "Uma joia ou acessório 💍", "Algo utilitário que precisava muito 🎒", "Uma viagem juntos 🗺️"] },
+                { p: "Se fossem uma dupla dinâmica de ficção, seriam:", o: ["Shrek e Fiona 💚", "Mickey e Minnie 🐭", "Batman e Robin 🦇", "Gomez e Morticia Addams 🖤"] },
+                { p: "Qual o melhor tipo de cafuné?", o: ["Leve para dar sono 💤", "Firme para relaxar 💆", "Nas costas ao invés da cabeça 🖐️", "Qualquer um vindo do parceiro 🥰"] },
+                { p: "Quem acorda de melhor humor?", o: ["Ela 👸", "Ele 🧔", "Os dois são zumbis de manhã 🧟", "Depende do dia da semana 📆"] },
+                { p: "A melhor viagem romântica seria para:", o: ["Uma praia deserta e paradisíaca 🏖️", "Uma cabana fria nas montanhas 🏔️", "Uma grande metrópole turística 🏙️", "Um parque de diversões temático 🎢"] }
             ],
             2: [
-                { p: "Qual filme vocês mais assistiram juntos?", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] }
+                { p: "Qual filme vocês mais assistiram juntos?", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] },
+                { p: "Quem tem o pior gosto para piadas?", o: ["Ela 👸", "Ele 🧔", "As piadas são tão ruins que dão a volta e ficam boas 😂", "Temos o mesmo humor refinado 🧠"] },
+                { p: "Se o casal ganhasse na loteria hoje, qual seria o primeiro impulso?", o: ["Viajar pelo mundo sem rumo ✈️", "Comprar uma mansão tecnológica 🏡", "Investir tudo em segredo 💰", "Demitir-se do emprego com estilo 💼"] },
+                { p: "Quem corre mais risco de se perder no supermercado?", o: ["Ela 👸", "Ele 🧔", "Os dois se distraem muito fácil 🛒", "Nenhum, seguimos a lista rigidamente 📝"] },
+                { p: "Se fôssemos participar de um reality show, qual seria?", o: ["De férias com o ex (caos) 🌊", "Power Couple (parceria) ⚡", "Masterchef Duplas (comida) 🍳", "BBB (fama) 👁️"] },
+                { p: "Quem gasta mais tempo escolhendo o que comer?", o: ["Ela 👸", "Ele 🧔", "Ficamos num loop infinito de 'você escolhe' 🔄", "Decidimos em 2 segundos ⚡"] },
+                { p: "Qual o pior superpoder para um de vocês ter?", o: ["Ler mentes (zero segredos) 🧠", "Invisibilidade (susto toda hora) 👻", "Super audição (ouvir ronco alto) 👂", "Teletransporte (cobrança de pressa) ⚡"] },
+                { p: "Qual meme resume perfeitamente a nossa dinâmica?", o: ["O estressado & O calmo 🧘", "Duas pessoas com zero neurônios funcionando 🤪", "Românticos bregas 🌹", "Fome acumulada 24h 🍔"] },
+                { p: "Quem é o motorista/co-piloto mais desesperado?", o: ["Ela reclama de tudo 👸", "Ele corre demais 🧔", "Nenhum, nossa viagem é pura paz 🚗", "Nenhum sabe navegar direito 🗺️"] },
+                { p: "Se pudéssemos comer apenas uma comida pelo resto da vida?", o: ["Pizza eterna 🍕", "Hambúrguer artesanal 🍔", "Comida japonesa 🍣", "Arroz, feijão e batata frita 🍛"] },
+                { p: "Quem é o mais acumulador de abas abertas no celular?", o: ["Ela (mais de 50 abas) 👸", "Ele (tudo bagunçado) 🧔", "Os dois sofrem desse mal 📱", "Tudo fechado e limpo sempre 🧹"] },
+                { p: "Quem tem mais probabilidade de rir em um momento sério?", o: ["Ela 👸", "Ele 🧔", "Os dois começam a rir juntos pelo olhar 👀", "Somos extremamente maduros e sérios 👔"] },
+                { p: "Qual o maior motivo de discussões bobas?", o: ["Onde vamos comer 🍽️", "A temperatura do quarto/ventilador ❄️", "Quem esqueceu de responder a mensagem 📱", "Quem enrola mais para se arrumar ⏰"] },
+                { p: "Se a nossa vida fosse uma série de comédia, qual seria?", o: ["The Office 👔", "Friends ☕", "Modern Family 🏡", "Todo Mundo Odeia o Chris 🛹"] },
+                { p: "Quem é o mestre em inventar dancinhas idiotas na cozinha?", o: ["Ela 👸", "Ele 🧔", "Fazemos coreografias juntos 🕺", "Assistimos julgando a loucura alheia 🤨"] },
+                { p: "Qual bicho de estimação exótico combina com a gente?", o: ["Uma capivara calma 🦦", "Um furão hiperativo 🦡", "Uma arara tagarela 🦜", "Nenhum, foco em cão/gato clássico 🐶"] }
             ],
             3: [
-                { p: "Qual a data exata do aniversário de namoro?", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Sempre olhar no celular 📱"] }
+                { p: "Qual a data exata do aniversário de namoro?", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Temos que olhar sempre no celular 📱"] },
+                { p: "Onde aconteceu o nosso primeiro beijo?", o: ["No carro / transporte 🚗", "Na rua / lugar público 🌳", "Na casa de um de nós 🏡", "Em uma festa / evento 🎉"] },
+                { p: "Qual foi a primeira impressão que ela teve dele?", o: ["Achou tímido/quieto 🤫", "Achou engraçado/falante 🗣️", "Achou muito bonito 🥰", "Achou meio estranho/marrento 🤨"] },
+                { p: "E qual foi a primeira impressão que ele teve dela?", o: ["Maravilhosa e intimidadora 👸", "Super simpática e fofa 😊", "Estilosa / autêntica ✨", "Diferente de todo mundo 🌍"] },
+                { p: "Quem disse 'eu te amo' pela primeira vez?", o: ["Ela tomou a iniciativa 👸", "Ele falou primeiro 🧔", "Foi automático e ao mesmo tempo ⚡", "Demorou muito para os dois falarem ⏱️"] },
+                { p: "Qual foi o nosso primeiro desentendimento bobo?", o: ["Por causa de ciúmes bobo 😠", "Horários ou atrasos ⏰", "Falta de comunicação no Whats 📱", "Não lembramos de tão irrelevante 🧠"] },
+                { p: "Qual foi a primeira comida que compartilhamos?", o: ["Lanche / Hambúrguer 🍔", "Pizza 🍕", "Doce / Sorvete 🍦", "Comida caseira / restaurante 🍽️"] },
+                { p: "Quem demorou mais para se arrumar no primeiro encontro?", o: ["Ela, com certeza 👸", "Ele foi o mais vaidoso 🧔", "Ninguém atrasou, cronometrado ⏱️", "Foi tudo muito improvisado e rápido 🏃"] },
+                { p: "Qual presente dado no início marcou mais?", o: ["Um item de vestuário 👕", "Algo feito à mão / carta ✉️", "Uma comida favorita 🍫", "Um objeto decorativo / geek 🎮"] },
+                { p: "Quem lembra mais das datas de aniversário de parentes?", o: ["Ela lembra de todos 👸", "Ele gerencia essa parte 🧔", "Esquecemos juntos e nos salvamos 🗓️", "O Google Agenda salva a nossa vida 🤖"] },
+                { p: "Qual a lembrança mais engraçada do começo?", o: ["Um tombo ou mico público 🤸", "Uma confusão de caminhos/GPS 🗺️", "Alguém gaguejando de nervoso 💬", "Conhecer a família por surpresa 🚪"] },
+                { p: "O primeiro filme que assistiram juntos na vida foi:", o: ["No cinema com pipoca cara 🎬", "Na TV de casa se escondendo 📺", "Nenhum, só conversamos 🗣️", "Ficou passando de fundo e nem vimos 🤫"] },
+                { p: "Quem puxou assunto no primeiro contato?", o: ["Ela mandou direct/mensagem 👸", "Ele respondeu um stories / chamou 🧔", "Amigos em comum apresentaram pessoalmente 👥", "Foi obra do destino absoluto ✨"] },
+                { p: "Qual música tocava muito na época que se conheceram?", o: ["Um hit do rádio/Spotify 📻", "Uma música do artista favorito de vocês 🎵", "Nenhuma específica, o mundo estava em silêncio 🤫", "Várias músicas misturadas 🎧"] },
+                { p: "Qual roupa um dos dois usou no primeiro encontro que marcou?", o: ["Um casaco / jaqueta específico 🧥", "Um tênis estiloso 👟", "Uma cor marcante (preto/vermelho) 🎨", "Não fazemos a menor ideia 🤷"] },
+                { p: "Onde foi a nossa primeira foto juntos?", o: ["Espelho clássico 🤳", "Lugar aberto / natureza 🌳", "Dentro do carro 🚗", "Alguém tirou para nós 📸"] },
+                { p: "Quem guarda mais recordações físicas (ingressos, papéis)?", o: ["Ela tem uma caixinha 👸", "Ele guarda tudo com carinho 🧔", "Perdemos tudo ao longo do tempo 🗑️", "Nosso acervo é 100% digital ☁️"] }
             ],
             4: [
-                { p: "Onde gostariam de morar no futuro?", o: ["Apartamento 🏢", "Casa Bairro Calmo 🏡", "Perto da natureza 🍃", "Fora do país ✈️"] }
+                { p: "Onde gostariam de morar no futuro?", o: ["Apartamento moderno 🏢", "Casa em Bairro Calmo 🏡", "Perto da natureza / sítio 🍃", "Fora do país ✈️"] },
+                { p: "Quantos filhos ou pets pretendem ter no total?", o: ["Apenas pets (mini zoológico) 🐶", "1 filho + pets 👶", "2 ou mais filhos 👨‍👩‍👧‍👦", "Nenhum plano fixo, deixa fluir 🍃"] },
+                { p: "Qual o destino dos sonhos para a próxima grande viagem?", o: ["Europa histórica 🗼", "Praias do Nordeste / Maldivas 🏖️", "Nova York / Destino Urbano 🏙️", "Japão / Cultura Geek 🗺️"] },
+                { p: "Como vocês se imaginam daqui a 10 anos?", o: ["Estáveis na carreira e viajando muito 💼", "Com nossa casa própria totalmente decorada 🏡", "Começando um negócio próprio juntos 🚀", "Ricos e aposentados cedo (sonho) 💰"] },
+                { p: "Qual o estilo de decoração da futura casa?", o: ["Minimalista e moderno (preto e branco) 🖤", "Rústico e aconchegante (madeira e plantas) 🪵", "Nerd / Gamer cheio de colecionáveis 🎮", "Bagunça organizada confortável 🛋️"] },
+                { p: "Quem vai comandar a cozinha na casa própria?", o: ["Ela será a chef 👸", "Ele assumirá as panelas 🧔", "Divisão perfeita / Cada dia um cozinha 🤝", "O iFood será nosso melhor amigo 🛵"] },
+                { p: "Qual eletrodoméstico caro é o sonho de consumo?", o: ["Airfryer gigante de última geração 🍟", "Robô aspirador inteligente 🤖", "Geladeira inverse que faz gelo na porta 🧊", "Lava e Seca que faz tudo sozinha 🧺"] },
+                { p: "Se pudessem abrir um negócio juntos, seria no ramo de:", o: ["Alimentação / Café / Doceria ☕", "Tecnologia / Loja Online 💻", "Moda / Vestuário 👕", "Turismo / Pousada na praia 🏖️"] },
+                { p: "Qual hábito atual pretendem manter para sempre?", o: ["O cafuné antes de dormir 💤", "As noites de maratona de séries 🍿", "Sair para jantar em datas especiais 🍽️", "Apoiar os sonhos malucos um do outro 🚀"] },
+                { p: "Qual o maior objetivo financeiro de curto prazo?", o: ["Trocar ou comprar um carro 🚗", "Juntar dinheiro para dar entrada na casa 💰", "Fazer uma super viagem planejada ✈️", "Quitar todas as contas e respirar 🧘"] },
+                { p: "Quem vai surtar mais na hora de escolher os móveis?", o: ["Ela (perfeccionista) 👸", "Ele (preocupado com espaço) 🧔", "Os dois vão brigar na Leroy Merlin 🛠️", "Contrataremos um arquiteto para salvar o casamento 📐"] },
+                { p: "Como será a comemoração de aniversário de casamento ideal?", o: ["Festa gigante com amigos 🎉", "Jantar超 chique exclusivo 🕯️", "Uma viagem de fuga de fim de semana 🚗", "Ficar em casa curtindo a nossa companhia 🛌"] },
+                { p: "Qual o primeiro item geek/decorativo que vai pra sala?", o: ["Um quadro gigante de filme/série 🖼️", "Uma estante cheia de livros / mangás 📚", "Videogame de última geração em destaque 🎮", "Uma planta grande bem cuidada 🌿"] },
+                { p: "Quem vai acordar no meio da noite se o alarme tocar?", o: ["Ele vai armado com uma vassoura 🧔", "Ela vai investigar cheia de coragem 👸", "Trancamos a porta e fingimos demência 🚪", "O cachorro/gato resolve o problema 🐶"] },
+                { p: "Qual idioma vocês deveriam aprender juntos?", o: ["Inglês avançado para viajar 🇺🇸", "Japonês para ler mangás/animes 🇯🇵", "Francês/Italiano por puro charme 🇮🇹", "Nossa própria linguagem de sinais 🤟"] },
+                { p: "Se tivessem um canal no YouTube no futuro, seria de:", o: ["Vlogs de Viagem 🗺️", "Culinária e Testes de Comida 🍕", "Gamer / Gameplays em dupla 🎮", "Humor / Casal cotidiano 😂"] }
             ],
             5: [
-                { p: "Qual a maior virtude do relacionamento?", o: ["Confiança total 🤝", "Carinho diário 🥰", "Parceria total 🚀", "Risadas bobas 😂"] }
+                { p: "Qual a maior virtude do relacionamento?", o: ["Confiança total 🤝", "Carinho diário 🥰", "Parceria total 🚀", "Risadas bobas 😂"] },
+                { p: "O que fortalece a relação nos momentos difíceis?", o: ["A paciência mútua 🧘", "A capacidade de conversar e resolver 🗣️", "O abraço que cura qualquer estresse 🤗", "Saber dar espaço ao outro ⏳"] },
+                { p: "Qual o maior aprendizado que um trouxe para o outro?", o: ["A ser mais calmo / paciente 🌊", "A expressar melhor os sentimentos 💬", "A ter mais ambição e sonhar alto 🚀", "A aproveitar os pequenos momentos da vida ☀️"] },
+                { p: "O que faz o outro se sentir mais amado?", o: ["Elogios sinceros do nada 🗣️", "Defender o parceiro na frente dos outros 🛡️", "Lembrar de detalhes bobos que ele gosta 🍫", "Estar presente fisicamente quando tudo tá ruim 🤝"] },
+                { p: "Qual palavra define perfeitamente o nosso amor?", o: ["Cumplicidade 🔗", "Intensidade 🔥", "Paz 🕊️", "Aventura 🗺️"] },
+                { p: "Como lidamos com as diferenças de personalidade?", o: ["Nos completamos perfeitamente 🧩", "Rimos das manias opostas 😂", "Negociamos até achar o meio termo 🤝", "Ignoramos e seguimos a vida 🤷"] },
+                { p: "O que torna o nosso casal único em comparação aos outros?", o: ["Nossa sintonia e piadas internas 🧠", "A forma leve como resolvemos as coisas 🕊️", "Nossa rotina cheia de carinho 🥰", "A nossa lealdade inabalável 🛡️"] },
+                { p: "Quando um está triste, o que o outro faz de melhor?", o: ["Escuta sem julgar por horas 🗣️", "Traz uma comida gostosa pra animar 🍔", "Faz palhaçada até arrancar um sorriso 😂", "Fica quietinho abraçado dando apoio 🤗"] },
+                { p: "O que você mais admira na evolução do outro?", o: ["A maturidade emocional 🧠", "A dedicação ao trabalho / estudos 💼", "O cuidado com o relacionamento 🥰", "O crescimento pessoal contínuo 🚀"] },
+                { p: "Qual o segredo para manter o fogo e o romance?", o: ["Quebrar a rotina sempre que dá ⚡", "Manter os olhares e elogios diários 👀", "Respeitar a individualidade de cada um ⏳", "Beijos demorados do nada 💋"] },
+                { p: "Qual o momento mais marcante de superação juntos?", o: ["Um problema de saúde / cansaço 🏥", "Dificuldade financeira temporária 💰", "Fase de distância ou falta de tempo ⏳", "Decisões difíceis sobre o futuro 🗺️"] },
+                { p: "O que você sente quando fica muito tempo longe do outro?", o: ["Saudade física esmagadora 💔", "Vontade de compartilhar tudo por Whats 📱", "Foco nas tarefas para o tempo passar rápido ⏱️", "Paz sabendo que logo estaremos juntos 🕊️"] },
+                { p: "Qual a melhor parte de envelhecer ao lado do outro?", o: ["Ver as mudanças físicas com carinho 👵👨‍🦳", "Construir uma história cheia de memórias 📚", "Ter um porto seguro eterno para voltar ⚓", "Poder ser 100% você mesmo sem máscaras 🎭"] },
+                { p: "O que a sua família pensa do seu parceiro?", o: ["Amam mais do que a mim 🤦", "Aprovam totalmente e acham incrível 👍", "Respeitam e gostam muito 🤝", "É o xodó das reuniões familiares 🏡"] },
+                { p: "Qual promessa silenciosa fazemos todos os dias?", o: ["Não ir dormir brigados 🛌", "Estar lá aconteça o que acontecer 🛡️", "Tentar ser uma pessoa melhor para o outro 🚀", "Fazer o outro sorrir pelo menos uma vez 😂"] },
+                { p: "O nosso amor se parece mais com:", o: ["Um porto seguro calmo em dia de chuva ⚓", "Uma fogueira quente no inverno 🔥", "Uma viagem de montanha-russa emocionante 🎢", "Um livro que nunca queremos parar de ler 📚"] }
             ],
             6: [
-                { p: "Qual o prato ou lanche favorito do Ele?", o: ["Lasanha 🍝", "Pizza 🍕", "Hambúrguer 🍔", "Churrasco 🥩"] }
+                { p: "Qual o prato ou lanche favorito do Ele?", o: ["Lasanha / Massas 🍝", "Pizza artesanal 🍕", "Hambúrguer超 recheado 🍔", "Churrasco clássico 🥩"] },
+                { p: "Qual o maior hobby dele nos tempos livres?", o: ["Jogar videogame / PC 🎮", "Assistir futebol / esportes ⚽", "Ver séries / animes / filmes 📺", "Dormir profundamente 💤"] },
+                { p: "O que deixa o Ele mais estressado no dia a dia?", o: ["Gente lerda / trânsito lento 🚗", "Fome extrema (muda o humor) 🍔", "Falta de sono / cansaço acumulado 😴", "Bagunça extrema onde precisa achar algo 🧺"] },
+                { p: "Qual o estilo de roupa que ele se sente mais confortável?", o: ["Camiseta de anime/geek + bermuda 🩳", "Moletom largo e calça confortável 🧥", "Estilo arrumadinho com camisa 👔", "Qualquer trapo preto que achar na gaveta 🖤"] },
+                { p: "Qual a maior mania irritante ou engraçada do Ele?", o: ["Ficar balançando a perna sem parar 🦵", "Esquecer onde deixou a chave/carteira 🔑", "Fazer barulhos estranhos do nada 🤪", "Demorar uma eternidade no banheiro 🚽"] },
+                { p: "Se ele pudesse ter um carro dos sonhos?", o: ["Um esportivo ultra rápido (Ferrari/Porsche) 🏎️", "Um SUV gigante confortável 🚙", "Um carro antigo clássico restaurado 🚗", "Uma moto de alta cilindrada 🏍️"] },
+                { p: "Qual sabor de pizza ele escolhe sem errar?", o: ["Calabresa clássica 🍕", "Quatro Queijos 🧀", "Frango com Catupiry 🍗", "Sabor exótico / doce 🍫"] },
+                { p: "Como ele reage quando assiste a um filme triste?", o: ["Chora escondido limpando o olho rápido 😢", "Diz que entrou um cisco no olho 👁️", "Não se abala, coração de pedra 🗿", "Chora rios de lágrimas junto com ela 😭"] },
+                { p: "Quem é o super-herói favorito dele?", o: ["Batman (o brabo) 🦇", "Homem-Aranha (clássico) 🕷️", "Iron Man (tecnológico) 🤖", "Não curte muito super-heróis 🤷"] },
+                { p: "Qual a marca de tênis ou calçado que ele prefere?", o: ["Nike / Adidas (esportivo) 👟", "Vans / All Star (casual) 🛹", "Chinelo 24h por dia se puder 🩴", "Bota / Sapato robusto 🥾"] },
+                { p: "Qual o maior medo dele?", o: ["Alturas / Brinquedos radicais 🎢", "Insetos voadores / Baratas 🪳", "Ficar sem dinheiro / desempregado 💰", "Perder as pessoas que ama ❤️"] },
+                { p: "O que ele prefere fazer no frio?", o: ["Ficar embaixo da coberta jogando 🎮", "Dormir o dia inteiro 💤", "Comer fondue / caldos quentes 🍲", "Reclamar que prefere o calor ☀️"] },
+                { p: "Qual o doce que ele não consegue resistir?", o: ["Chocolate meio amargo / ao leite 🍫", "Pudim clássico de leite condensado 🍮", "Sorvete de massa 🍦", "Açaí completo cheio de adicionais 🍇"] },
+                { p: "Qual jogo marcou a infância dele?", o: ["GTA San Andreas / Vice City 🚗", "Counter-Strike / League of Legends 💻", "Super Mario / Sonic clássicos 🍄", "Futebol (Bomba Patch / FIFA) ⚽"] },
+                { p: "Como ele demonstra que está bravo sem falar nada?", o: ["Fica em silêncio absoluto mudando o rosto 😐", "Responde tudo de forma curta e direta 📝", "Começa a fazer as coisas com força/barulho 💥", "Ele não consegue esconder, reclama na hora 🗣️"] },
+                { p: "Se o Ele pudesse viajar no tempo, iria para:", o: ["O futuro ver a tecnologia robótica 🚀", "A época dos dinossauros 🦖", "Os anos 80/90 curtir a cultura pop 📼", "O passado para corrigir algum mico bobo 🧠"] },
+                { p: "O que ele mais elogia nela?", o: ["A beleza física e os olhos 😍", "A inteligência e determinação 🧠", "O cheiro e o abraço macio 🥰", "O senso de humor e as risadas 😂"] }
             ]
         };
 
@@ -415,7 +505,7 @@
                 }
             }
 
-            // SE OS DOIS JOGARAM: VALIDAÇÃO POR SINTONIA DO CASAL!
+            // EXIBIÇÃO EM TEMPO REAL POR SINTONIA (MATCH DE CASAL)
             if (dados.voto_ela && dados.voto_ele) {
                 clearInterval(timerInterval);
                 votadoNestaRodada = true;
@@ -425,17 +515,14 @@
 
                 elAlertaStatus.innerHTML = `SEU VOTO: ${meuVoto} | PARCEIRO: ${votoParceiro}`;
 
-                // Se as duas respostas forem rigorosamente iguais, é um ACERTO do casal
                 const casalAcertou = (dados.voto_ela === dados.voto_ele);
 
                 ["A", "B", "C", "D"].forEach(alt => {
                     const btn = document.getElementById(`opt-${alt}`);
                     if (btn) {
                         if (casalAcertou && alt === meuVoto) {
-                            // Se bateram a resposta, a opção fica verde para os dois
                             btn.className = "btn-opcao acerto";
                         } else if (!casalAcertou && (alt === meuVoto || alt === votoParceiro)) {
-                            // Se divergiram, as opções que vocês escolheram ficam vermelhas
                             btn.className = "btn-opcao erro";
                         }
                     }
