@@ -54,7 +54,7 @@
             cursor: pointer;
             border: 3px solid #3a3a4a;
             border-radius: 8px;
-            font-size: 1.3em; /* Fonte aumentada */
+            font-size: 1.3em;
             color: white;
         }
         #btn-ela { background: #d81b60; }
@@ -79,7 +79,7 @@
         }
 
         .titulo-painel {
-            font-size: 1.0em; /* Fonte aumentada */
+            font-size: 1.0em;
             margin: -15px -15px 12px -15px;
             background-color: #3a3a4a;
             padding: 8px 12px;
@@ -94,8 +94,8 @@
             margin-bottom: 12px;
         }
 
-        #titulo-principal { font-size: 1.5em; margin: 0; text-shadow: 2px 2px 0 #000; text-align: center;} /* Fonte aumentada */
-        #sub-titulo { font-size: 1.1em; margin: 5px 0; color: #ccc; text-align: center; font-weight: bold; } /* Fonte aumentada */
+        #titulo-principal { font-size: 1.5em; margin: 0; text-shadow: 2px 2px 0 #000; text-align: center;}
+        #sub-titulo { font-size: 1.1em; margin: 5px 0; color: #ccc; text-align: center; font-weight: bold; }
 
         #quadro-jogo {
             background-color: #387a56;
@@ -118,15 +118,13 @@
             border: 3px solid #5c3e32;
             text-align: center;
             font-weight: bold;
-            font-size: 1.15em; /* Fonte aumentada */
+            font-size: 1.15em;
             line-height: 1.3;
             width: 100%;
             margin-bottom: 12px;
             word-wrap: break-word;
             box-sizing: border-box;
         }
-
-        #cronometro { font-size: 1.25em; font-weight: bold; margin-bottom: 12px; text-shadow: 1px 1px 0 #000; } /* Fonte aumentada */
 
         #zona-respostas {
             display: flex;
@@ -155,7 +153,7 @@
             border-radius: 10px;
             padding: 12px;
             text-align: left;
-            font-size: 1.0em; /* Fonte aumentada */
+            font-size: 1.0em;
             line-height: 1.3;
             cursor: pointer;
             font-family: inherit;
@@ -184,7 +182,7 @@
             border: 3px solid #5c3e32;
             font-family: inherit;
             font-weight: bold;
-            font-size: 1.1em; /* Fonte aumentada */
+            font-size: 1.1em;
             cursor: pointer;
             color: white;
             text-shadow: 1px 1px 0px #000;
@@ -195,23 +193,23 @@
         .btn-acao-quiz:active { transform: translateY(2px); box-shadow: 0 2px 0px #111; }
 
         .grid-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .card-status { background-color: #252530; border: 2px solid #3a3a4a; border-radius: 8px; padding: 10px; text-align: center; font-size: 0.9em; font-weight: bold; } /* Fonte aumentada */
-        .bar-pb { background: linear-gradient(to right, #ffd700, #ffa500); color: black; font-weight: bold; padding: 10px; border-radius: 6px; text-align: center; margin-top: 8px; font-size: 1.1em; } /* Fonte aumentada */
+        .card-status { background-color: #252530; border: 2px solid #3a3a4a; border-radius: 8px; padding: 10px; text-align: center; font-size: 0.9em; font-weight: bold; }
+        .bar-pb { background: linear-gradient(to right, #ffd700, #ffa500); color: black; font-weight: bold; padding: 10px; border-radius: 6px; text-align: center; margin-top: 8px; font-size: 1.1em; }
 
         .abas-container { display: flex; gap: 6px; margin-bottom: 8px; }
-        .aba-btn { background-color: #2a2a35; color: white; border: 2px solid #4a4a5a; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 0.95em; font-family: inherit; flex: 1; text-align: center; font-weight: bold; } /* Fonte aumentada */
+        .aba-btn { background-color: #2a2a35; color: white; border: 2px solid #4a4a5a; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 0.95em; font-family: inherit; flex: 1; text-align: center; font-weight: bold; }
         .aba-btn.ativa { background-color: #d81b60; border-color: #ff6b81; }
         .conteudo-aba { display: none; }
         .conteudo-aba.ativa { display: block; }
         .menu-temas { display: flex; flex-direction: column; gap: 8px; }
-        .btn-tema { background: linear-gradient(to bottom, #d81b60, #ad1457); color: white; border: 3px solid #3a3a4a; border-radius: 8px; padding: 12px; text-align: left; font-weight: bold; font-size: 1.0em; cursor: pointer; box-shadow: 0px 4px 0px #111; font-family: inherit; } /* Fonte aumentada */
+        .btn-tema { background: linear-gradient(to bottom, #d81b60, #ad1457); color: white; border: 3px solid #3a3a4a; border-radius: 8px; padding: 12px; text-align: left; font-weight: bold; font-size: 1.0em; cursor: pointer; box-shadow: 0px 4px 0px #111; font-family: inherit; }
 
         .acerto { background-color: #27ae60 !important; color: white !important; }
         .erro { background-color: #c0392b !important; color: white !important; }
         
         #alerta-status {
             margin-top: 10px;
-            font-size: 0.95em; /* Fonte aumentada */
+            font-size: 0.95em;
             text-align: center;
             font-weight: bold;
             color: #ffd700;
@@ -240,7 +238,6 @@
         
         <div id="quadro-jogo">
             <div id="caixa-pergunta">CONECTANDO AO BANCO...</div>
-            <div id="cronometro">TEMPO RESTANTE: <span id="tempo">15S</span></div>
             
             <div id="zona-respostas">
                 <div class="pnl-resposta">
@@ -326,7 +323,7 @@
                 { p: "Se pudessem parar o tempo juntos, onde seria?", o: ["Num final de semana relaxante 💆", "No momento do primeiro beijo 💋", "Em uma viagem especial 🗺️", "No sofá de casa jogando conversa fora 🛋️"] },
                 { p: "Qual a melhor forma de demonstrar amor?", o: ["Palavras de apoio 🗣️", "Dar presentes significativos 🎁", "Gestos de serviço diários 🛠️", "Tempo de qualidade juntos ⏳"] },
                 { p: "Como seria o domingo de manhã perfeito?", o: ["Dormir até tarde 💤", "Café da manhã caprichado na cama ☕", "Sair para passear cedo ☀️", "Assistir desenhos/séries antigos 📺"] },
-                { p: "Qual detalhe físico você mais repara no outro?", o: ["O sorriso 😾", "O olhar/olhos 👀", "O cabelo 💇", "As mãos 🤝"] },
+                { p: "Qual detalhe físico você mais repara no outro?", o: ["O sorriso 😾", "O olhar/olhos 👀", "O cabelo 💇", "As manos 🤝"] },
                 { p: "Quem é mais propenso a planejar surpresas?", o: ["Ela 👸", "Ele 🧔", "Nenhum dos dois é muito fã 🤷", "Os dois tentam igualmente ⚡"] },
                 { p: "O que não pode faltar em uma noite de filmes?", o: ["Pipoca salgada clássica 🍿", "Doces e chocolates 🍫", "Cobertores e frio ❄️", "Pauses eternos para conversar 💬"] },
                 { p: "Qual presente tem mais valor sentimental?", o: ["Uma carta feita à mão ✉️", "Uma joia ou acessório 💍", "Algo utilitário que precisava muito 🎒", "Uma viagem juntos 🗺️"] },
@@ -374,7 +371,7 @@
             ],
             4: [
                 { p: "Onde gostariam de morar no futuro?", o: ["Apartamento moderno 🏢", "Casa em Bairro Calmo 🏡", "Perto da natureza / sítio 🍃", "Fora do país ✈️"] },
-                { p: "Quantos filhos ou pets pretendem ter no total?", o: ["Apenas pets (mini zoológico) 🐶", "1 filho + pets 👶", "2 ou mais filhos 👨‍👩‍Jacob👦", "Nenhum plano fixo, deixa fluir 🍃"] },
+                { p: "Quantos filhos ou pets pretendem ter no total?", o: ["Apenas pets (mini zoológico) 🐶", "1 filho + pets 👶", "2 ou mais filhos 👨‍👩‍👧‍👦", "Nenhum plano fixo, deixa fluir 🍃"] },
                 { p: "Qual o destino dos sonhos para a próxima grande viagem?", o: ["Europa histórica 🗼", "Praias do Nordeste / Maldivas 🏖️", "Nova York / Destino Urbano 🏙️", "Japão / Cultura Geek 🗺️"] },
                 { p: "Como vocês se imaginam daqui a 10 anos?", o: ["Estáveis na carreira e viajando muito 💼", "Com nossa casa própria totalmente decorada 🏡", "Começando um negócio próprio juntos 🚀", "Ricos e aposentados cedo (sonho) 💰"] },
                 { p: "Qual o estilo de decoração da futura casa?", o: ["Minimalista e moderno (preto e branco) 🖤", "Rústico e aconchegante (madeira e plantas) 🪵", "Nerd / Gamer cheio de colecionáveis 🎮", "Bagunça organizada confortável 🛋️"] },
@@ -384,7 +381,7 @@
                 { p: "Qual hábito atual pretendem manter para sempre?", o: ["O cafuné antes de dormir 💤", "As noites de maratona de séries 🍿", "Sair para jantar em datas especiais 🍽️", "Apoiar os sonhos malucos um do outro 🚀"] },
                 { p: "Qual o maior objetivo financeiro de curto prazo?", o: ["Trocar ou comprar um carro 🚗", "Juntar dinheiro para dar entrada na casa 💰", "Fazer uma super viagem planejada ✈️", "Quitar todas as contas e respirar 🧘"] },
                 { p: "Quem vai surtar mais na hora de escolher os móveis?", o: ["Ela (perfeccionista) 👸", "Ele (preocupado com espaço) 🧔", "Os dois vão brigar na Leroy Merlin 🛠️", "Contrataremos um arquiteto para salvar o casamento 📐"] },
-                { p: "Como será a comemoração de aniversário de casamento ideal?", o: ["Festa gigante com amigos 🎉", "Jantar超 chique exclusivo 🕯️", "Uma viagem de fuga de fim de semana 🚗", "Ficar em casa curtindo a nossa companhia 🛌"] },
+                { p: "Como será a comemoração de aniversário de casamento ideal?", o: ["Festa gigante com amigos 🎉", "Jantar extremamente chique exclusivo 🕯️", "Uma viagem de fuga de fim de semana 🚗", "Ficar em casa curtindo a nossa companhia 🛌"] },
                 { p: "Qual o primeiro item geek/decorativo que vai pra sala?", o: ["Um quadro gigante de filme/série 🖼️", "Uma estante cheia de livros / mangás 📚", "Videogame de última geração em destaque 🎮", "Uma planta grande bem cuidada 🌿"] },
                 { p: "Quem vai acordar no meio da noite se o alarme tocar?", o: ["Ele vai armado com uma vassoura 🧔", "Ela vai investigar cheia de coragem 👸", "Trancamos a porta e fingimos demência 🚪", "O cachorro/gato resolve o problema 🐶"] },
                 { p: "Qual idioma vocês deveriam aprender juntos?", o: ["Inglês avançado para viajar 🇺🇸", "Japonês para ler mangás/animes 🇯🇵", "Francês/Italiano por puro charme 🇮🇹", "Nossa própria linguagem de sinais 🤟"] },
@@ -409,9 +406,9 @@
                 { p: "O nosso amor se parece mais com:", o: ["Um porto seguro calmo em dia de chuva ⚓", "Uma fogueira quente no inverno 🔥", "Uma viagem de montanha-russa emocionante 🎢", "Um livro que nunca queremos parar de ler 📚"] }
             ],
             6: [
-                { p: "Qual o prato ou lanche favorito do Ele?", o: ["Lasanha / Massas 🍝", "Pizza artesanal 🍕", "Hambúrguer超 recheado 🍔", "Churrasco clássico 🥩"] },
+                { p: "Qual o prato ou lanche favorito do Ele?", o: ["Lasanha / Massas 🍝", "Pizza artesanal 🍕", "Hambúrguer super recheado 🍔", "Churrasco clássico 🥩"] },
                 { p: "Qual o maior hobby dele nos tempos livres?", o: ["Jogar videogame / PC 🎮", "Assistir futebol / esportes ⚽", "Ver séries / animes / filmes 📺", "Dormir profundamente 💤"] },
-                { p: "O que deixa o Ele mais estressado no dia a dia?", o: ["Gente lerda / trânsito lento 🚗", "Fome extrema (muda o humor) 🍔", "Falta de sono / cansaço acumulado 😴", "Bagunça extrema onde precisa achar algo 🧺"] },
+                { p: "O que deixa o Ele mais estressado no dia a dia?", o: ["Gente lerda / trânsito lento 🚗", "Fome extrema (muda o humor) 🍔", "Falta de acesso ao sono / cansaço acumulado 😴", "Bagunça extrema onde precisa achar algo 🧺"] },
                 { p: "Qual o estilo de roupa que ele se sente mais confortável?", o: ["Camiseta de anime/geek + bermuda 🩳", "Moletom largo e calça confortável 🧥", "Estilo arrumadinho com camisa 👔", "Qualquer trapo preto que achar na gaveta 🖤"] },
                 { p: "Qual a maior mania irritante ou engraçada do Ele?", o: ["Ficar balançando a perna sem parar 🦵", "Esquecer onde deixou a chave/carteira 🔑", "Fazer barulhos estranhos do nada 🤪", "Demorar uma eternidade no banheiro 🚽"] },
                 { p: "Se ele pudesse ter um carro dos sonhos?", o: ["Um esportivo ultra rápido (Ferrari/Porsche) 🏎️", "Um SUV gigante confortável 🚙", "Um carro antigo clássico restaurado 🚗", "Uma moto de alta cilindrada 🏍️"] },
@@ -423,7 +420,7 @@
                 { p: "O que ele prefere fazer no frio?", o: ["Ficar embaixo da coberta jogando 🎮", "Dormir o dia inteiro 💤", "Comer fondue / caldos quentes 🍲", "Reclamar que prefere o calor ☀️"] },
                 { p: "Qual o doce que ele não consegue resistir?", o: ["Chocolate meio amargo / ao leite 🍫", "Pudim clássico de leite condensado 🍮", "Sorvete de massa 🍦", "Açaí completo cheio de adicionais 🍇"] },
                 { p: "Qual jogo marcou a infância dele?", o: ["GTA San Andreas / Vice City 🚗", "Counter-Strike / League of Legends 💻", "Super Mario / Sonic clássicos 🍄", "Futebol (Bomba Patch / FIFA) ⚽"] },
-                { p: "Como ele demonstra que está bravo sem falar nada?", o: ["Fica em silêncio absoluto mudando o rosto 😐", "Responde tudo de forma corta e direta 📝", "Começa a fazer as coisas com força/barulho 💥", "Ele não consegue esconder, reclama na hora 🗣️"] },
+                { p: "Como ele demonstra que está bravo sem falar nada?", o: ["Fica em silêncio absoluto mudando o rosto 😐", "Responde tudo de forma curta e direta 📝", "Começa a fazer as coisas com força/barulho 💥", "Ele não consegue esconder, reclama na hora 🗣️"] },
                 { p: "Se o Ele pudesse viajar no tempo, iria para:", o: ["O futuro ver a tecnologia robótica 🚀", "A época dos dinossauros 🦖", "Os anos 80/90 curtir a cultura pop 📼", "O passado para corrigir algum mico bobo 🧠"] },
                 { p: "O que ele mais elogia nela?", o: ["A beleza física e os olhos 😍", "A inteligência e determinação 🧠", "O cheiro e o abraço macio 🥰", "O senso de humor e as risadas 😂"] }
             ]
@@ -432,12 +429,9 @@
         let meuPerfil = ""; 
         let categoriaAtual = 1;
         let perguntaIndice = 0;
-        let tempoRestante = 15;
-        let timerInterval;
         let votadoNestaRodada = false;
 
         const elCaixaPergunta = document.getElementById("caixa-pergunta");
-        const elTempo = document.getElementById("tempo");
         const elOpcoesJogador = document.getElementById("opcoes-jogador");
         const elAlertaStatus = document.getElementById("alerta-status");
         const elBtnConfirmar = document.getElementById("quiz-confirmar");
@@ -468,7 +462,6 @@
                 categoriaAtual = dados.categoria;
                 perguntaIndice = dados.indice;
                 votadoNestaRodada = false;
-                resetTimer();
             }
 
             const pool = bancoPerguntas[categoriaAtual] || bancoPerguntas[1];
@@ -479,7 +472,6 @@
                 elOpcoesJogador.innerHTML = "";
                 elAlertaStatus.textContent = "";
                 elBtnConfirmar.style.display = "none";
-                clearInterval(timerInterval);
                 return;
             }
 
@@ -509,7 +501,6 @@
             }
 
             if (dados.voto_ela && dados.voto_ele) {
-                clearInterval(timerInterval);
                 votadoNestaRodada = true;
                 
                 const meuVoto = meuPerfil === "ela" ? dados.voto_ela : dados.voto_ele;
@@ -545,7 +536,6 @@
         function enviarVotoOnline(letra) {
             if (votadoNestaRodada) return;
             votadoNestaRodada = true;
-            clearInterval(timerInterval);
 
             const opt = document.getElementById(`opt-${letra}`);
             if (opt) opt.classList.add("selecionado");
@@ -573,22 +563,6 @@
                 voto_ela: "",
                 voto_ele: ""
             });
-        }
-
-        function resetTimer() {
-            clearInterval(timerInterval);
-            tempoRestante = 15;
-            elTempo.textContent = `${tempoRestante}S`;
-            timerInterval = setInterval(() => {
-                tempoRestante--;
-                elTempo.textContent = `${tempoRestante}S`;
-                if (tempoRestante <= 0) {
-                    clearInterval(timerInterval);
-                    if (!votadoNestaRodada) {
-                        enviarVotoOnline("N/A");
-                    }
-                }
-            }, 1000);
         }
 
         window.mudarAba = function(abaId) {
