@@ -2,15 +2,13 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Quiz de Casal - Nosso Mundo</title>
     <style>
-        /* 1. ARQUITETURA DE LAYOUT E ESTILO GERAL */
         body {
             margin: 0;
             padding: 0;
             background-color: #1a1a24;
-            /* Fundo quadriculado cinza escuro/preto */
             background-image:
                 linear-gradient(45deg, #111 25%, transparent 25%),
                 linear-gradient(-45deg, #111 25%, transparent 25%),
@@ -22,634 +20,382 @@
             color: white;
             font-family: 'Courier New', Courier, monospace;
             text-transform: uppercase;
-            user-select: none; /* Evita seleção de texto no jogo */
+            user-select: none;
             -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
+            box-sizing: border-box;
         }
 
-        /* Estética dos Painéis */
+        #main-container {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        @media (max-width: 900px) {
+            #main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .painel {
-            background-color: rgba(30, 30, 38, 0.9);
+            background-color: rgba(30, 30, 38, 0.95);
             border: 4px solid #3a3a4a;
             border-radius: 12px;
-            box-shadow: 0px 8px 0px #111;
+            box-shadow: 0px 6px 0px #111;
+            padding: 12px;
             box-sizing: border-box;
-            padding: 15px;
-            margin: 10px;
         }
 
         .titulo-painel {
-            font-size: 0.9em;
-            margin: -10px -10px 10px -10px;
+            font-size: 0.85em;
+            margin: -12px -12px 10px -12px;
             background-color: #3a3a4a;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 8px 8px 0 0;
-            color: #ccc;
+            color: #ffd700;
+            font-weight: bold;
         }
 
-        /* Responsividade CSS Grid */
-        #main-container {
-            display: grid;
-            grid-template-columns: 2fr 1.2fr 1fr;
-            grid-template-areas: "quiz progresso temas";
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        #pnl-quiz { grid-area: quiz; }
-        #pnl-centro { grid-area: progresso; display: flex; flex-direction: column; }
-        #pnl-temas-ext { grid-area: temas; }
-
-        @media (max-width: 1100px) {
-            #main-container {
-                grid-template-columns: 1fr;
-                grid-template-areas:
-                    "quiz"
-                    "progresso"
-                    "temas";
-            }
-            #pnl-centro { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-            .col-centro { flex: 1; min-width: 300px; }
-        }
-
-        /* 2. PAINEL PRINCIPAL DO QUIZ */
+        /* PAINEL DO JOGO */
         #header-quiz {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
-        #titulo-principal {
-            font-size: 2em;
-            margin: 0;
-            color: white;
-            text-shadow: 3px 3px 0 #000;
-        }
-
-        #sub-titulo {
-            font-size: 1.2em;
-            margin: 5px 0;
-            color: #ccc;
-            text-shadow: 2px 2px 0 #000;
-        }
+        #titulo-principal { font-size: 1.5em; margin: 0; text-shadow: 2px 2px 0 #000; }
+        #sub-titulo { font-size: 0.9em; margin: 3px 0; color: #ccc; }
 
         #quadro-jogo {
-            aspect-ratio: 16 / 9;
-            background-color: #387a56; /* Verde grama */
-            border: 10px solid #5c3e32; /* Bordas marrons grossas */
-            border-radius: 16px;
+            background-color: #387a56;
+            border: 8px solid #5c3e32;
+            border-radius: 14px;
             position: relative;
-            box-sizing: border-box;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
+            min-height: 340px;
+            box-sizing: border-box;
         }
 
         #caixa-pergunta {
             background-color: white;
             color: black;
-            padding: 15px;
-            border-radius: 10px;
-            border: 4px solid #5c3e32;
+            padding: 12px;
+            border-radius: 8px;
+            border: 3px solid #5c3e32;
             text-align: center;
             font-weight: bold;
-            font-size: 1.1em;
-            width: 80%;
-            margin-bottom: 10px;
+            font-size: 0.95em;
+            width: 95%;
+            margin-bottom: 8px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        #cronometro {
-            font-size: 1.3em;
-            color: white;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
+        #cronometro { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
 
-        /* Plano de fundo interno avatares neon */
-        #neon-background {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            pointer-events: none;
-            opacity: 0.3;
-        }
-
-        #silhueta-ela, #silhueta-ele {
-            width: 150px;
-            height: 250px;
-            background-color: #111;
-            margin: 0 50px;
-            position: relative;
-        }
-
-        .neon-coracao {
-            position: absolute;
-            top: -50px;
-            left: -25px;
-            width: 200px;
-            height: 200px;
-            border: 6px solid transparent;
-            border-top-color: #ff6b81;
-            border-radius: 50% 50% 0 0;
-            transform: rotate(-45deg);
-            filter: drop-shadow(0 0 5px #ff6b81) drop-shadow(0 0 10px #ff6b81);
-            animation: pulsacaoNeon 1.5s infinite alternate ease-in-out;
-        }
-
-        .neon-coracao.externo {
-            width: 220px; height: 220px; top: -60px; left: -35px;
-        }
-
-        @keyframes pulsacaoNeon {
-            from { opacity: 0.5; filter: drop-shadow(0 0 3px #ff6b81); }
-            to { opacity: 1; filter: drop-shadow(0 0 8px #ff6b81) drop-shadow(0 0 15px #ff6b81); }
-        }
-
-        /* Painéis de resposta duplos */
+        /* SISTEMA ANTI-ROUBO: TELAS INDIVIDUAIS */
         #zona-respostas {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
-            position: relative;
-            z-index: 2; /* Acima do neon */
+            z-index: 2;
+        }
+
+        @media (max-width: 600px) {
+            #zona-respostas { grid-template-columns: 1fr; gap: 10px; }
         }
 
         .pnl-resposta {
-            background-color: #fce4ec; /* Rosa pastel */
-            border-radius: 12px;
-            border: 4px solid #5c3e32;
-            padding: 10px;
-            box-sizing: border-box;
+            background-color: #fce4ec;
+            border-radius: 10px;
+            border: 3px solid #5c3e32;
+            padding: 8px;
             color: black;
             position: relative;
+            min-height: 180px;
         }
 
-        .mini-avatar-circulo {
+        .tela-privacidade {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background-color: #111;
-            top: -15px;
-            border: 3px solid #5c3e32;
-        }
-
-        #pnl-ela .mini-avatar-circulo { left: 10px; background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="40" fill="%235c3e32" /%3E%3Ccircle cx="50" cy="40" r="20" fill="%23fce4ec" /%3E%3Cpath d="M 20,80 Q 50,60 80,80" fill="%23fce4ec" stroke="%23fce4ec" /%3E%3C/svg%3E'); background-size: cover; }
-        #pnl-ele .mini-avatar-circulo { right: 10px; background-image: url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="40" fill="%235c3e32" /%3E%3Ccircle cx="50" cy="40" r="20" fill="%23d1c4e9" /%3E%3Cpath d="M 20,80 Q 50,60 80,80" fill="%23d1c4e9" stroke="%23d1c4e9" /%3E%3C/svg%3E'); background-size: cover; }
-
-        .lista-opcoes {
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #222;
+            color: #ff6b81;
+            border-radius: 6px;
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            z-index: 10;
+            padding: 10px;
+            box-sizing: border-box;
         }
+
+        .lista-opcoes { display: flex; flex-direction: column; gap: 6px; margin-top: 15px; }
 
         .btn-opcao {
             background-color: white;
             color: black;
-            border: 3px solid #ccc;
-            border-radius: 20px;
-            padding: 8px 15px;
+            border: 2px solid #ccc;
+            border-radius: 15px;
+            padding: 6px 12px;
             text-align: left;
-            font-size: 0.9em;
+            font-size: 0.85em;
             cursor: pointer;
-            transition: border-color 0.1s;
-            position: relative;
-        }
-
-        .btn-opcao:hover {
-            border-color: #999;
+            font-family: inherit;
         }
 
         .btn-opcao.selecionado {
-            border-color: #ffd700 !important; /* Borda amarela de destaque */
+            border-color: #ffd700 !important;
+            background-color: #fffde6;
             box-shadow: 0 0 5px #ffd700;
         }
 
-        .icone-indicativo {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.1em;
-        }
-
-        /* 3. PAINÉIS DE STATUS E PROGRESSO */
-        .grid-conquistas {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .pnl-insignia {
+        /* ABAS INTERATIVAS PARA CELULAR */
+        .abas-container { display: flex; gap: 5px; margin-bottom: 8px; }
+        .aba-btn {
             background-color: #2a2a35;
-            border: 3px solid #4a4a5a;
-            border-radius: 8px;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .insignia-icone {
-            font-size: 2em;
-            margin-bottom: 5px;
-        }
-
-        .estrela-contador {
-            color: #ffd700; /* Dourado */
-            font-size: 0.9em;
-        }
-
-        /* Painel Controle Crítico */
-        #pnl-controle {
-            background-color: #fce4ec; /* Rosa suave */
-            color: black;
-        }
-
-        #pnl-controle .titulo-painel {
-            background-color: #f48fb1;
             color: white;
-        }
-
-        .lista-critica {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .item-critico {
-            font-size: 1.8em;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        /* Painel Pontos Bônus */
-        #pnl-bonus {
-            background: linear-gradient(to bottom, #ffd700, #b8860b);
-            border: 4px solid #111;
-            color: black;
+            border: 2px solid #4a4a5a;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75em;
+            font-family: inherit;
+            flex: 1;
             text-align: center;
-            padding: 10px;
         }
+        .aba-btn.ativa { background-color: #d81b60; border-color: #ff6b81; }
+        .conteudo-aba { display: none; }
+        .conteudo-aba.ativa { display: block; }
 
-        #pnl-bonus .titulo-painel { display: none; }
+        /* CORES DE STATUS */
+        .acerto { background-color: #27ae60 !important; color: white !important; }
+        .erro { background-color: #c0392b !important; color: white !important; }
 
-        #txt-bonus {
-            font-size: 1.8em;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .coracao-pisca {
-            font-size: 0.8em;
-            animation: piscaBonus 1s infinite alternate ease-in-out;
-        }
-
-        @keyframes piscaBonus {
-            from { color: #f48fb1; opacity: 1; }
-            to { color: #fff; opacity: 0.5; }
-        }
-
-        /* 4. PLACARES E MENU DE TEMAS */
-        .rank-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-
-        .rank-pts { color: #ffd700; }
-
-        .item-destaque {
-            color: #ffd700 !important;
-            font-weight: bold;
-            font-size: 1.1em;
-            border-top: 2px dashed #4a4a5a;
-            padding-top: 5px;
-            margin-top: 5px;
-        }
-
-        /* Menu de temas */
-        .menu-temas {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        /* MENU DE TEMAS */
+        .menu-temas { display: flex; flex-direction: column; gap: 6px; }
         .btn-tema {
             background: linear-gradient(to bottom, #d81b60, #ad1457);
-            color: white;
-            border: 4px solid #3a3a4a;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: left;
-            font-weight: bold;
-            font-size: 1em;
-            cursor: pointer;
-            box-shadow: 0px 5px 0px #111;
-            position: relative;
-            transition: box-shadow 0.1s, transform 0.1s;
+            color: white; border: 3px solid #3a3a4a; border-radius: 8px;
+            padding: 10px; text-align: left; font-weight: bold; font-size: 0.85em;
+            cursor: pointer; box-shadow: 0px 4px 0px #111; font-family: inherit;
         }
+        .btn-tema:active { box-shadow: 0px 1px 0px #111; transform: translateY(3px); }
 
-        .btn-tema:active {
-            box-shadow: 0px 2px 0px #111;
-            transform: translateY(3px);
-        }
-
-        .btn-tema::after {
-            content: '>';
-            position: absolute;
-            right: 15px;
-        }
-
-        /* 5. CONTROLES VIRTUAIS INFERIORES */
+        /* CONTROLES INFERIORES */
         #controles-inferiores {
-            grid-column: 1 / span 3; /* Ocupa toda a largura */
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 20px;
-            background-color: #2a2a35;
-            border-top: 6px solid #3a3a4a;
-            box-shadow: 0px -5px 15px rgba(0,0,0,0.5);
-            width: 100%;
-            box-sizing: border-box;
+            display: flex; justify-content: space-around; align-items: center;
+            padding: 12px; background-color: #2a2a35; border-top: 4px solid #3a3a4a;
+            margin-top: 15px; border-radius: 12px;
         }
+        @media (max-width: 600px) { #controles-inferiores { flex-direction: column; gap: 15px; } }
 
-        @media (max-width: 900px) {
-            #controles-inferiores { flex-direction: column; gap: 20px; }
-        }
+        .dpad-cruz { display: grid; grid-template-columns: repeat(3, 35px); grid-template-rows: repeat(3, 35px); gap: 3px; }
+        .btn-seta { background-color: #5c3e32; color: white; border: 2px solid #111; font-size: 1em; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .seta-cima { grid-column: 2; grid-row: 1; } .seta-esq { grid-column: 1; grid-row: 2; } .seta-baixo { grid-column: 2; grid-row: 3; } .seta-dir { grid-column: 3; grid-row: 2; }
 
-        /* D-pad Virtual */
-        #zona-dpad {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #ccc;
-        }
-
-        .dpad-cruz {
-            display: grid;
-            grid-template-columns: repeat(3, 40px);
-            grid-template-rows: repeat(3, 40px);
-            gap: 5px;
-        }
-
-        .btn-seta {
-            background-color: #5c3e32;
-            color: white;
-            border: 3px solid #111;
-            font-size: 1.2em;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 3px 0 #111;
-        }
-
-        .btn-seta:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #111;
-        }
-
-        .seta-cima { grid-column: 2; grid-row: 1; }
-        .seta-baixo { grid-column: 2; grid-row: 3; }
-        .seta-esq { grid-column: 1; grid-row: 2; }
-        .seta-dir { grid-column: 3; grid-row: 2; }
-
-        /* Botões de Ação de Comando */
-        #zona-acoes {
-            display: flex;
-            gap: 30px;
-        }
-
-        .btn-comando {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            color: white;
-            border: 5px solid #111;
-            font-size: 0.9em;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 8px 0 #111;
-            transition: box-shadow 0.1s, transform 0.1s;
-        }
-
-        .btn-comando:active {
-            transform: translateY(5px);
-            box-shadow: 0 3px 0 #111;
-        }
-
-        #btn-confirmar { background-color: #2980b9; } /* Azul brilhante */
-        #btn-confirmar:hover { background-color: #3498db; }
-
-        #btn-pista { background-color: #27ae60; } /* Verde vibrante */
-        #btn-pista:hover { background-color: #2ecc71; }
-
+        .btn-comando { width: 90px; height: 90px; border-radius: 50%; color: white; border: 4px solid #111; font-size: 0.75em; font-weight: bold; cursor: pointer; box-shadow: 0 5px 0 #111; font-family: inherit; }
+        #btn-confirmar { background-color: #2980b9; } #btn-pista { background-color: #27ae60; }
+        .btn-comando:active { transform: translateY(3px); box-shadow: 0 2px 0 #111; }
     </style>
 </head>
 <body>
 
     <div id="main-container">
-        
-        <div id="pnl-quiz">
+        <div>
             <div id="header-quiz">
-                <h1 id="titulo-principal">QUIZ DE CASAL - NOSSO MUNDO</h1>
-                <h2 id="sub-titulo">PONTUACAO ATUAL</h2>
+                <h1 id="titulo-principal">QUIZ DE CASAL</h1>
+                <div id="sub-titulo">NOS: <span id="pts-nos" style="color: #ffd700;">78 PTS</span> | <span id="vlr-bonus" style="color: #ff6b81;">12 PB</span></div>
             </div>
             
             <div id="quadro-jogo">
-                <div id="caixa-pergunta">CARREGANDO PERGUNTA...</div>
-                
-                <div id="cronometro">TEMPO RESTANTE: <span id="tempo">15S</span></div>
-                
-                <div id="neon-background">
-                    <div id="silhueta-ela">
-                        <div class="neon-coracao"></div>
-                        <div class="neon-coracao externo"></div>
-                    </div>
-                    <div id="silhueta-ele">
-                        <div class="neon-coracao"></div>
-                        <div class="neon-coracao externo"></div>
-                    </div>
-                </div>
+                <div id="caixa-pergunta">CARREGANDO...</div>
+                <div id="cronometro">TEMPO: <span id="tempo">15S</span></div>
                 
                 <div id="zona-respostas">
                     <div class="pnl-resposta" id="pnl-ela">
-                        <div class="mini-avatar-circulo"></div>
-                        <div class="lista-opcoes" id="opcoes-ela">
-                            </div>
+                        <div style="font-weight: bold; margin-bottom: 5px;">👑 ELA:</div>
+                        <div class="tela-privacidade" id="privacidade-ela" style="display:none;">VEJA PARA O LADO!<br>TURNO DO ELE</div>
+                        <div class="lista-opcoes" id="opcoes-ela"></div>
                     </div>
                     
                     <div class="pnl-resposta" id="pnl-ele">
-                        <div class="mini-avatar-circulo"></div>
-                        <div class="lista-opcoes" id="opcoes-ele">
-                            </div>
+                        <div style="font-weight: bold; margin-bottom: 5px;">🧔 ELE:</div>
+                        <div class="tela-privacidade" id="privacidade-ele">AGUARDE...<br>TURNO DA ELA</div>
+                        <div class="lista-opcoes" id="opcoes-ele"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="pnl-centro">
-            <div class="col-centro">
-                <div class="painel" id="pnl-categoria">
-                    <div class="titulo-painel">CATEGORIA: CURIOSIDADES</div>
-                    <div class="grid-conquistas">
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">💖</span>
-                            <span class="estrela-contador">★ x<span id="star-romance">0</span></span>
-                        </div>
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">🎭</span>
-                            <span class="estrela-contador">★ x<span id="star-diversao">0</span></span>
-                        </div>
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">🧠</span>
-                            <span class="estrela-contador">★ x<span id="star-memoria">0</span></span>
-                        </div>
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">✈️</span>
-                            <span class="estrela-contador">★ x<span id="star-futuro">0</span></span>
-                        </div>
-                    </div>
-                </div>
+        <div>
+            <div class="abas-container">
+                <button class="aba-btn ativa" onclick="mudarAba('aba-temas')">TEMAS</button>
+                <button class="aba-btn" onclick="mudarAba('aba-status')">STATUS</button>
+            </div>
 
-                <div class="painel" id="pnl-progresso">
-                    <div class="titulo-painel">NOSSO PROGRESSO</div>
-                    <div class="grid-conquistas">
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">💖</span>
-                            <span class="estrela-contador">★ x<span id="star-p-romance">0</span></span>
-                        </div>
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">🎭</span>
-                            <span class="estrela-contador">★ x<span id="star-p-diversao">0</span></span>
-                        </div>
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">🧠</span>
-                            <span class="estrela-contador">★ x<span id="star-p-memoria">0</span></span>
-                        </div>
-                        <div class="pnl-insignia">
-                            <span class="insignia-icone">✈️</span>
-                            <span class="estrela-contador">★ x<span id="star-p-futuro">0</span></span>
-                        </div>
+            <div id="aba-temas" class="conteudo-aba ativa">
+                <div class="painel">
+                    <div class="titulo-painel">SELECIONE O TEMA</div>
+                    <div class="menu-temas">
+                        <button class="btn-tema" onclick="mudarTema(1)">1. ROMANCE 💖</button>
+                        <button class="btn-tema" onclick="mudarTema(2)">2. DIVERSAO 🎭</button>
+                        <button class="btn-tema" onclick="mudarTema(3)">3. MEMORIA 🧠</button>
+                        <button class="btn-tema" onclick="mudarTema(4)">4. FUTURO ✈️</button>
+                        <button class="btn-tema" onclick="mudarTema(5)">5. ESPECIAIS ✨</button>
+                        <button class="btn-tema" onclick="mudarTema(6)" style="background: linear-gradient(to bottom, #2980b9, #1f4e79);">6. TEMA "ELE" 🧔</button>
+                        <button class="btn-tema" onclick="mudarTema('aleatorio')" style="background: linear-gradient(to bottom, #8e44ad, #6c3483);">🎲 TEMA ALEATORIO</button>
                     </div>
                 </div>
             </div>
 
-            <div class="col-centro">
-                <div class="painel" id="pnl-controle">
-                    <div class="titulo-painel">CONTROLE CRITICO</div>
-                    <div class="lista-critica">
-                        <div class="item-critico">💖🎭🧠✈️✨</div>
-                        <div class="item-critico">🍝🍕🍲🍔🍟</div>
-                        <div class="item-critico">⭐✨🌟🐶🐱🐾</div>
-                    </div>
-                </div>
-
-                <div class="painel" id="pnl-bonus">
-                    <div class="titulo-painel">PONTOS BONUS</div>
-                    <div id="txt-bonus">
-                        <span class="coracao-pisca">💖</span>
-                        <span id="vlr-bonus">12 PB</span>
-                        <span class="coracao-pisca">💖</span>
+            <div id="aba-status" class="conteudo-aba">
+                <div class="painel">
+                    <div class="titulo-painel">LEADERBOARD</div>
+                    <div style="font-size: 0.85em; line-height: 1.6;">
+                        CASAL 1: <span style="color:#ffd700">125 PTS</span><br>
+                        CASAL 2: <span style="color:#ffd700">98 PTS</span><br>
+                        VOCES: <span id="status-nos-pts" style="color:#2ecc71">78 PTS</span>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="pnl-temas-ext">
-            <div class="painel" id="pnl-leaderboard">
-                <div class="titulo-painel">TEMAS DO JOGO / LEADERBOARD</div>
-                <div id="rank-lista">
-                    <div class="rank-item"><span>CASAL 1:</span> <span class="rank-pts">125 PTS</span></div>
-                    <div class="rank-item"><span>CASAL 1:</span> <span class="rank-pts">125 PTS</span></div>
-                    <div class="rank-item"><span>CASAL 2:</span> <span class="rank-pts">98 PTS</span></div>
-                    <div class="rank-item item-destaque"><span>NOS:</span> <span class="rank-pts" id="pts-nos">78 PTS</span></div>
-                </div>
-            </div>
-
-            <div class="painel" id="pnl-menu-temas">
-                <div class="titulo-painel">MENU DE TEMAS</div>
-                <div class="menu-temas">
-                    <button class="btn-tema" id="btn-tema-1">1. ROMANCE 💖</button>
-                    <button class="btn-tema" id="btn-tema-2">2. DIVERSAO 🎭</button>
-                    <button class="btn-tema" id="btn-tema-3">3. MEMORIA 🧠</button>
-                    <button class="btn-tema" id="btn-tema-4">4. FUTURO ✈️</button>
-                    <button class="btn-tema" id="btn-tema-5">5. ESPECIAIS ✨</button>
-                </div>
+    <div id="controles-inferiores">
+        <div id="zona-dpad">
+            <div class="dpad-cruz">
+                <button class="btn-seta seta-cima">↑</button>
+                <button class="btn-seta seta-esq">←</button>
+                <button class="btn-seta seta-baixo">↓</button>
+                <button class="btn-seta seta-dir">→</button>
             </div>
         </div>
-
-        <div id="controles-inferiores">
-            <div id="zona-dpad">
-                <div class="dpad-cruz">
-                    <button class="btn-seta seta-cima">↑</button>
-                    <button class="btn-seta seta-esq">←</button>
-                    <button class="btn-seta seta-baixo">↓</button>
-                    <button class="btn-seta seta-dir">→</button>
-                </div>
-                <span id="txt-navegar">NAVEGAR</span>
-            </div>
-
-            <div id="zona-acoes">
-                <button class="btn-comando" id="btn-confirmar">CONFIRMAR RESPOSTA</button>
-                <button class="btn-comando" id="btn-pista">USAR PISTA</button>
-            </div>
+        <div style="display: flex; gap: 15px;">
+            <button class="btn-comando" id="btn-confirmar">AVANCAR TURNO</button>
+            <button class="btn-comando" id="btn-pista">USAR PISTA</button>
         </div>
-
     </div>
 
     <script>
-        // 6. LOGICA E DINAMICA DE JOGO
-
-        // Banco de Dados de Perguntas
-        const perguntas = {
+        // GERADOR DE 100 PERGUNTAS DIVERSIFICADAS (16 a 17 por categoria)
+        const bancoPerguntas = {
             1: [ // ROMANCE
-                { p: "Qual é o prato favorito do seu parceiro?", r: "A", o: ["LASANHA 🍝", "PIZZA 🍕", "STROGONOFF 🍲", "HAMBÚRGUER 🍔"] },
-                { p: "Onde foi o primeiro encontro?", r: "C", o: ["CINEMA 🎬", "PARQUE 🌳", "RESTAURANTE 🍽️", "PRAIA 🏖️"] }
+                { p: "Qual o melhor lugar para um encontro perfeito?", r: "A", o: ["Jantar à luz de velas 🕯️", "Piquenique no parque 🌳", "Ir ao cinema 🎬", "Ficar em casa vendo série 🍿"] },
+                { p: "Quem demonstrou interesse primeiro?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois juntos ⚡", "Foi por mensagem 📱"] },
+                { p: "Qual o apelido carinhoso mais usado?", r: "A", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] },
+                { p: "Qual música define o romance de vocês?", r: "C", o: ["Uma romântica antiga 🎵", "Um pop chiclete 🎤", "Uma que toca no rádio 📻", "Não temos uma música ❌"] },
+                { p: "O que é mais romântico?", r: "B", o: ["Dar flores 🌹", "Escrever cartas 📝", "Dar abraço apertado 🤗", "Preparar a comida 🍳"] },
+                { p: "Qual estação do ano combina mais com namoro?", r: "D", o: ["Primavera 🌸", "Verão ☀️", "Outono 🍂", "Inverno ❄️"] },
+                { p: "O primeiro beijo foi...", r: "A", o: ["Inesquecível ✨", "Rápido de surpresa ⚡", "Vergonhoso 🙈", "Demorou para acontecer ⏰"] },
+                { p: "Qual presente seria o mais marcante?", r: "C", o: ["Aliança nova 💍", "Viagem surpresa 🧳", "Álbum de fotos feito à mão 📸", "Roupas combinando 👕"] },
+                { p: "Onde gostariam de passar o aniversário de namoro?", r: "B", o: ["Num hotel fazenda 🏡", "Na praia pegando sol 🏖️", "Num restaurante caro 🍾", "Embaixo das cobertas 🛏️"] },
+                { p: "Quem é o mais ciumento da relação?", r: "A", o: ["Ela 👸", "Ele 🧔", "Os dois igualmente ⚖️", "Nenhum de nós 🕊️"] },
+                { p: "O que não pode faltar no dia dos namorados?", r: "D", o: ["Chocolate 🍫", "Flores 💐", "Declaração nas redes 🌐", "Tempo de qualidade a sós ⏰"] },
+                { p: "Com que frequência vocês trocam 'eu te amo'?", r: "A", o: ["Toda hora! 🥰", "Algumas vezes ao dia ☀️", "Só antes de dormir 💤", "Nos momentos especiais 💎"] },
+                { p: "Qual o emoji que mais usam juntos?", r: "B", o: ["❤️", "🥰", "😍", "😘"] },
+                { p: "O primeiro 'eu te amo' partiu de quem?", r: "C", o: ["Ela 👸", "Ele 🧔", "Disseram juntos 📣", "Foi por escrito ✉️"] },
+                { p: "Qual o nível de romantismo do casal?", r: "A", o: ["100% melosos 🍯", "Equilibrados ⚖️", "Mais descontraídos 😎", "Quase nada românticos 🌵"] },
+                { p: "Quem dorme primeiro abraçado?", r: "B", o: ["Ela 👸", "Ele 🧔", "Ninguém dorme abraçado 🥵", "Os dois apagam juntos 😴"] }
             ],
             2: [ // DIVERSÃO
-                { p: "Qual filme vocês mais assistiram juntos?", r: "B", o: ["VINGADORES 🎬", "STAR WARS 🚀", "HARRY POTTER ✨", "SHREK 💚"] },
-                { p: "Qual o jogo de videogame favorito do parceiro?", r: "D", o: ["MARIO 🍄", "ZELDA ⚔️", "FIFA ⚽", "MINECRAFT 🧱"] }
+                { p: "Qual filme vocês mais assistiram juntos?", r: "B", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] },
+                { p: "Se pudessem virar personagens, quais seriam?", r: "A", o: ["Super-heróis 🦸‍♂️", "Vilões estilosos🦹", "Personagens de anime ⛩️", "Desenho animado 🧸"] },
+                { p: "Qual o rolê ideal de fim de semana?", r: "C", o: ["Festa/Balada 🕺", "Shopping 🛍️", "Comer lanche na praça 🍔", "Jogar online juntos 🎮"] },
+                { p: "Quem perde mais nos jogos?", r: "B", o: ["Ela 👸", "Ele 🧔", "Dá empate sempre 🤝", "Não jogamos 🚫"] },
+                { p: "Qual o estilo de filme preferido do casal?", r: "A", o: ["Comédia rir até chorar 😂", "Terror de dar susto 👻", "Ação/Corrida 🏎️", "Drama de chorar 😢"] },
+                { p: "Qual meme resume o relacionamento?", r: "C", o: ["O casal briguento 🥊", "O casal fofoqueiro 🤫", "O casal que só pensa em comer 🍕", "O casal fitness fictício 🏋️"] },
+                { p: "Quem é mais engraçado?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois são bobos 🤡", "Nenhum tem graça 😐"] },
+                { p: "Se fossem cantar no Karaokê, qual seria o estilo?", r: "D", o: ["Sertanejo sofrência 💔", "Rock clássico 🎸", "Pop das antigas 🎤", "Funk/Pagode pra dançar 💃"] },
+                { p: "Quem gasta mais dinheiro com bobeira?", r: "A", o: ["Ela 👸", "Ele 🧔", "Os dois sumindo com o dinheiro 💸", "Somos controlados 🪙"] },
+                { p: "Qual doce destrói qualquer dieta do casal?", r: "B", o: ["Bolo de chocolate 🍰", "Açaí completo 🍧", "Sorvete de massa 🍦", "Brigadeiro de panela 🍫"] },
+                { p: "Quem manda mais TikTok/Kwai pro outro?", r: "A", o: ["Ela 👸", "Ele 🧔", "Os dois competem 📱", "Raramente mandamos 🔇"] },
+                { p: "Se ganhassem na loteria hoje, qual a primeira palhaçada?", r: "C", o: ["Comprar uma mansão inflável 🏰", "Viajar sem rumo ✈️", "Comer o cardápio todo de um restaurante 🍕", "Comprar um carro de corrida 🏎️"] },
+                { p: "Qual brinquedo de parque dá mais medo?", r: "B", o: ["Montanha-russa 🎢", "Barco pirata 🏴‍☠️", "Roda-gigante 🎡", "Casa do terror 👻"] },
+                { p: "Quem tira mais fotos zoadas do outro?", r: "A", o: ["Ela 👸", "Ele 🧔", "Temos pastas secretas cheias 📁", "Só foto bonita 📸"] },
+                { p: "Qual o sabor de pizza oficial do casal?", r: "C", o: ["Calabresa 🍕", "Frango com Catupiry 🍗", "Meio a Meio (Doce/Salgada) 🍫", "Quatro Queijos 🧀"] },
+                { p: "Quem é mais provável de se perder no shopping?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois se perdem juntos 🧭", "Temos senso de direção 🗺️"] }
             ],
             3: [ // MEMÓRIA
-                { p: "Quem é mais propenso a esquecer aniversários?", r: "A", o: ["ELA 👸", "ELE 👨", "AMBOS 🤷‍♂️🤷‍♀️", "NENHUM 🧠"] },
-                { p: "Qual é o apelido de infância do parceiro?", r: "B", o: ["GABY 🎀", "BETINHO 👶", "DU ✌️", "CACÁ 🍫"] }
+                { p: "Qual a data exata do aniversário de namoro?", r: "A", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Sempre temos que olhar no celular 📱"] },
+                { p: "Quem lembra mais das conversas antigas?", r: "A", o: ["Ela (memória de elefante) 👸", "Ele (esquece o que comeu ontem) 🧔", "Nenhum lembra nada 🚫", "Lembramos tudo perfeitamente 🧠"] },
+                { p: "De que cor era a roupa do parceiro no primeiro encontro?", r: "C", o: ["Escura/Preta 🖤", "Branca/Clara 🤍", "Lembramos a cor certa! 🎨", "Ninguém faz ideia 🤷‍♂️"] },
+                { p: "Quem demorou mais para responder a primeira mensagem?", r: "B", o: ["Ela 👸", "Ele 🧔", "Foi um papo instantâneo ⚡", "Ninguém lembra do chat 💬"] },
+                { p: "Quem foi o primeiro a falar com os sogros?", r: "A", o: ["Ela 👸", "Ele 🧔", "Foi no mesmo dia para ambos 👥", "Ainda evitamos 🤫"] },
+                { p: "Qual foi o primeiro presente dado?", r: "D", o: ["Uma roupa 👕", "Um chocolate/doce 🍫", "Algo feito à mão 🎨", "Outra coisa/Lembrancinha 🎁"] },
+                { p: "Qual o primeiro filme que viram juntos?", r: "B", o: ["No cinema com pipoca 🍿", "Na TV de casa 📺", "Lembramos o nome certinho! 🎬", "Esquecemos completamente 🎞️"] },
+                { p: "Quem costuma esquecer as chaves ou objetos?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois vivem perdendo coisas 🔑", "Somos muito organizados 📁"] },
+                { p: "Onde vocês estavam quando decidiram namorar?", r: "A", o: ["Lugar marcante externo 🌲", "Na casa de um de nós 🏠", "Por mensagem/Ligação 📞", "Aconteceu naturalmente sem pedido 🕊️"] },
+                { p: "Quem guarda mais prints antigos de momentos fofos?", r: "A", o: ["Ela 👸", "Ele 🧔", "Nossa galeria está cheia 📸", "Não tiramos prints 📵"] },
+                { p: "Qual detalhe do primeiro dia vocês mais comentam?", r: "C", o: ["O nervosismo/Vergonha 🫨", "A roupa esquisita 🧥", "A primeira risada real 😂", "O atraso de alguém ⏰"] },
+                { p: "Quem lembra melhor dos aniversários da família?", r: "A", o: ["Ela 👸", "Ele 🧔", "Temos que usar o calendário do Google 📆", "Sempre esquecemos 🥲"] },
+                { p: "Qual foi a primeira briga boba por bobeira?", r: "D", o: ["Ciúmes de redes sociais 🌐", "Demora para responder 📱", "Decisão de onde comer 🍕", "Nem lembramos o motivo de tão boba 🕊️"] },
+                { p: "Quem tem mais facilidade para guardar caminhos de rua?", r: "B", o: ["Ela 👸", "Ele 🧔", "O GPS é nosso melhor amigo 🗺️", "Sempre erramos o caminho 🧭"] },
+                { p: "Quem lembra o horário que o outro nasceu?", r: "C", o: ["Ela sabe o dele 👸", "Ele sabe o dela 🧔", "Os dois sabem! ⏰", "Nenhum sabe o próprio horário 🤷‍♀️"] },
+                { p: "Quem guarda cartas ou ingressos antigos de papel?", r: "A", o: ["Ela guarda tudo numa caixinha 📦", "Ele guarda na carteira 💳", "Jogamos fora sem querer 🗑️", "Não guardamos papéis 📄"] }
             ],
             4: [ // FUTURO
-                { p: "Qual é o próximo destino de viagem dos sonhos?", r: "C", o: ["PARIS 🥐", "JAPÃO ⛩️", "MALDIVAS 🏝️", "NEW YORK 🗽"] },
-                { p: "Quantos filhos o parceiro gostaria de ter?", r: "A", o: ["UM 👶", "DOIS 🧒🧒", "TRES 🧑🧑🧑", "NENHUM 🐶"] }
+                { p: "Onde gostariam de morar no futuro?", r: "C", o: ["Apartamento na cidade grande 🏢", "Casa espaçosa em bairro calmo 🏡", "Chácara ou perto da natureza 🍃", "Ir para fora do país ✈️"] },
+                { p: "Quantos filhos ou pets pretendem ter?", r: "B", o: ["Só filhos humanos 🧒", "Só filhos de quatro patas (pets) 🐶", "Os dois combinados! 👶🐾", "Nenhum dos dois, foco total em viajar 🗺️"] },
+                { p: "Qual o maior plano financeiro do casal?", r: "A", o: ["Ter o próprio negócio/Empreender 💼", "Estabilidade em concurso público 📝", "Trabalhar com internet/Tecnologia 💻", "Ficar rico investindo 🪙"] },
+                { p: "Qual o destino da viagem dos sonhos de vocês?", r: "C", o: ["Lugares históricos/Europa 🥐", "Ilha paradisíaca/Maldivas 🏝️", "Parques de diversão/Disney 🎢", "Conhecer o Brasil todo de carro 🚗"] },
+                { p: "Como imaginam a rotina daqui a 5 anos?", r: "A", o: ["Trabalhando muito e crescendo juntos 📈", "Viajando todo mês ✈️", "Rotina calma e caseira ☕", "Ainda estudando muito 📚"] },
+                { p: "Quem vai cozinhar a maior parte das refeições na casa nova?", r: "B", o: ["Ela 👸", "Ele 🧔", "Vamos revesar ou pedir delivery 🍕", "Quem cozinhar melhor assume 🍳"] },
+                { p: "Qual estilo de decoração a casa de vocês vai ter?", r: "A", o: ["Moderna e cheia de tecnologia 💻", "Rústica com plantas e madeira 🌱", "Simples e minimalista ⚪", "Quarto gamer e decorações de filmes 🎮"] },
+                { p: "Quem vai gerenciar as contas e economias?", r: "A", o: ["Ela (controlada) 👸", "Ele (investidor) 🧔", "Cada um cuida do seu e divide 🤝", "Vai ser uma bagunça parcelada 💳"] },
+                { p: "Qual o primeiro grande bem que querem comprar juntos?", r: "C", o: ["Um carro confortável 🚗", "Uma moto potente 🏍️", "A casa/Apartamento próprio 🔑", "Móveis e eletrônicos caros 📺"] },
+                { p: "Como vai ser o casamento dos sonhos?", r: "B", o: ["Festa gigante com muita gente 🎪", "Cerimônia íntima só para família 🌸", "Casar na praia ou campo 🏖️", "Apenas assinar o papel e viajar ✈️"] },
+                { p: "Quem vai acordar mais cedo na rotina do futuro?", r: "B", o: ["Ela 👸", "Ele 🧔", "Nenhum, os dois gostam de dormir 😴", "A rotina do trabalho vai obrigar ⏰"] },
+                { p: "Qual pet não pode faltar na casa nova?", r: "A", o: ["Cachorro grande ou pequeno 🐶", "Gato companheiro 🐱", "Passarinho/Peixe 🐟", "Nenhum bicho dentro de casa 🚫"] },
+                { p: "Onde vocês se imaginam passando a aposentadoria?", r: "C", o: ["Na praia vendo o mar 🌊", "No interior cuidando de plantas 🏡", "Viajando em um motorhome 🚐", "Na cidade perto de tudo 🏙️"] },
+                { p: "Se pudessem escolher um superpoder para o futuro, qual seria?", r: "A", o: ["Teletransporte para viajar de graça ⚡", "Ler a mente do parceiro 🧠", "Prever o futuro financeiro 🔮", "Tempo infinito para dormir ⏳"] },
+                { p: "Qual hábito atual vocês querem levar para sempre?", r: "D", o: ["Assistir séries juntinhos no frio 🍿", "Conversar sobre o dia antes de dormir 💬", "Fazer planos mirabolantes 🗺️", "Todas as alternativas anteriores! 🥰"] },
+                { p: "Quem é mais focado em estudar para garantir o futuro?", r: "A", o: ["Ela 👸", "Ele 🧔", "Os dois se cobram muito 📚", "Levamos de forma mais leve 🕊️"] }
             ],
             5: [ // ESPECIAIS
-                { p: "Qual é a maior virtude do seu parceiro?", r: "D", o: ["PACIÊNCIA 😌", "SINCERIDADE ✨", "INTELIGÊNCIA 🧠", "SENSO DE HUMOR 😂"] },
-                { p: "Qual hábito do parceiro você acha mais fofo?", r: "C", o: ["MANEIRA DE RIR 😂", "FALAR DORMINDO 💤", "JEITO DE ESPREGUIÇAR 🦁", "CONTARE HISTÓRIAS 💬"] }
+                { p: "Qual a maior virtude do relacionamento de vocês?", r: "D", o: ["A confiança total 🤝", "O carinho diário 🥰", "A parceria para qualquer hora 🚀", "A amizade e as risadas bobas 😂"] },
+                { p: "O que o parceiro faz que te deixa bobo(a) de amor?", r: "C", o: ["O sorriso sincero 😁", "O jeito de olhar fixo 👀", "O abraço protetor de surpresa 🤗", "Quando cuida de mim doente 💊"] },
+                { p: "Qual o maior aprendizado que tiveram juntos?", r: "B", o: ["Ter mais paciência 😌", "Ouvir e conversar mais 💬", "Demonstrar sentimentos sem medo 💖", "Dividir as coisas igualmente 🤝"] },
+                { p: "Se o relacionamento fosse um filme, qual gênero seria?", r: "C", o: ["Comédia romântica clichê 🍿", "Aventura cheia de adrenalina 🎢", "Fantasia mágica ✨", "Um documentário engraçado 📽️"] },
+                { p: "Qual o nível de conexão do casal em silêncio?", r: "A", o: ["Nos entendemos só pelo olhar! 👀", "Fica um silêncio confortável ☕", "Dá agonia, temos que falar algo 💬", "Depende do dia e do humor 🌤️"] },
+                { p: "Qual o cheiro que mais lembra o parceiro?", r: "B", o: ["O perfume oficial dele(a) 🧴", "Cheiro de roupa limpa 👕", "Cheiro de abraço quentinho 🤗", "Cheiro de comida boa 🍕"] },
+                { p: "O que vocês mais sentem falta quando estão longe?", r: "D", o: ["Das conversas bestas 💬", "Do carinho físico 💖", "Da presença do outro no ambiente 🏢", "De tudo junto ao mesmo tempo! 🌍"] },
+                { p: "O que faz vocês resolverem qualquer briga?", r: "A", o: ["Uma conversa sincera na hora 💬", "Um abraço forte em silêncio 🤗", "Pedir desculpas com comida 🍕", "Esperar o sangue esfriar sozinhos ⏳"] },
+                { p: "Qual a melhor parte de namorar o outro?", r: "D", o: ["Ter alguém para desabafar tudo 🗣️", "Se sentir seguro e amado(a) 🛡️", "Ter uma companhia para qualquer rolê 🏃‍♂️", "Poder ser eu mesmo(a) sem julgamentos 🎭"] },
+                { p: "O que define o apoio que dão um ao outro?", r: "A", o: ["Incondicional, apoiamos qualquer sonho! 🚀", "Pés no chão, ajudamos a avaliar tudo 🗺️", "Silencioso, mas sempre presente 🤫", "Cobramos o crescimento mútuo 📈"] },
+                { p: "Qual detalhe físico você mais repara no outro?", r: "B", o: ["Os olhos 👁️", "O sorriso/Boca 👄", "O cabelo 💇‍♂️", "As mãos/Abraço 🤝"] },
+                { p: "Qual música secreta faz vocês lembrarem um do outro?", r: "C", o: ["Um funk animado 💃", "Um pop acústico calmo 🎸", "Aquela música brega que cantamos rindo 🎤", "Não temos músicas secretas ❌"] },
+                { p: "O que mais acalma o parceiro em um dia estressante?", r: "A", o: ["Ficar quietinho recebendo cafuné 💆‍♂️", "Desabafar falando sem parar 🗣️", "Comer o lanche favorito 🍔", "Dormir por algumas horas 💤"] },
+                { p: "Qual brincadeira interna só vocês dois entendem?", r: "C", o: ["Uma piada com alguma palavra 🔤", "Um som ou careta esquisita 😜", "Um meme interno muito antigo 🎞️", "Não temos brincadeiras internas 🤷‍♂️"] },
+                { p: "Qual o maior sonho em comum no momento?", r: "A", o: ["Fazer a nossa primeira grande viagem ✈️", "Terminar os estudos bem colocados 🎓", "Comprar algo importante juntos 🔑", "Ficar mais tempo juntos na semana ⏰"] },
+                { p: "Se pudessem congelar o tempo em um momento, qual seria?", r: "B", o: ["No meio de uma crise de riso juntos 😂", "Em um abraço bem calmo no frio ❄️", "No instante do reencontro após dias longe ⏰", "Em um rolê inesquecível de férias 🏖️"] }
+            ],
+            6: [ // TEMA DELE
+                { p: "Qual o prato ou lanche favorito do Ele?", r: "A", o: ["Lasanha 🍝", "Pizza de calabresa 🍕", "Hambúrguer artesanal 🍔", "Churrasco com os amigos 🥩"] },
+                { p: "Qual o maior hobby ou passatempo do Ele?", r: "C", o: ["Assistir jogos de futebol ⚽", "Academia e treinos 🏋️‍♂️", "Jogar videogame/PC 🎮", "Ver vídeos no YouTube/Kwai 📱"] },
+                { p: "Qual o estilo de roupa que o Ele mais gosta de usar?", r: "B", o: ["Social e camisa polo 👕", "Camiseta casual e bermuda 🩳", "Estilo esportivo/Moletom 👟", "O que estiver limpo no armário 🤷‍♂️"] },
+                { p: "O que mais irrita o Ele facilmente?", r: "A", o: ["Fome extrema 😡🍔", "Internet caindo ou travando 🌐", "Demora excessiva para sair ⏰", "Gente fazendo drama desnecessário 🎭"] },
+                { p: "Qual o maior sonho de consumo material do Ele?", r: "D", o: ["Um celular topo de linha 📱", "Um computador gamer potente 🖥️", "Uma moto esportiva 🏍️", "O carro dos sonhos modificado 🏎️"] },
+                { p: "Como o Ele reage quando está triste ou estressado?", r: "C", o: ["Fica reclamando e falando bastante 🗣️", "Quer carinho e atenção imediata 🥺", "Fica mais quieto no canto dele 🤫", "Tenta se distrair jogando/Assistindo 🎮"] },
+                { p: "Qual o super-herói ou personagem de filme favorito do Ele?", r: "A", o: ["Batman ou herói sombrio 🦇", "Homem-Aranha ou herói carismático 🕷️", "Personagem de ação de carros (Brian/Toretto) 🏎️", "Não liga para heróis ❌"] },
+                { p: "Se o Ele pudesse comer apenas uma coisa para o resto da vida, seria:", r: "B", o: ["Arroz, feijão e carne frita 🥩", "Pizza de qualquer sabor 🍕", "Hambúrguer com muita batata 🍟", "Açaí lotado de acompanhamentos 🍧"] },
+                { p: "Qual o maior talento oculto ou habilidade do Ele?", r: "A", o: ["Manjar muito de tecnologia/Jogos 💻", "Cozinhar lanches ótimos 🍳", "Saber piadas na hora certa 😂", "Ter facilidade com cálculos/Lógica 🧠"] },
+                { p: "Quem é o Ele na hora de acordar de manhã?", r: "B", o: ["Acorda elétrico e disposto ☀️", "Coloca 10 despertadores e acorda bravo ⏰", "Levanta arrastando os pés e toma café ☕", "Dorme direto se ninguém chamar 😴"] },
+                { p: "Qual estilo de música domina a playlist do Ele?", r: "D", o: ["Sertanejo ou pisadinha animada 🤠", "Rock ou metal pesado 🎸", "Rap/Trap nacional 🎤", "Músicas de jogos ou eletrônica 🎧"] },
+                { p: "Qual o maior medo secreto ou receio do Ele?", r: "B", o: ["Insetos voadores/Barata 🪳", "Fracassar nos planos de futuro 📉", "Ficar sem bateria na rua 🪫", "Lugares muito altos/Alturas 🏔️"] },
+                { p: "O que o Ele acha que faz melhor do que a Ela?", r: "C", o: ["Ter paciência em discussões 😌", "Escolher filmes bons para assistir 🎬", "Jogar qualquer tipo de jogo 🎮", "Economizar dinheiro nas saídas 🪙"] },
+                { p: "Qual o time de futebol do coração do Ele?", r: "A", o: ["Acompanha e torce muito ⚽", "Só torce em jogos grandes 🏆", "Não liga para futebol de jeito nenhum 🚫", "Prefere outros esportes 🏎️"] },
+                { p: "O que o Ele mais repara em uma menina de início?", r: "B", o: ["O estilo de se vestir 👗", "O olhar e o sorriso 😁", "O jeito de falar e a simpatia 💬", "O cabelo 💇‍♀️"] },
+                { p: "Qual a mania mais engraçada ou esquisita do Ele?", r: "A", o: ["Ficar mexendo no cabelo toda hora 💇‍♂️", "Ficar balançando a perna quando senta 🦵", "Falar sozinho jogando 🎮", "Fazer piada em momentos sérios 🤡"] }
             ]
         };
-
-        const categoriasNomes = { 1: "ROMANCE", 2: "DIVERSÃO", 3: "MEMÓRIA", 4: "FUTURO", 5: "ESPECIAIS" };
-        const categoriasÍcones = { 1: "💖", 2: "🎭", 3: "🧠", 4: "✈️", 5: "✨" };
 
         let categoriaAtual = 1;
         let perguntaIndice = 0;
@@ -657,317 +403,178 @@
         let timerInterval;
         let pontosNos = 78;
         let pontosBonus = 12;
-        let pistaUsadaNaRodada = false;
+        let turnoJogador = "ela"; // ela -> ele -> confirmacao
 
-        // Elementos DOM
+        let escolhaEla = null;
+        let escolhaEle = null;
+
         const elCaixaPergunta = document.getElementById("caixa-pergunta");
         const elTempo = document.getElementById("tempo");
         const elOpcoesEla = document.getElementById("opcoes-ela");
         const elOpcoesEle = document.getElementById("opcoes-ele");
         const elPontosNos = document.getElementById("pts-nos");
+        const elStatusNos = document.getElementById("status-nos-pts");
         const elPontosBonus = document.getElementById("vlr-bonus");
-        const elCategoriaTitulo = document.querySelector("#pnl-categoria .titulo-painel");
+        const elBtnConfirmar = document.getElementById("btn-confirmar");
 
-        // Mecânica Síncrona Local
         function renderizarPergunta() {
-            pistaUsadaNaRodada = false;
-            document.getElementById("btn-pista").disabled = false;
-            document.getElementById("btn-pista").style.opacity = 1;
+            let catID = categoriaAtual;
+            if (categoriaAtual === "aleatorio") {
+                catID = Math.floor(Math.random() * 6) + 1;
+            }
 
-            const dados = perguntas[categoriaAtual][perguntaIndice];
-            if (!dados) return; // Erro de carregamento
-
+            const pool = bancoPerguntas[catID];
+            // Garante que o índice não estoure o banco de dados
+            if (perguntaIndice >= pool.length) perguntaIndice = 0;
+            
+            const dados = pool[perguntaIndice];
             elCaixaPergunta.textContent = dados.p.toUpperCase();
+            elCaixaPergunta.className = ""; 
+
             elOpcoesEla.innerHTML = "";
             elOpcoesEle.innerHTML = "";
-
             const alternativas = ["A", "B", "C", "D"];
 
             for (let i = 0; i < 4; i++) {
-                // Renderizar para ELA
                 const btnEla = document.createElement("button");
                 btnEla.className = "btn-opcao";
-                btnEla.id = `opcao-ela-${alternativas[i]}`;
+                btnEla.id = `opt-ela-${alternativas[i]}`;
                 btnEla.textContent = `${alternativas[i]}) ${dados.o[i]}`;
-                btnEla.onclick = () => selecionarOpcao('ela', alternativas[i]);
+                btnEla.onclick = () => selecionar('ela', alternativas[i]);
                 elOpcoesEla.appendChild(btnEla);
 
-                // Renderizar para ELE
                 const btnEle = document.createElement("button");
                 btnEle.className = "btn-opcao";
-                btnEle.id = `opcao-ele-${alternativas[i]}`;
+                btnEle.id = `opt-ele-${alternativas[i]}`;
                 btnEle.textContent = `${alternativas[i]}) ${dados.o[i]}`;
-                btnEle.onclick = () => selecionarOpcao('ele', alternativas[i]);
+                btnEle.onclick = () => selecionar('ele', alternativas[i]);
                 elOpcoesEle.appendChild(btnEle);
             }
 
-            elCategoriaTitulo.textContent = `CATEGORIA: ${categoriasNomes[categoriaAtual]}`;
-            atualizarContadoresCategoria();
+            configurarTurno("ela");
             resetTimer();
         }
 
-        let opcaoSelecionadaEla = null;
-        let opcaoSelecionadaEle = null;
+        function selecionar(jogador, alt) {
+            if (jogador !== turnoJogador) return; // Impede responder fora do turno
 
-        function selecionarOpcao(jogador, alternativa) {
-            // Desmarcar anterior
             if (jogador === 'ela') {
-                if (opcaoSelecionadaEla) document.getElementById(`opcao-ela-${opcaoSelecionadaEla}`).classList.remove("selecionado");
-                opcaoSelecionadaEla = alternativa;
+                if (escolhaEla) document.getElementById(`opt-ela-${escolhaEla}`).classList.remove("selecionado");
+                escolhaEla = alt;
             } else {
-                if (opcaoSelecionadaEle) document.getElementById(`opcao-ele-${opcaoSelecionadaEle}`).classList.remove("selecionado");
-                opcaoSelecionadaEle = alternativa;
+                if (escolhaEle) document.getElementById(`opt-ele-${escolhaEle}`).classList.remove("selecionado");
+                escolhaEle = alt;
             }
-
-            // Marcar novo
-            document.getElementById(`opcao-${jogador}-${alternativa}`).classList.add("selecionado");
-            
-            // Feedback visual D-pad (Apenas visual, sem mecânica associada)
-            const dpad = document.querySelector(".dpad-cruz");
-            dpad.style.borderColor = (jogador === 'ela') ? '#ff6b81' : '#d1c4e9'; // Rosa p/ ela, Roxo p/ ele
-            setTimeout(() => dpad.style.borderColor = '#111', 150);
+            document.getElementById(`opt-${jogador}-${alt}`).classList.add("selecionado");
         }
 
-        // Validação de Afinidade
-        document.getElementById("btn-confirmar").onclick = function() {
-            if (!opcaoSelecionadaEla || !opcaoSelecionadaEle) {
-                alert("OS DOIS PRECISAM SELECIONAR UMA RESPOSTA!");
-                return;
+        function configurarTurno(turno) {
+            turnoJogador = turno;
+            if (turno === "ela") {
+                document.getElementById("privacidade-ela").style.display = "none";
+                document.getElementById("privacidade-ele").style.display = "flex";
+                elBtnConfirmar.textContent = "PRONTINHO (PROX. TURNO)";
+                elBtnConfirmar.style.background = "#2980b9";
+            } else if (turno === "ele") {
+                document.getElementById("privacidade-ela").style.display = "flex";
+                document.getElementById("privacidade-ele").style.display = "none";
+                elBtnConfirmar.textContent = "REVELAR RESPOSTAS 🚨";
+                elBtnConfirmar.style.background = "#e67e22";
             }
+        }
 
-            confirmarResposta();
+        elBtnConfirmar.onclick = function() {
+            if (turnoJogador === "ela") {
+                if (!escolhaEla) { alert("ELA PRECISA RESPONDER!"); return; }
+                configurarTurno("ele");
+            } else if (turnoJogador === "ele") {
+                if (!escolhaEle) { alert("ELE PRECISA RESPONDER!"); return; }
+                validarAfinidade();
+            }
         };
 
-        function confirmarResposta() {
+        function validarAfinidade() {
             clearInterval(timerInterval);
+            document.getElementById("privacidade-ela").style.display = "none";
+            document.getElementById("privacidade-ele").style.display = "none";
 
-            // Verifica se as escolhas são iguais
-            if (opcaoSelecionadaEla === opcaoSelecionadaEle) {
-                // Acerto: Somas pontos e progressos
-                somarPontos();
-                animacaoSucesso();
+            // Se baterem as respostas (Afinidade!)
+            if (escolhaEla === escolhaEle) {
+                pontosNos += 10;
+                pontosBonus += 2;
+                elCaixaPergunta.textContent = "SINTONIA PERFEITA! VOCES COINCIDIRAM! ✨";
+                elCaixaPergunta.className = "acerto";
+                document.getElementById(`opt-ela-${escolhaEla}`).className = "btn-opcao acerto";
+                document.getElementById(`opt-ele-${escolhaEle}`).className = "btn-opcao acerto";
             } else {
-                // Erro: Feedback visual negativo
-                animacaoErro();
+                elCaixaPergunta.textContent = "DIVIRGIRAM! CADA UM PENSOO DE UM JEITO 💔";
+                elCaixaPergunta.className = "erro";
+                document.getElementById(`opt-ela-${escolhaEla}`).className = "btn-opcao erro";
+                document.getElementById(`opt-ele-${escolhaEle}`).className = "btn-opcao erro";
             }
 
-            resetSelecoes();
-            setTimeout(proximaPergunta, 1500); // Aguarda animação
-        }
-
-        function somarPontos() {
-            pontosNos += 10;
-            pontosBonus += 2;
             elPontosNos.textContent = `${pontosNos} PTS`;
+            elStatusNos.textContent = `${pontosNos} PTS`;
             elPontosBonus.textContent = `${pontosBonus} PB`;
-            
-            // Incrementa contadores de estrela na categoria e progresso
-            incrementarEstrelas();
-        }
 
-        function animacaoSucesso() {
-            elCaixaPergunta.style.color = "#27ae60"; // Verde
-            elCaixaPergunta.textContent = "ACERTARAM! +10 PONTOS!";
-            
-            // Corações concêntricos neon piscam mais rápido
-            document.querySelectorAll(".neon-coracao").forEach(el => {
-                el.style.animationDuration = '0.5s';
-            });
-            
-            // Sombra do verde grama pisca
-            document.getElementById("quadro-jogo").style.boxShadow = "0 0 20px #2ecc71";
-
+            turnoJogador = "travado";
             setTimeout(() => {
-                elCaixaPergunta.style.color = "black";
-                document.querySelectorAll(".neon-coracao").forEach(el => { el.style.animationDuration = '1.5s'; });
-                document.getElementById("quadro-jogo").style.boxShadow = "none";
-            }, 1000);
+                escolhaEla = null;
+                escolhaEle = null;
+                perguntaIndice++;
+                renderizarPergunta();
+            }, 3000);
         }
 
-        function animacaoErro() {
-            elCaixaPergunta.style.color = "#e74c3c"; // Vermelho suave
-            elCaixaPergunta.textContent = `DIVIRGIRAM! ELA: ${opcaoSelecionadaEla}, ELE: ${opcaoSelecionadaEle}`;
-
-            // Sombra do verde grama pisca vermelho
-            document.getElementById("quadro-jogo").style.boxShadow = "0 0 20px #e74c3c";
-
-            setTimeout(() => {
-                elCaixaPergunta.style.color = "black";
-                document.getElementById("quadro-jogo").style.boxShadow = "none";
-            }, 1000);
-        }
-
-        // Sistema de Pistas
-        document.getElementById("btn-pista").onclick = function() {
-            if (pistaUsadaNaRodada) return; // Limite de 1 por rodada
-
-            usarPista();
-        };
-
-        function usarPista() {
-            pistaUsadaNaRodada = true;
-            document.getElementById("btn-pista").disabled = true;
-            document.getElementById("btn-pista").style.opacity = 0.5;
-
-            const dados = perguntas[categoriaAtual][perguntaIndice];
-            const alternativas = ["A", "B", "C", "D"];
-            
-            // Identifica as alternativas incorretas
-            const incorretas = alternativas.filter(alt => alt !== dados.r);
-            
-            // Embaralha incorretas e pega as duas primeiras
-            const incorretasParaEliminar = incorretas.sort(() => 0.5 - Math.random()).slice(0, 2);
-
-            // Elimina (esconde) visualmente em ambos os painéis
-            incorretasParaEliminar.forEach(alt => {
-                const btnEla = document.getElementById(`opcao-ela-${alt}`);
-                const btnEle = document.getElementById(`opcao-ele-${alt}`);
-                if (btnEla) {
-                    btnEla.style.opacity = 0.2;
-                    btnEla.disabled = true;
-                    btnEla.classList.remove("selecionado");
-                    if (opcaoSelecionadaEla === alt) opcaoSelecionadaEla = null;
-                }
-                if (btnEle) {
-                    btnEle.style.opacity = 0.2;
-                    btnEle.disabled = true;
-                    btnEle.classList.remove("selecionado");
-                    if (opcaoSelecionadaEle === alt) opcaoSelecionadaEle = null;
-                }
-            });
-
-            // Feedback visual botão pista
-            document.getElementById("btn-pista").style.boxShadow = "0 0 10px #2ecc71";
-            setTimeout(() => document.getElementById("btn-pista").style.boxShadow = "0 8px 0 #111", 300);
-        }
-
-        // Temporizador Ativo
         function resetTimer() {
             clearInterval(timerInterval);
             tempoRestante = 15;
             elTempo.textContent = `${tempoRestante}S`;
-            elTempo.style.color = "white";
-
             timerInterval = setInterval(() => {
                 tempoRestante--;
                 elTempo.textContent = `${tempoRestante}S`;
-
-                // Urgência visual nos últimos segundos
-                if (tempoRestante <= 5) {
-                    elTempo.style.color = "#e74c3c";
-                    if (tempoRestante % 2 === 0) elTempo.style.visibility = "hidden";
-                    else elTempo.style.visibility = "visible";
-                }
-
                 if (tempoRestante <= 0) {
                     clearInterval(timerInterval);
-                    elTempo.style.visibility = "visible";
-                    // Se o tempo esgotar, processa como divergência automática
-                    if (!opcaoSelecionadaEla || !opcaoSelecionadaEle) {
-                        opcaoSelecionadaEla = "N/A"; // Gambiarra p/ divergência
-                        opcaoSelecionadaEle = "TEMPO"; 
-                    }
-                    confirmarResposta();
+                    if (!escolhaEla) escolhaEla = "N/A";
+                    if (!escolhaEle) escolhaEle = "N/A";
+                    validarAfinidade();
                 }
             }, 1000);
         }
 
-        // Interatividade Total
-        document.querySelectorAll(".btn-tema").forEach((btn, index) => {
-            btn.onclick = () => mudarTema(index + 1);
-        });
-
-        function mudarTema(index) {
-            categoriaAtual = index;
-            perguntaIndice = 0; // Reinicia o índice para o novo tema
-            
-            // Feedback visual de clique D-pad
-            const dpad = document.querySelector(".dpad-cruz");
-            dpad.style.borderColor = '#ffd700'; // Amarelo tema
-            setTimeout(() => dpad.style.borderColor = '#111', 150);
-
-            resetSelecoes();
+        function mudarTema(tema) {
+            categoriaAtual = tema;
+            perguntaIndice = 0;
+            escolhaEla = null;
+            escolhaEle = null;
             renderizarPergunta();
         }
 
-        // Navegação D-pad visual feedback apenas
-        document.querySelectorAll(".btn-seta").forEach(btn => {
-            btn.onclick = () => {
-                const dpad = document.querySelector(".dpad-cruz");
-                dpad.style.borderColor = '#ccc';
-                setTimeout(() => dpad.style.borderColor = '#111', 150);
-            };
-        });
-
-        // Funções Auxiliares
-        function proximaPergunta() {
-            perguntaIndice++;
-            // Verifica se acabou as perguntas do tema atual
-            if (perguntaIndice >= perguntas[categoriaAtual].length) {
-                // Passa para próximo tema ou cicla
-                perguntaIndice = 0;
-                categoriaAtual++;
-                if (categoriaAtual > 5) categoriaAtual = 1;
-            }
-            renderizarPergunta();
+        function mudarAba(abaId) {
+            document.querySelectorAll('.conteudo-aba').forEach(el => el.classList.remove('ativa'));
+            document.querySelectorAll('.aba-btn').forEach(el => el.classList.remove('ativa'));
+            document.getElementById(abaId).classList.add('ativa');
+            event.currentTarget.classList.add('ativa');
         }
 
-        function resetSelecoes() {
-            opcaoSelecionadaEla = null;
-            opcaoSelecionadaEle = null;
-            document.querySelectorAll(".btn-opcao").forEach(btn => btn.classList.remove("selecionado"));
-        }
+        // SISTEMA DE PISTA (Elimina duas erradas)
+        document.getElementById("btn-pista").onclick = function() {
+            let catID = categoriaAtual === "aleatorio" ? 1 : categoriaAtual;
+            const dados = bancoPerguntas[catID][perguntaIndice];
+            const erradas = ["A", "B", "C", "D"].filter(a => a !== dados.r);
+            const sorteadas = erradas.sort(() => 0.5 - Math.random()).slice(0, 2);
 
-        // Contadores de Estrela
-        const estrelasCategoria = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        const estrelasProgresso = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-
-        const idsCategoria = { 1: "romance", 2: "diversao", 3: "memoria", 4: "futuro" };
-        const idsProgresso = { 1: "p-romance", 2: "p-diversao", 3: "p-memoria", 4: "p-futuro" };
-
-        function incrementarEstrelas() {
-            // Categoria (reinicia a cada tema/pergunta mas incrementa o total acumulado)
-            estrelasCategoria[categoriaAtual]++;
-            // Progresso (acumulado do jogo)
-            estrelasProgresso[categoriaAtual]++;
-
-            atualizarContadoresCategoria();
-            atualizarContadoresProgresso();
-        }
-
-        function atualizarContadoresCategoria() {
-            // Categoria só mostra p/ temas 1-4. Especial (5) não mostra.
-            if (categoriaAtual <= 4) {
-                const id = idsCategoria[categoriaAtual];
-                document.getElementById(`star-${id}`).textContent = estrelasCategoria[categoriaAtual];
-                
-                // Reinicia os outros contadores visuais da categoria p/ 0
-                for (let cat = 1; cat <= 4; cat++) {
-                    if (cat !== categoriaAtual) {
-                        const otherId = idsCategoria[cat];
-                        document.getElementById(`star-${otherId}`).textContent = 0;
-                    }
+            sorteadas.forEach(alt => {
+                const opt = document.getElementById(`opt-${turnoJogador}-${alt}`);
+                if (opt) {
+                    opt.style.opacity = "0.3";
+                    opt.style.pointerEvents = "none";
                 }
-            } else {
-                // Se tema for especial, todos zerados visualmente na categoria
-                for (let cat = 1; cat <= 4; cat++) {
-                    const otherId = idsCategoria[cat];
-                    document.getElementById(`star-${otherId}`).textContent = 0;
-                }
-            }
-        }
+            });
+        };
 
-        function atualizarContadoresProgresso() {
-             // Progresso só mostra p/ temas 1-4. Especial (5) não acumula estrela visual.
-            if (categoriaAtual <= 4) {
-                const id = idsProgresso[categoriaAtual];
-                document.getElementById(`star-${id}`).textContent = estrelasProgresso[categoriaAtual];
-            }
-        }
-
-        // Inicialização
+        // Inicializar o jogo
         renderizarPergunta();
-
     </script>
 </body>
 </html>
