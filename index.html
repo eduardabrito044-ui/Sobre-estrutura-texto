@@ -25,8 +25,72 @@
             box-sizing: border-box;
         }
 
+        /* TELA DE LOGIN INITIAL */
+        #tela-login {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .caixa-login {
+            background-color: rgba(30, 30, 38, 0.95);
+            border: 4px solid #3a3a4a;
+            border-radius: 12px;
+            box-shadow: 0px 6px 0px #111;
+            padding: 25px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .caixa-login h2 {
+            color: #ffd700;
+            margin-top: 0;
+            font-size: 1.4em;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .input-login {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 3px solid #3a3a4a;
+            border-radius: 8px;
+            background-color: #111;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1em;
+            box-sizing: border-box;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .btn-login {
+            background: linear-gradient(to bottom, #d81b60, #ad1457);
+            color: white;
+            border: 3px solid #3a3a4a;
+            border-radius: 8px;
+            padding: 12px 25px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0px 4px 0px #111;
+            width: 100%;
+        }
+
+        .btn-login:active {
+            transform: translateY(3px);
+            box-shadow: 0px 1px 0px #111;
+        }
+
+        /* CONTAINER DO JOGO */
         #main-container {
-            display: grid;
+            display: none; /* Começa escondido até logar */
             grid-template-columns: 1.8fr 1.2fr;
             max-width: 1200px;
             margin: 0 auto;
@@ -59,7 +123,6 @@
             font-weight: bold;
         }
 
-        /* PAINEL DO JOGO */
         #header-quiz {
             text-align: center;
             margin-bottom: 10px;
@@ -89,25 +152,24 @@
             border: 3px solid #5c3e32;
             text-align: center;
             font-weight: bold;
-            font-size: 0.95em;
+            font-size: 0.85em;
             width: 95%;
             margin-bottom: 8px;
+            word-wrap: break-word;
             transition: background-color 0.3s, color 0.3s;
         }
 
         #cronometro { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
 
-        /* SISTEMA ANTI-ROUBO: TELAS INDIVIDUAIS */
+        /* PAINEL DE RESPOSTAS AJUSTADO PARA CORREÇÃO MOBILE */
         #zona-respostas {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             width: 100%;
             z-index: 2;
-        }
-
-        @media (max-width: 600px) {
-            #zona-respostas { grid-template-columns: 1fr; gap: 10px; }
+            padding: 0 5px;
+            box-sizing: border-box;
         }
 
         .pnl-resposta {
@@ -117,7 +179,9 @@
             padding: 8px;
             color: black;
             position: relative;
-            min-height: 180px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 0.9em;
         }
 
         .tela-privacidade {
@@ -144,7 +208,7 @@
             color: black;
             border: 2px solid #ccc;
             border-radius: 15px;
-            padding: 6px 12px;
+            padding: 8px 12px;
             text-align: left;
             font-size: 0.85em;
             cursor: pointer;
@@ -157,7 +221,6 @@
             box-shadow: 0 0 5px #ffd700;
         }
 
-        /* ABAS INTERATIVAS PARA CELULAR */
         .abas-container { display: flex; gap: 5px; margin-bottom: 8px; }
         .aba-btn {
             background-color: #2a2a35;
@@ -175,11 +238,9 @@
         .conteudo-aba { display: none; }
         .conteudo-aba.ativa { display: block; }
 
-        /* CORES DE STATUS */
         .acerto { background-color: #27ae60 !important; color: white !important; }
         .erro { background-color: #c0392b !important; color: white !important; }
 
-        /* MENU DE TEMAS */
         .menu-temas { display: flex; flex-direction: column; gap: 6px; }
         .btn-tema {
             background: linear-gradient(to bottom, #d81b60, #ad1457);
@@ -189,7 +250,6 @@
         }
         .btn-tema:active { box-shadow: 0px 1px 0px #111; transform: translateY(3px); }
 
-        /* CONTROLES INFERIORES */
         #controles-inferiores {
             display: flex; justify-content: space-around; align-items: center;
             padding: 12px; background-color: #2a2a35; border-top: 4px solid #3a3a4a;
@@ -208,11 +268,20 @@
 </head>
 <body>
 
+    <div id="tela-login">
+        <div class="caixa-login">
+            <h2>ENTRAR NO JOGO</h2>
+            <p style="font-size: 0.8em; color: #ccc;">DIGITE SEU NOME PARA ACESSAR SUA TELA PRIVADA:</p>
+            <input type="text" id="campo-nome" class="input-login" placeholder="SEU NOME...">
+            <button class="btn-login" onclick="fazerLoginDoCasal()">ENTRAR</button>
+        </div>
+    </div>
+
     <div id="main-container">
         <div>
             <div id="header-quiz">
                 <h1 id="titulo-principal">QUIZ DE CASAL</h1>
-                <div id="sub-titulo">NOS: <span id="pts-nos" style="color: #ffd700;">78 PTS</span> | <span id="vlr-bonus" style="color: #ff6b81;">12 PB</span></div>
+                <div id="sub-titulo">JOGADOR ATUAL: <span id="nome-logado-painel" style="color:#ffd700;">...</span> | NOS: <span id="pts-nos" style="color: #ffd700;">78 PTS</span> | <span id="vlr-bonus" style="color: #ff6b81;">12 PB</span></div>
             </div>
             
             <div id="quadro-jogo">
@@ -220,16 +289,10 @@
                 <div id="cronometro">TEMPO: <span id="tempo">15S</span></div>
                 
                 <div id="zona-respostas">
-                    <div class="pnl-resposta" id="pnl-ela">
-                        <div style="font-weight: bold; margin-bottom: 5px;">👑 ELA:</div>
-                        <div class="tela-privacidade" id="privacidade-ela" style="display:none;">VEJA PARA O LADO!<br>TURNO DO ELE</div>
-                        <div class="lista-opcoes" id="opcoes-ela"></div>
-                    </div>
-                    
-                    <div class="pnl-resposta" id="pnl-ele">
-                        <div style="font-weight: bold; margin-bottom: 5px;">🧔 ELE:</div>
-                        <div class="tela-privacidade" id="privacidade-ele">AGUARDE...<br>TURNO DA ELA</div>
-                        <div class="lista-opcoes" id="opcoes-ele"></div>
+                    <div class="pnl-resposta">
+                        <div style="font-weight: bold; margin-bottom: 5px;" id="lbl-jogador-local">SUA TELA DE RESPOSTA:</div>
+                        <div class="tela-privacidade" id="privacidade-bloqueio" style="display:none;">AGUARDE O SEU TURNO!</div>
+                        <div class="lista-opcoes" id="opcoes-jogador"></div>
                     </div>
                 </div>
             </div>
@@ -264,6 +327,7 @@
                         CASAL 2: <span style="color:#ffd700">98 PTS</span><br>
                         VOCES: <span id="status-nos-pts" style="color:#2ecc71">78 PTS</span>
                     </div>
+                    <button onclick="fazerLogoff()" style="background:#c0392b; color:white; border:none; padding:8px; border-radius:5px; margin-top:15px; font-family:inherit; cursor:pointer; font-size:0.8em; width:100%;">TROCAR DE JOGADOR / SAIR</button>
                 </div>
             </div>
         </div>
@@ -279,15 +343,15 @@
             </div>
         </div>
         <div style="display: flex; gap: 15px;">
-            <button class="btn-comando" id="btn-confirmar">AVANCAR TURNO</button>
+            <button class="btn-comando" id="btn-confirmar">CONFIRMAR</button>
             <button class="btn-comando" id="btn-pista">USAR PISTA</button>
         </div>
     </div>
 
     <script>
-        // GERADOR DE 100 PERGUNTAS DIVERSIFICADAS (16 a 17 por categoria)
+        // BANCO DE 100 PERGUNTAS INTEGRALMENTE GUARDADO
         const bancoPerguntas = {
-            1: [ // ROMANCE
+            1: [
                 { p: "Qual o melhor lugar para um encontro perfeito?", r: "A", o: ["Jantar à luz de velas 🕯️", "Piquenique no parque 🌳", "Ir ao cinema 🎬", "Ficar em casa vendo série 🍿"] },
                 { p: "Quem demonstrou interesse primeiro?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois juntos ⚡", "Foi por mensagem 📱"] },
                 { p: "Qual o apelido carinhoso mais usado?", r: "A", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] },
@@ -305,7 +369,7 @@
                 { p: "Qual o nível de romantismo do casal?", r: "A", o: ["100% melosos 🍯", "Equilibrados ⚖️", "Mais descontraídos 😎", "Quase nada românticos 🌵"] },
                 { p: "Quem dorme primeiro abraçado?", r: "B", o: ["Ela 👸", "Ele 🧔", "Ninguém dorme abraçado 🥵", "Os dois apagam juntos 😴"] }
             ],
-            2: [ // DIVERSÃO
+            2: [
                 { p: "Qual filme vocês mais assistiram juntos?", r: "B", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] },
                 { p: "Se pudessem virar personagens, quais seriam?", r: "A", o: ["Super-heróis 🦸‍♂️", "Vilões estilosos🦹", "Personagens de anime ⛩️", "Desenho animado 🧸"] },
                 { p: "Qual o rolê ideal de fim de semana?", r: "C", o: ["Festa/Balada 🕺", "Shopping 🛍️", "Comer lanche na praça 🍔", "Jogar online juntos 🎮"] },
@@ -323,14 +387,14 @@
                 { p: "Qual o sabor de pizza oficial do casal?", r: "C", o: ["Calabresa 🍕", "Frango com Catupiry 🍗", "Meio a Meio (Doce/Salgada) 🍫", "Quatro Queijos 🧀"] },
                 { p: "Quem é mais provável de se perder no shopping?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois se perdem juntos 🧭", "Temos senso de direção 🗺️"] }
             ],
-            3: [ // MEMÓRIA
+            3: [
                 { p: "Qual a data exata do aniversário de namoro?", r: "A", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Sempre temos que olhar no celular 📱"] },
                 { p: "Quem lembra mais das conversas antigas?", r: "A", o: ["Ela (memória de elefante) 👸", "Ele (esquece o que comeu ontem) 🧔", "Nenhum lembra nada 🚫", "Lembramos tudo perfeitamente 🧠"] },
                 { p: "De que cor era a roupa do parceiro no primeiro encontro?", r: "C", o: ["Escura/Preta 🖤", "Branca/Clara 🤍", "Lembramos a cor certa! 🎨", "Ninguém faz ideia 🤷‍♂️"] },
                 { p: "Quem demorou mais para responder a primeira mensagem?", r: "B", o: ["Ela 👸", "Ele 🧔", "Foi um papo instantâneo ⚡", "Ninguém lembra do chat 💬"] },
                 { p: "Quem foi o primeiro a falar com os sogros?", r: "A", o: ["Ela 👸", "Ele 🧔", "Foi no mesmo dia para ambos 👥", "Ainda evitamos 🤫"] },
                 { p: "Qual foi o primeiro presente dado?", r: "D", o: ["Uma roupa 👕", "Um chocolate/doce 🍫", "Algo feito à mão 🎨", "Outra coisa/Lembrancinha 🎁"] },
-                { p: "Qual o primeiro filme que viram juntos?", r: "B", o: ["No cinema com pipoca 🍿", "Na TV de casa 📺", "Lembramos o nome certinho! 🎬", "Esquecemos completamente 🎞️"] },
+                { p: "Qual foi o primeiro filme que viram juntos?", r: "B", o: ["No cinema com pipoca 🍿", "Na TV de casa 📺", "Lembramos o nome certinho! 🎬", "Esquecemos completamente 🎞️"] },
                 { p: "Quem costuma esquecer as chaves ou objetos?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois vivem perdendo coisas 🔑", "Somos muito organizados 📁"] },
                 { p: "Onde vocês estavam quando decidiram namorar?", r: "A", o: ["Lugar marcante externo 🌲", "Na casa de um de nós 🏠", "Por mensagem/Ligação 📞", "Aconteceu naturalmente sem pedido 🕊️"] },
                 { p: "Quem guarda mais prints antigos de momentos fofos?", r: "A", o: ["Ela 👸", "Ele 🧔", "Nossa galeria está cheia 📸", "Não tiramos prints 📵"] },
@@ -341,7 +405,7 @@
                 { p: "Quem lembra o horário que o outro nasceu?", r: "C", o: ["Ela sabe o dele 👸", "Ele sabe o dela 🧔", "Os dois sabem! ⏰", "Nenhum sabe o próprio horário 🤷‍♀️"] },
                 { p: "Quem guarda cartas ou ingressos antigos de papel?", r: "A", o: ["Ela guarda tudo numa caixinha 📦", "Ele guarda na carteira 💳", "Jogamos fora sem querer 🗑️", "Não guardamos papéis 📄"] }
             ],
-            4: [ // FUTURO
+            4: [
                 { p: "Onde gostariam de morar no futuro?", r: "C", o: ["Apartamento na cidade grande 🏢", "Casa espaçosa em bairro calmo 🏡", "Chácara ou perto da natureza 🍃", "Ir para fora do país ✈️"] },
                 { p: "Quantos filhos ou pets pretendem ter?", r: "B", o: ["Só filhos humanos 🧒", "Só filhos de quatro patas (pets) 🐶", "Os dois combinados! 👶🐾", "Nenhum dos dois, foco total em viajar 🗺️"] },
                 { p: "Qual o maior plano financeiro do casal?", r: "A", o: ["Ter o próprio negócio/Empreender 💼", "Estabilidade em concurso público 📝", "Trabalhar com internet/Tecnologia 💻", "Ficar rico investindo 🪙"] },
@@ -352,17 +416,17 @@
                 { p: "Quem vai gerenciar as contas e economias?", r: "A", o: ["Ela (controlada) 👸", "Ele (investidor) 🧔", "Cada um cuida do seu e divide 🤝", "Vai ser uma bagunça parcelada 💳"] },
                 { p: "Qual o primeiro grande bem que querem comprar juntos?", r: "C", o: ["Um carro confortável 🚗", "Uma moto potente 🏍️", "A casa/Apartamento próprio 🔑", "Móveis e eletrônicos caros 📺"] },
                 { p: "Como vai ser o casamento dos sonhos?", r: "B", o: ["Festa gigante com muita gente 🎪", "Cerimônia íntima só para família 🌸", "Casar na praia ou campo 🏖️", "Apenas assinar o papel e viajar ✈️"] },
-                { p: "Quem vai acordar mais cedo na rotina do futuro?", r: "B", o: ["Ela 👸", "Ele 🧔", "Nenhum, os dois gostam de dormir 😴", "A rotina do trabalho vai obrigar ⏰"] },
+                { p: "Quem vai acordar mais cedo na rotina do futuro?", r: "B", o: ["Ela 👸", "Ele 🧔", "Nenhun, os dois gostam de dormir 😴", "A rotina do trabalho vai obrigar ⏰"] },
                 { p: "Qual pet não pode faltar na casa nova?", r: "A", o: ["Cachorro grande ou pequeno 🐶", "Gato companheiro 🐱", "Passarinho/Peixe 🐟", "Nenhum bicho dentro de casa 🚫"] },
                 { p: "Onde vocês se imaginam passando a aposentadoria?", r: "C", o: ["Na praia vendo o mar 🌊", "No interior cuidando de plantas 🏡", "Viajando em um motorhome 🚐", "Na cidade perto de tudo 🏙️"] },
                 { p: "Se pudessem escolher um superpoder para o futuro, qual seria?", r: "A", o: ["Teletransporte para viajar de graça ⚡", "Ler a mente do parceiro 🧠", "Prever o futuro financeiro 🔮", "Tempo infinito para dormir ⏳"] },
                 { p: "Qual hábito atual vocês querem levar para sempre?", r: "D", o: ["Assistir séries juntinhos no frio 🍿", "Conversar sobre o dia antes de dormir 💬", "Fazer planos mirabolantes 🗺️", "Todas as alternativas anteriores! 🥰"] },
                 { p: "Quem é mais focado em estudar para garantir o futuro?", r: "A", o: ["Ela 👸", "Ele 🧔", "Os dois se cobram muito 📚", "Levamos de forma mais leve 🕊️"] }
             ],
-            5: [ // ESPECIAIS
+            5: [
                 { p: "Qual a maior virtude do relacionamento de vocês?", r: "D", o: ["A confiança total 🤝", "O carinho diário 🥰", "A parceria para qualquer hora 🚀", "A amizade e as risadas bobas 😂"] },
                 { p: "O que o parceiro faz que te deixa bobo(a) de amor?", r: "C", o: ["O sorriso sincero 😁", "O jeito de olhar fixo 👀", "O abraço protetor de surpresa 🤗", "Quando cuida de mim doente 💊"] },
-                { p: "Qual o maior aprendizado que tiveram juntos?", r: "B", o: ["Ter mais paciência 😌", "Ouvir e conversar mais 💬", "Demonstrar sentimentos sem medo 💖", "Dividir as coisas igualmente 🤝"] },
+                { p: "Qual o maior学习 que tiveram juntos?", r: "B", o: ["Ter mais paciência 😌", "Ouvir e conversar mais 💬", "Demonstrar sentimentos sem medo 💖", "Dividir as coisas igualmente 🤝"] },
                 { p: "Se o relacionamento fosse um filme, qual gênero seria?", r: "C", o: ["Comédia romântica clichê 🍿", "Aventura cheia de adrenalina 🎢", "Fantasia mágica ✨", "Um documentário engraçado 📽️"] },
                 { p: "Qual o nível de conexão do casal em silêncio?", r: "A", o: ["Nos entendemos só pelo olhar! 👀", "Fica um silêncio confortável ☕", "Dá agonia, temos que falar algo 💬", "Depende do dia e do humor 🌤️"] },
                 { p: "Qual o cheiro que mais lembra o parceiro?", r: "B", o: ["O perfume oficial dele(a) 🧴", "Cheiro de roupa limpa 👕", "Cheiro de abraço quentinho 🤗", "Cheiro de comida boa 🍕"] },
@@ -377,7 +441,7 @@
                 { p: "Qual o maior sonho em comum no momento?", r: "A", o: ["Fazer a nossa primeira grande viagem ✈️", "Terminar os estudos bem colocados 🎓", "Comprar algo importante juntos 🔑", "Ficar mais tempo juntos na semana ⏰"] },
                 { p: "Se pudessem congelar o tempo em um momento, qual seria?", r: "B", o: ["No meio de uma crise de riso juntos 😂", "Em um abraço bem calmo no frio ❄️", "No instante do reencontro após dias longe ⏰", "Em um rolê inesquecível de férias 🏖️"] }
             ],
-            6: [ // TEMA DELE
+            6: [
                 { p: "Qual o prato ou lanche favorito do Ele?", r: "A", o: ["Lasanha 🍝", "Pizza de calabresa 🍕", "Hambúrguer artesanal 🍔", "Churrasco com os amigos 🥩"] },
                 { p: "Qual o maior hobby ou passatempo do Ele?", r: "C", o: ["Assistir jogos de futebol ⚽", "Academia e treinos 🏋️‍♂️", "Jogar videogame/PC 🎮", "Ver vídeos no YouTube/Kwai 📱"] },
                 { p: "Qual o estilo de roupa que o Ele mais gosta de usar?", r: "B", o: ["Social e camisa polo 👕", "Camiseta casual e bermuda 🩳", "Estilo esportivo/Moletom 👟", "O que estiver limpo no armário 🤷‍♂️"] },
@@ -397,25 +461,47 @@
             ]
         };
 
+        let nomeUsuarioLogado = ""; 
         let categoriaAtual = 1;
         let perguntaIndice = 0;
         let tempoRestante = 15;
         let timerInterval;
         let pontosNos = 78;
         let pontosBonus = 12;
-        let turnoJogador = "ela"; // ela -> ele -> confirmacao
-
-        let escolhaEla = null;
-        let escolhaEle = null;
+        let escolhaAtual = null;
 
         const elCaixaPergunta = document.getElementById("caixa-pergunta");
         const elTempo = document.getElementById("tempo");
-        const elOpcoesEla = document.getElementById("opcoes-ela");
-        const elOpcoesEle = document.getElementById("opcoes-ele");
+        const elOpcoesJogador = document.getElementById("opcoes-jogador");
         const elPontosNos = document.getElementById("pts-nos");
         const elStatusNos = document.getElementById("status-nos-pts");
         const elPontosBonus = document.getElementById("vlr-bonus");
         const elBtnConfirmar = document.getElementById("btn-confirmar");
+
+        function fazerLoginDoCasal() {
+            const nomeInput = document.getElementById("campo-nome").value.trim();
+            if(nomeInput === "") {
+                alert("POR FAVOR, INSIRA SEU NOME!");
+                return;
+            }
+            nomeUsuarioLogado = nomeInput.toUpperCase();
+            
+            // Esconde a tela de login e ativa o jogo grande
+            document.getElementById("tela-login").style.display = "none";
+            document.getElementById("main-container").style.display = "grid";
+            document.getElementById("nome-logado-painel").textContent = nomeUsuarioLogado;
+            document.getElementById("lbl-jogador-local").textContent = `🎮 PAINEL DE RESPOSTAS DE: ${nomeUsuarioLogado}`;
+            
+            renderizarPergunta();
+        }
+
+        function fazerLogoff() {
+            nomeUsuarioLogado = "";
+            clearInterval(timerInterval);
+            document.getElementById("campo-nome").value = "";
+            document.getElementById("main-container").style.display = "none";
+            document.getElementById("tela-login").style.display = "flex";
+        }
 
         function renderizarPergunta() {
             let catID = categoriaAtual;
@@ -424,103 +510,75 @@
             }
 
             const pool = bancoPerguntas[catID];
-            // Garante que o índice não estoure o banco de dados
             if (perguntaIndice >= pool.length) perguntaIndice = 0;
             
             const dados = pool[perguntaIndice];
             elCaixaPergunta.textContent = dados.p.toUpperCase();
             elCaixaPergunta.className = ""; 
 
-            elOpcoesEla.innerHTML = "";
-            elOpcoesEle.innerHTML = "";
+            elOpcoesJogador.innerHTML = "";
             const alternativas = ["A", "B", "C", "D"];
 
             for (let i = 0; i < 4; i++) {
-                const btnEla = document.createElement("button");
-                btnEla.className = "btn-opcao";
-                btnEla.id = `opt-ela-${alternativas[i]}`;
-                btnEla.textContent = `${alternativas[i]}) ${dados.o[i]}`;
-                btnEla.onclick = () => selecionar('ela', alternativas[i]);
-                elOpcoesEla.appendChild(btnEla);
-
-                const btnEle = document.createElement("button");
-                btnEle.className = "btn-opcao";
-                btnEle.id = `opt-ele-${alternativas[i]}`;
-                btnEle.textContent = `${alternativas[i]}) ${dados.o[i]}`;
-                btnEle.onclick = () => selecionar('ele', alternativas[i]);
-                elOpcoesEle.appendChild(btnEle);
+                const btn = document.createElement("button");
+                btn.className = "btn-opcao";
+                btn.id = `opt-user-${alternativas[i]}`;
+                btn.textContent = `${alternativas[i]}) ${dados.o[i]}`;
+                btn.onclick = () => selecionarAlternativa(alternativas[i]);
+                elOpcoesJogador.appendChild(btn);
             }
 
-            configurarTurno("ela");
+            escolhaAtual = null;
+            document.getElementById("privacidade-bloqueio").style.display = "none";
             resetTimer();
         }
 
-        function selecionar(jogador, alt) {
-            if (jogador !== turnoJogador) return; // Impede responder fora do turno
-
-            if (jogador === 'ela') {
-                if (escolhaEla) document.getElementById(`opt-ela-${escolhaEla}`).classList.remove("selecionado");
-                escolhaEla = alt;
-            } else {
-                if (escolhaEle) document.getElementById(`opt-ele-${escolhaEle}`).classList.remove("selecionado");
-                escolhaEle = alt;
+        function selecionarAlternativa(alt) {
+            if (escolhaAtual) {
+                document.getElementById(`opt-user-${escolhaAtual}`).classList.remove("selecionado");
             }
-            document.getElementById(`opt-${jogador}-${alt}`).classList.add("selecionado");
-        }
-
-        function configurarTurno(turno) {
-            turnoJogador = turno;
-            if (turno === "ela") {
-                document.getElementById("privacidade-ela").style.display = "none";
-                document.getElementById("privacidade-ele").style.display = "flex";
-                elBtnConfirmar.textContent = "PRONTINHO (PROX. TURNO)";
-                elBtnConfirmar.style.background = "#2980b9";
-            } else if (turno === "ele") {
-                document.getElementById("privacidade-ela").style.display = "flex";
-                document.getElementById("privacidade-ele").style.display = "none";
-                elBtnConfirmar.textContent = "REVELAR RESPOSTAS 🚨";
-                elBtnConfirmar.style.background = "#e67e22";
-            }
+            escolhaAtual = alt;
+            document.getElementById(`opt-user-${alt}`).classList.add("selecionado");
         }
 
         elBtnConfirmar.onclick = function() {
-            if (turnoJogador === "ela") {
-                if (!escolhaEla) { alert("ELA PRECISA RESPONDER!"); return; }
-                configurarTurno("ele");
-            } else if (turnoJogador === "ele") {
-                if (!escolhaEle) { alert("ELE PRECISA RESPONDER!"); return; }
-                validarAfinidade();
+            if (!escolhaAtual) { 
+                alert("ESCOLHA UMA OPÇÃO ANTES DE CONFIRMAR!"); 
+                return; 
             }
+            validarResposta();
         };
 
-        function validarAfinidade() {
+        function validarResposta() {
             clearInterval(timerInterval);
-            document.getElementById("privacidade-ela").style.display = "none";
-            document.getElementById("privacidade-ele").style.display = "none";
+            let catID = categoriaAtual === "aleatorio" ? 1 : categoriaAtual;
+            const respostaCorreta = bancoPerguntas[catID][perguntaIndice].r;
 
-            // Se baterem as respostas (Afinidade!)
-            if (escolhaEla === escolhaEle) {
+            // Se acertou fica verde, se errou fica vermelha!
+            if (escolhaAtual === respostaCorreta) {
                 pontosNos += 10;
-                pontosBonus += 2;
-                elCaixaPergunta.textContent = "SINTONIA PERFEITA! VOCES COINCIDIRAM! ✨";
+                pontosBonus += 1;
+                elCaixaPergunta.textContent = "VOCÊ ACERTOU! PARABÉNS! 🎉";
                 elCaixaPergunta.className = "acerto";
-                document.getElementById(`opt-ela-${escolhaEla}`).className = "btn-opcao acerto";
-                document.getElementById(`opt-ele-${escolhaEle}`).className = "btn-opcao acerto";
+                document.getElementById(`opt-user-${escolhaAtual}`).className = "btn-opcao acerto";
             } else {
-                elCaixaPergunta.textContent = "DIVIRGIRAM! CADA UM PENSOO DE UM JEITO 💔";
+                elCaixaPergunta.textContent = "RESPOSTA INCORRETA! 💔";
                 elCaixaPergunta.className = "erro";
-                document.getElementById(`opt-ela-${escolhaEla}`).className = "btn-opcao erro";
-                document.getElementById(`opt-ele-${escolhaEle}`).className = "btn-opcao erro";
+                document.getElementById(`opt-user-${escolhaAtual}`).className = "btn-opcao erro";
+                // Mostra onde era o acerto
+                if(document.getElementById(`opt-user-${respostaCorreta}`)) {
+                    document.getElementById(`opt-user-${respostaCorreta}`).className = "btn-opcao acerto";
+                }
             }
 
             elPontosNos.textContent = `${pontosNos} PTS`;
             elStatusNos.textContent = `${pontosNos} PTS`;
             elPontosBonus.textContent = `${pontosBonus} PB`;
 
-            turnoJogador = "travado";
+            document.getElementById("privacidade-bloqueio").style.display = "flex";
+            document.getElementById("privacidade-bloqueio").textContent = "PRÓXIMA PERGUNTA CARREGANDO...";
+
             setTimeout(() => {
-                escolhaEla = null;
-                escolhaEle = null;
                 perguntaIndice++;
                 renderizarPergunta();
             }, 3000);
@@ -535,9 +593,8 @@
                 elTempo.textContent = `${tempoRestante}S`;
                 if (tempoRestante <= 0) {
                     clearInterval(timerInterval);
-                    if (!escolhaEla) escolhaEla = "N/A";
-                    if (!escolhaEle) escolhaEle = "N/A";
-                    validarAfinidade();
+                    if (!escolhaAtual) escolhaAtual = "N/A";
+                    validarResposta();
                 }
             }, 1000);
         }
@@ -545,8 +602,6 @@
         function mudarTema(tema) {
             categoriaAtual = tema;
             perguntaIndice = 0;
-            escolhaEla = null;
-            escolhaEle = null;
             renderizarPergunta();
         }
 
@@ -557,7 +612,7 @@
             event.currentTarget.classList.add('ativa');
         }
 
-        // SISTEMA DE PISTA (Elimina duas erradas)
+        // SISTEMA DE PISTA
         document.getElementById("btn-pista").onclick = function() {
             let catID = categoriaAtual === "aleatorio" ? 1 : categoriaAtual;
             const dados = bancoPerguntas[catID][perguntaIndice];
@@ -565,16 +620,13 @@
             const sorteadas = erradas.sort(() => 0.5 - Math.random()).slice(0, 2);
 
             sorteadas.forEach(alt => {
-                const opt = document.getElementById(`opt-${turnoJogador}-${alt}`);
+                const opt = document.getElementById(`opt-user-${alt}`);
                 if (opt) {
                     opt.style.opacity = "0.3";
                     opt.style.pointerEvents = "none";
                 }
             });
         };
-
-        // Inicializar o jogo
-        renderizarPergunta();
     </script>
 </body>
 </html>
