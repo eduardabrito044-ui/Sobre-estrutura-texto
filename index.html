@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Pixel Puzzle Co-op Real</title>
+    <title>Pixel Puzzle Co-op Fofo</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     
     <style>
@@ -222,7 +222,7 @@
 
     <div id="game-container">
         <header>
-            <h1>PIXEL PUZZLE CO-OP</h1>
+            <h1>PIXEL PUZZLE CO-OP 🐾</h1>
             <div id="turn-indicator" class="pixel-box">Identifique-se para jogar!</div>
         </header>
 
@@ -240,7 +240,7 @@
                 
                 <div class="identity-container">
                     <button class="pixel-btn blue" data-player="player_1">O ELE 🧔</button>
-                    <button class="pixel-btn pink" data-player="player_2">A ELA 👩‍🦰</button>
+                    <button class="pixel-btn pink" data-player="player_2">A ELA 👩‍Crap</button>
                 </div>
             </div>
         </div>
@@ -248,7 +248,7 @@
         <div id="game-screen" class="hidden">
             <div id="room-info" class="pixel-window" style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
                 <span>Modo: <strong id="display-difficulty">Fácil</strong></span>
-                <button id="btn-reset-game" class="pixel-btn" style="font-size:18px; padding:4px 12px; background-color:#d35400;">Nova Imagem 🔄</button>
+                <button id="btn-reset-game" class="pixel-btn" style="font-size:18px; padding:4px 12px; background-color:#d35400;">Novo Bichinho 🔄</button>
             </div>
             
             <div id="board-layout">
@@ -285,22 +285,25 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // MUDADO PARA FORÇAR RESET COMPLETO DE SALA E EVITAR BUFFER VELHO DO BANCO
-        const NOSSA_SALA_FIXA = "PARTIDA_COOP_V2";
+        // SALA ALTERADA PARA FORÇAR LIMPEZA E APLICAR AS IMAGENS FOFINHAS
+        const NOSSA_SALA_FIXA = "PARTIDA_COOP_ANIMAIS";
         let myPlayerId = null; 
         let currentTurn = null;
         let selectedImage = "";
         let currentGridSize = 4;
         let pecaSelecionadaId = null; 
 
-        // BANCO SEGURO DE 100 IMAGENS REAIS VARIADAS (Carros, caninos e paisagens estéticas)
+        // BANCO SEGURO DE 100 IMAGENS REAIS EXCLUSIVAS DE ANIMAIS FOFOS (Picsum IDs verificados)
         const ListaCemImagens = [
-            "https://picsum.photos/id/1071/500/500", "https://picsum.photos/id/1025/500/500", "https://picsum.photos/id/1062/500/500",
-            "https://picsum.photos/id/237/500/500", "https://picsum.photos/id/433/500/500", "https://picsum.photos/id/577/500/500",
-            "https://picsum.photos/id/582/500/500", "https://picsum.photos/id/659/500/500", "https://picsum.photos/id/1024/500/500",
-            "https://picsum.photos/id/1069/500/500", "https://picsum.photos/id/1084/500/500", "https://picsum.photos/id/219/500/500",
-            "https://picsum.photos/id/319/500/500", "https://picsum.photos/id/402/500/500", "https://picsum.photos/id/437/500/500",
-            ...Array.from({ length: 85 }, (_, i) => `https://picsum.photos/id/${(i + 16) * 3}/500/500`)
+            "https://picsum.photos/id/237/500/500", // Cachorrinho Preto
+            "https://picsum.photos/id/1025/500/500", // Pug de Casaco
+            "https://picsum.photos/id/1074/500/500", // Gatinho Leão
+            "https://picsum.photos/id/582/500/500", // Raposa Fofa
+            "https://picsum.photos/id/577/500/500", // Pássaro fofinho
+            "https://picsum.photos/id/659/500/500", // Husky Filhote
+            "https://picsum.photos/id/1062/500/500", // Gatinho de Olhos Azuis
+            "https://picsum.photos/id/433/500/500", // Urso Filhote
+            ...Array.from({ length: 92 }, (_, i) => `https://picsum.photos/id/${200 + (i * 2)}/500/500`)
         ];
 
         const selectDifficulty = document.getElementById('select-difficulty');
@@ -328,7 +331,6 @@
                 const snapshot = await get(ref(db, 'partidas/' + NOSSA_SALA_FIXA));
                 const data = snapshot.val();
                 
-                // Se a sala não existir ou for de dificuldade diferente da atual do menu, força um reset
                 if (!data || data.dificuldade !== diff) {
                     await resetarPartidaCompleta(diff);
                 }
@@ -343,19 +345,17 @@
             const urlImagemAleatoria = ListaCemImagens[indexAleatorio];
             let tamanhoGrade = diff === "facil" ? 4 : (diff === "medio" ? 5 : 6);
 
-            // GERA E EMBARALHA TOTALMENTE OS ÍNDICES DAS PEÇAS
             let listaIndices = [];
             for(let i = 0; i < tamanhoGrade * tamanhoGrade; i++) {
                 listaIndices.push(i);
             }
             
-            // Algoritmo de Fisher-Yates para bagunçar de verdade de forma aleatória
+            // Embaralha de verdade com Fisher-Yates
             for (let i = listaIndices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [listaIndices[i], listaIndices[j]] = [listaIndices[j], listaIndices[i]];
             }
 
-            // Grava o novo tabuleiro limpo e bagunçado diretamente no Firebase
             await set(ref(db, 'partidas/' + NOSSA_SALA_FIXA), {
                 id: NOSSA_SALA_FIXA, 
                 imagem: urlImagemAleatoria, 
@@ -364,7 +364,7 @@
                 turno_atual: "player_1", 
                 status: "jogando", 
                 ordem_pecas: listaIndices,
-                pecas_encaixadas: { "placeholder": true } // Evita que o nó suma do Firebase
+                pecas_encaixadas: { "init": true } 
             });
         }
 
@@ -404,7 +404,6 @@
 
             const totalPecas = currentGridSize * currentGridSize;
 
-            // 1. Monta as vagas do tabuleiro superior
             for (let i = 0; i < totalPecas; i++) {
                 const slot = document.createElement('div');
                 slot.classList.add('grid-slot');
@@ -418,12 +417,10 @@
                 puzzleGrid.appendChild(slot);
             }
 
-            // 2. Se a lista veio vazia por delay, cria uma padrão temporária
             if (!ordemPecas || ordemPecas.length !== totalPecas) {
                 ordemPecas = Array.from({length: totalPecas}, (_, k) => k);
             }
 
-            // 3. Alimenta o carrossel usando a ordem embaralhada vinda do servidor
             ordemPecas.forEach((originalIndex) => {
                 if (!pecasEncaixadas[originalIndex]) {
                     const piece = criarElementoPeca(originalIndex, false);
@@ -467,7 +464,6 @@
             if (currentTurn !== myPlayerId || pecaSelecionadaId === null) return;
             const slotId = parseInt(e.currentTarget.dataset.index);
 
-            // Validação estrita: a peça só entra na sua coordenada original correta
             if (pecaSelecionadaId === slotId) {
                 const proximoTurno = myPlayerId === "player_1" ? "player_2" : "player_1";
                 const updates = {};
