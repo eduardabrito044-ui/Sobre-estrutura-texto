@@ -219,6 +219,7 @@
 </head>
 <body>
 
+    <!-- SELEÇÃO DE JOGADOR -->
     <div id="tela-perfil">
         <div class="caixa-perfil">
             <h2 style="color: #ffd700; font-size: 1.2em;">QUEM ESTÁ JOGANDO AGORA?</h2>
@@ -227,6 +228,7 @@
         </div>
     </div>
 
+    <!-- PAINEL PRINCIPAL -->
     <div id="main-container">
         <div id="header-quiz">
             <h1 id="titulo-principal">QUIZ DE CASAL - NOSSO MUNDO</h1>
@@ -243,7 +245,7 @@
                 </div>
             </div>
 
-            <div id="alerta-status">SABOTANDO ERROS DE SINCRONIZAÇÃO...</div>
+            <div id="alerta-status">SINCRONIZANDO VOTOS...</div>
 
             <div class="controles-quiz-container">
                 <button class="btn-acao-quiz" id="quiz-confirmar" onclick="avancarRodadaOnline()">PRÓXIMA PERGUNTA</button>
@@ -290,11 +292,12 @@
         </div>
     </div>
 
+    <!-- SCRIPTS CORE DO FIREBASE MODERNO -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-        // CREDENCIAIS EXTRAÍDAS DO SEU SITE DE SOCIOLOGIA
+        // CREDENCIAIS DO SEU FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
             authDomain: "dddua-81207.firebaseapp.com",
@@ -306,31 +309,30 @@
             measurementId: "G-F4SC83V4KB"
         };
 
-        // Inicializa o Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const salaQuizRef = ref(db, "sala_quiz");
 
         const bancoPerguntas = {
             1: [
-                { p: "Qual o melhor lugar para um encontro perfeito?", r: "A", o: ["Jantar à luz de velas 🕯️", "Piquenique no parque 🌳", "Ir ao cinema 🎬", "Ficar em casa vendo série 🍿"] },
-                { p: "Quem demonstrou interesse primeiro?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois juntos ⚡", "Foi por mensagem 📱"] },
-                { p: "Qual o apelido carinhoso mais usado?", r: "A", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] }
+                { p: "Qual o melhor lugar para um encontro perfeito?", o: ["Jantar à luz de velas 🕯️", "Piquenique no parque 🌳", "Ir ao cinema 🎬", "Ficar em casa vendo série 🍿"] },
+                { p: "Quem demonstrou interesse primeiro?", o: ["Ela 👸", "Ele 🧔", "Os dois juntos ⚡", "Foi por mensagem 📱"] },
+                { p: "Qual o apelido carinhoso mais usado?", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] }
             ],
             2: [
-                { p: "Qual filme vocês mais assistiram juntos?", r: "B", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] }
+                { p: "Qual filme vocês mais assistiram juntos?", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] }
             ],
             3: [
-                { p: "Qual a data exata do aniversário de namoro?", r: "A", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Sempre olhar no celular 📱"] }
+                { p: "Qual a data exata do aniversário de namoro?", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Sempre olhar no celular 📱"] }
             ],
             4: [
-                { p: "Onde gostariam de morar no futuro?", r: "C", o: ["Apartamento 🏢", "Casa Bairro Calmo 🏡", "Perto da natureza 🍃", "Fora do país ✈️"] }
+                { p: "Onde gostariam de morar no futuro?", o: ["Apartamento 🏢", "Casa Bairro Calmo 🏡", "Perto da natureza 🍃", "Fora do país ✈️"] }
             ],
             5: [
-                { p: "Qual a maior virtude do relacionamento?", r: "D", o: ["Confiança total 🤝", "Carinho diário 🥰", "Parceria total 🚀", "Risadas bobas 😂"] }
+                { p: "Qual a maior virtude do relacionamento?", o: ["Confiança total 🤝", "Carinho diário 🥰", "Parceria total 🚀", "Risadas bobas 😂"] }
             ],
             6: [
-                { p: "Qual o prato ou lanche favorito do Ele?", r: "A", o: ["Lasanha 🍝", "Pizza 🍕", "Hambúrguer 🍔", "Churrasco 🥩"] }
+                { p: "Qual o prato ou lanche favorito do Ele?", o: ["Lasanha 🍝", "Pizza 🍕", "Hambúrguer 🍔", "Churrasco 🥩"] }
             ]
         };
 
@@ -353,7 +355,6 @@
             document.getElementById("tela-perfil").style.display = "none";
             document.getElementById("main-container").style.display = "block";
             
-            // Ouvinte em tempo real do Firebase
             onValue(salaQuizRef, (snapshot) => {
                 const dados = snapshot.val();
                 if (dados) {
@@ -414,33 +415,37 @@
                 }
             }
 
-            // SE OS DOIS JOGARAM: EXIBE NA HORA O VERDE OU VERMELHO
+            // SE OS DOIS JOGARAM: VALIDAÇÃO POR SINTONIA DO CASAL!
             if (dados.voto_ela && dados.voto_ele) {
                 clearInterval(timerInterval);
                 votadoNestaRodada = true;
                 
-                const gabarito = dadosPergunta.r;
                 const meuVoto = meuPerfil === "ela" ? dados.voto_ela : dados.voto_ele;
                 const votoParceiro = meuPerfil === "ela" ? dados.voto_ele : dados.voto_ela;
 
                 elAlertaStatus.innerHTML = `SEU VOTO: ${meuVoto} | PARCEIRO: ${votoParceiro}`;
 
+                // Se as duas respostas forem rigorosamente iguais, é um ACERTO do casal
+                const casalAcertou = (dados.voto_ela === dados.voto_ele);
+
                 ["A", "B", "C", "D"].forEach(alt => {
                     const btn = document.getElementById(`opt-${alt}`);
                     if (btn) {
-                        if (alt === gabarito) {
+                        if (casalAcertou && alt === meuVoto) {
+                            // Se bateram a resposta, a opção fica verde para os dois
                             btn.className = "btn-opcao acerto";
-                        } else if (alt === meuVoto || alt === votoParceiro) {
+                        } else if (!casalAcertou && (alt === meuVoto || alt === votoParceiro)) {
+                            // Se divergiram, as opções que vocês escolheram ficam vermelhas
                             btn.className = "btn-opcao erro";
                         }
                     }
                 });
 
-                if (meuVoto === gabarito) {
-                    elCaixaPergunta.textContent = "VOCÊ ACERTOU! 🎉";
+                if (casalAcertou) {
+                    elCaixaPergunta.textContent = "VOCÊS EM SINTONIA! 🎉 MATCH!";
                     elCaixaPergunta.className = "acerto";
                 } else {
-                    elCaixaPergunta.textContent = "VOCÊ ERROU! 💔";
+                    elCaixaPergunta.textContent = "RESPOSTAS DIFERENTES! 💔";
                     elCaixaPergunta.className = "erro";
                 }
 
