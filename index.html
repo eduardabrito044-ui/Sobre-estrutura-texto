@@ -217,6 +217,7 @@
             <div id="turn-indicator" class="pixel-box">Identifique-se para começar!</div>
         </header>
 
+        <!-- TELA DE IDENTIFICAÇÃO (ELE OU ELA) -->
         <div id="lobby-screen" class="pixel-window">
             <h2>Quem está jogando?</h2>
             <div class="setup-container">
@@ -236,6 +237,7 @@
             </div>
         </div>
 
+        <!-- TELA DO JOGO -->
         <div id="game-screen" class="hidden">
             <div id="room-info" class="pixel-window">
                 <span>Modo de Jogo: <strong id="display-difficulty">Fácil</strong></span>
@@ -262,21 +264,17 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-        // Substitua ESTAS credenciais pelas chaves do seu console do Firebase!
+        // Credenciais sincronizadas com o seu projeto Realtime Database!
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
+            authDomain: "dddua-81207.firebaseapp.com",
+            databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com",
+            projectId: "dddua-81207",
+            storageBucket: "dddua-81207.firebasestorage.app",
+            messagingSenderId: "844138746278",
+            appId: "1:844138746278:web:341f704f22c106473d7f67",
+            measurementId: "G-F4SC83V4KB"
         };
-
-        // Alerta de proteção caso esqueça de configurar as chaves do banco
-        if (firebaseConfig.apiKey === "SUA_API_KEY") {
-            alert("Atenção! Você precisa colar as chaves do seu Firebase dentro do código no bloco 'firebaseConfig' para o botão funcionar.");
-        }
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -318,7 +316,6 @@
                 const snapshot = await get(ref(db, 'partidas/' + NOSSA_SALA_FIXA));
                 const partidaAtiva = snapshot.val();
 
-                // Se a partida não existir no Firebase, força a criação inicial automática
                 if (!partidaAtiva) {
                     await resetarPartidaCompleta(diff);
                 }
@@ -326,7 +323,7 @@
                 setupGameSession();
             } catch (error) {
                 console.error(error);
-                alert("Erro ao conectar ao Firebase. Verifique suas credenciais e regras do banco de dados!");
+                alert("Erro ao conectar ao Firebase. Verifique suas regras no console!");
             }
         }
 
