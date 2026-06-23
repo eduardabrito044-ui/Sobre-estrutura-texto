@@ -25,78 +25,47 @@
             box-sizing: border-box;
         }
 
-        /* TELA DE LOGIN INICIAL */
-        #tela-login {
+        #tela-perfil {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            box-sizing: border-box;
         }
 
-        .caixa-login {
+        .caixa-perfil {
             background-color: rgba(30, 30, 38, 0.95);
             border: 4px solid #3a3a4a;
             border-radius: 12px;
-            box-shadow: 0px 6px 0px #111;
             padding: 25px;
             text-align: center;
             max-width: 400px;
             width: 100%;
-            box-sizing: border-box;
+            box-shadow: 0px 6px 0px #111;
         }
 
-        .caixa-login h2 {
-            color: #ffd700;
-            margin-top: 0;
-            font-size: 1.4em;
-            text-shadow: 2px 2px 0 #000;
-        }
-
-        .input-login {
+        .btn-perfil {
             width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 3px solid #3a3a4a;
-            border-radius: 8px;
-            background-color: #111;
-            color: #fff;
+            padding: 15px;
+            margin: 10px 0;
             font-family: inherit;
-            font-size: 1em;
-            box-sizing: border-box;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        .btn-login {
-            background: linear-gradient(to bottom, #d81b60, #ad1457);
-            color: white;
-            border: 3px solid #3a3a4a;
-            border-radius: 8px;
-            padding: 12px 25px;
             font-weight: bold;
-            font-family: inherit;
             cursor: pointer;
-            box-shadow: 0px 4px 0px #111;
-            width: 100%;
+            border: 3px solid #3a3a4a;
+            border-radius: 8px;
+            font-size: 1.1em;
+            color: white;
         }
+        #btn-ela { background: #d81b60; }
+        #btn-ele { background: #2980b9; }
 
-        /* CONTAINER PRINCIPAL DO JOGO */
         #main-container {
             display: none;
-            grid-template-columns: 1.8fr 1.2fr;
-            max-width: 1200px;
+            max-width: 500px;
             margin: 0 auto;
             padding: 10px;
             gap: 10px;
-        }
-
-        @media (max-width: 900px) {
-            #main-container {
-                grid-template-columns: 1fr;
-            }
         }
 
         .painel {
@@ -117,6 +86,7 @@
             border-radius: 8px 8px 0 0;
             color: #ffd700;
             font-weight: bold;
+            text-align: center;
         }
 
         #header-quiz {
@@ -124,10 +94,9 @@
             margin-bottom: 10px;
         }
 
-        #titulo-principal { font-size: 1.5em; margin: 0; text-shadow: 2px 2px 0 #000; }
-        #sub-titulo { font-size: 0.9em; margin: 3px 0; color: #ccc; }
+        #titulo-principal { font-size: 1.3em; margin: 0; text-shadow: 2px 2px 0 #000; text-align: center;}
+        #sub-titulo { font-size: 0.85em; margin: 3px 0; color: #ccc; text-align: center; }
 
-        /* QUADRO DO QUIZ */
         #quadro-jogo {
             background-color: #387a56;
             border: 8px solid #5c3e32;
@@ -135,7 +104,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px;
+            padding: 12px;
             box-sizing: border-box;
             margin-bottom: 10px;
             position: relative;
@@ -156,12 +125,11 @@
             box-sizing: border-box;
         }
 
-        #cronometro { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; text-shadow: 1px 1px 0 #000; }
+        #cronometro { font-size: 1em; font-weight: bold; margin-bottom: 10px; text-shadow: 1px 1px 0 #000; }
 
         #zona-respostas {
             display: flex;
             flex-direction: column;
-            gap: 10px;
             width: 100%;
             box-sizing: border-box;
             position: relative;
@@ -171,40 +139,22 @@
             background-color: #fce4ec;
             border-radius: 10px;
             border: 3px solid #5c3e32;
-            padding: 10px;
+            padding: 8px;
             color: black;
             width: 100%;
             box-sizing: border-box;
-            font-size: 0.9em;
-            position: relative;
-            overflow: hidden;
         }
 
-        /* ESCUDO DE PRIVACIDADE ENQUANTO ESPERA O OUTRO PARCEIRO */
-        .escudo-privacidade {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #222;
-            color: #ff6b81;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1em;
-            z-index: 10;
-        }
-
-        .lista-opcoes { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+        .lista-opcoes { display: flex; flex-direction: column; gap: 5px; }
 
         .btn-opcao {
             background-color: white;
             color: black;
             border: 2px solid #ccc;
-            border-radius: 15px;
-            padding: 10px 12px;
+            border-radius: 10px;
+            padding: 8px;
             text-align: left;
-            font-size: 0.85em;
+            font-size: 0.75em;
             cursor: pointer;
             font-family: inherit;
             width: 100%;
@@ -212,12 +162,12 @@
         }
 
         .btn-opcao.selecionado {
-            border-color: #ffd700 !important;
+            border-color: #d81b60 !important;
             background-color: #fffde6;
-            box-shadow: 0 0 5px #ffd700;
+            box-shadow: 0 0 5px #d81b60;
+            font-weight: bold;
         }
 
-        /* CONTROLES DO QUIZ */
         .controles-quiz-container {
             display: flex;
             gap: 10px;
@@ -232,319 +182,294 @@
             border: 3px solid #5c3e32;
             font-family: inherit;
             font-weight: bold;
-            font-size: 0.9em;
+            font-size: 0.85em;
             cursor: pointer;
             color: white;
             text-shadow: 1px 1px 0px #000;
             box-shadow: 0 4px 0px #111;
         }
 
-        #quiz-confirmar { background-color: #2980b9; }
+        #quiz-confirmar { background-color: #2980b9; display: none; }
         #quiz-pista { background-color: #27ae60; }
         .btn-acao-quiz:active { transform: translateY(2px); box-shadow: 0 2px 0px #111; }
 
-        /* CARDS DE PONTUACAO */
-        .grid-cards {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .card-status {
-            background-color: #252530;
-            border: 2px solid #3a3a4a;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            font-size: 0.8em;
-        }
+        .grid-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .card-status { background-color: #252530; border: 2px solid #3a3a4a; border-radius: 8px; padding: 8px; text-align: center; font-size: 0.75em; }
+        .bar-pb { background: linear-gradient(to right, #ffd700, #ffa500); color: black; font-weight: bold; padding: 8px; border-radius: 6px; text-align: center; margin-top: 5px; font-size: 0.85em; }
 
-        .bar-pb {
-            background: linear-gradient(to right, #ffd700, #ffa500);
-            color: black;
-            font-weight: bold;
-            padding: 8px;
-            border-radius: 6px;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        /* ABAS */
-        .abas-container { display: flex; gap: 5px; margin-bottom: 8px; }
-        .aba-btn {
-            background-color: #2a2a35;
-            color: white;
-            border: 2px solid #4a4a5a;
-            padding: 8px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.75em;
-            font-family: inherit;
-            flex: 1;
-            text-align: center;
-        }
+        .abas-container { display: flex; gap: 5px; margin-bottom: 5px; }
+        .aba-btn { background-color: #2a2a35; color: white; border: 2px solid #4a4a5a; padding: 8px; border-radius: 6px; cursor: pointer; font-size: 0.75em; font-family: inherit; flex: 1; text-align: center; }
         .aba-btn.ativa { background-color: #d81b60; border-color: #ff6b81; }
         .conteudo-aba { display: none; }
         .conteudo-aba.ativa { display: block; }
+        .menu-temas { display: flex; flex-direction: column; gap: 5px; }
+        .btn-tema { background: linear-gradient(to bottom, #d81b60, #ad1457); color: white; border: 3px solid #3a3a4a; border-radius: 8px; padding: 8px; text-align: left; font-weight: bold; font-size: 0.8em; cursor: pointer; box-shadow: 0px 4px 0px #111; font-family: inherit; }
 
         .acerto { background-color: #27ae60 !important; color: white !important; }
         .erro { background-color: #c0392b !important; color: white !important; }
-
-        .menu-temas { display: flex; flex-direction: column; gap: 6px; }
-        .btn-tema {
-            background: linear-gradient(to bottom, #d81b60, #ad1457);
-            color: white; border: 3px solid #3a3a4a; border-radius: 8px;
-            padding: 10px; text-align: left; font-weight: bold; font-size: 0.85em;
-            cursor: pointer; box-shadow: 0px 4px 0px #111; font-family: inherit;
+        
+        #alerta-status {
+            margin-top: 8px;
+            font-size: 0.75em;
+            text-align: center;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 1px 1px 0px #000;
         }
     </style>
 </head>
 <body>
 
-    <!-- TELA DE LOGIN INICIAL -->
-    <div id="tela-login">
-        <div class="caixa-login">
-            <h2>ENTRAR NO JOGO</h2>
-            <p style="font-size: 0.8em; color: #ccc; margin-bottom: 15px;">DIGITE SEU NOME PARA CONFIRMAR IDENTIDADE:</p>
-            <input type="text" id="campo-nome" class="input-login" placeholder="SEU NOME...">
-            <button class="btn-login" onclick="fazerLoginDoCasal()">ENTRAR</button>
+    <!-- SELEÇÃO DE QUEM É QUEM -->
+    <div id="tela-perfil">
+        <div class="caixa-perfil">
+            <h2 style="color: #ffd700; font-size: 1.2em;">QUEM ESTÁ JOGANDO AGORA?</h2>
+            <button id="btn-ela" class="btn-perfil" onclick="definirJogador('ela')">EU SOU A ELA 👩‍🦰</button>
+            <button id="btn-ele" class="btn-perfil" onclick="definirJogador('ele')">EU SOU O ELE 🧔</button>
         </div>
     </div>
 
-    <!-- MAIN INTERFACE -->
+    <!-- TELA PRINCIPAL DO JOGO -->
     <div id="main-container">
-        <div>
-            <div id="header-quiz">
-                <h1 id="titulo-principal">QUIZ DE CASAL - NOSSO MUNDO</h1>
-                <div id="sub-titulo">JOGADOR ATUAL: <span id="nome-logado-painel" style="color:#ffd700;">...</span></div>
-            </div>
+        <div id="header-quiz">
+            <h1 id="titulo-principal">QUIZ DE CASAL - NOSSO MUNDO</h1>
+            <div id="sub-titulo">JOGADOR ATUAL: <span id="lbl-jogador-atual" style="color: #ffd700;">---</span></div>
+        </div>
+        
+        <div id="quadro-jogo">
+            <div id="caixa-pergunta">CARREGANDO...</div>
+            <div id="cronometro">TEMPO RESTANTE: <span id="tempo">15S</span></div>
             
-            <div id="quadro-jogo">
-                <div id="caixa-pergunta">CARREGANDO...</div>
-                <div id="cronometro">TEMPO RESTANTE: <span id="tempo">15S</span></div>
-                
-                <div id="zona-respostas">
-                    <div class="pnl-resposta">
-                        <!-- ESCUDO DE ESPERA -->
-                        <div class="escudo-privacidade" id="bloqueio-espera">RESPOSTA SALVA!<br>CHAME SEU PARCEIRO PARA VER PROXIMA ETAPA.</div>
-                        <div class="lista-opcoes" id="opcoes-jogador"></div>
-                    </div>
-                </div>
-
-                <div class="controles-quiz-container">
-                    <button class="btn-acao-quiz" id="quiz-confirmar" onclick="acionarBotaoPrincipal()">CONFIRMAR</button>
-                    <button class="btn-acao-quiz" id="quiz-pista" onclick="usarPistaDoQuiz()">USAR PISTA</button>
+            <div id="zona-respostas">
+                <div class="pnl-resposta">
+                    <div class="lista-opcoes" id="opcoes-jogador"></div>
                 </div>
             </div>
 
-            <div class="painel">
-                <div class="titulo-painel">CATEGORIA: ATUAL</div>
-                <div class="grid-cards">
-                    <div class="card-status">💖 ROMANCE<br>⭐ X0</div>
-                    <div class="card-status">🎭 DIVERSÃO<br>⭐ X0</div>
-                    <div class="card-status">🧠 MEMÓRIA<br>⭐ X0</div>
-                    <div class="card-status">✈️ FUTURO<br>⭐ X0</div>
-                </div>
-                <div class="bar-pb">💖 <span id="vlr-bonus">12</span> PB 💖</div>
+            <div id="alerta-status">CONECTANDO AO BANCO...</div>
+
+            <div class="controles-quiz-container">
+                <button class="btn-acao-quiz" id="quiz-confirmar" onclick="avancarRodadaOnline()">PRÓXIMA PERGUNTA</button>
+                <button class="btn-acao-quiz" id="quiz-pista" onclick="usarPistaDoQuiz()">USAR PISTA</button>
             </div>
         </div>
 
-        <div>
-            <div class="abas-container">
-                <button class="aba-btn ativa" onclick="mudarAba('aba-temas')">TEMAS</button>
-                <button class="aba-btn" onclick="mudarAba('aba-status')">STATUS</button>
+        <div class="painel">
+            <div class="titulo-painel">CATEGORIA: ATUAL</div>
+            <div class="grid-cards">
+                <div class="card-status">💖 ROMANCE<br>⭐ X0</div>
+                <div class="card-status">🎭 DIVERSÃO<br>⭐ X0</div>
+                <div class="card-status">🧠 MEMÓRIA<br>⭐ X0</div>
+                <div class="card-status">✈️ FUTURO<br>⭐ X0</div>
             </div>
+            <div class="bar-pb">💖 <span id="vlr-bonus">12</span> PB 💖</div>
+        </div>
 
-            <div id="aba-temas" class="conteudo-aba ativa">
-                <div class="painel">
-                    <div class="titulo-painel">MENU DE TEMAS</div>
-                    <div class="menu-temas">
-                        <button class="btn-tema" onclick="mudarTema(1)">1. ROMANCE 💖</button>
-                        <button class="btn-tema" onclick="mudarTema(2)">2. DIVERSAO 🎭</button>
-                        <button class="btn-tema" onclick="mudarTema(3)">3. MEMORIA 🧠</button>
-                        <button class="btn-tema" onclick="mudarTema(4)">4. FUTURO ✈️</button>
-                        <button class="btn-tema" onclick="mudarTema(5)">5. ESPECIAIS ✨</button>
-                        <button class="btn-tema" onclick="mudarTema(6)" style="background: linear-gradient(to bottom, #2980b9, #1f4e79);">6. TEMA "ELE" 🧔</button>
-                        <button class="btn-tema" onclick="mudarTema('aleatorio')" style="background: linear-gradient(to bottom, #8e44ad, #6c3483);">🎲 TEMA ALEATORIO</button>
-                    </div>
+        <div class="abas-container">
+            <button class="aba-btn ativa" onclick="mudarAba('aba-temas')">TEMAS</button>
+            <button class="aba-btn" onclick="mudarAba('aba-status')">STATUS / PLACAR</button>
+        </div>
+
+        <div id="aba-temas" class="conteudo-aba ativa">
+            <div class="painel">
+                <div class="menu-temas">
+                    <button class="btn-tema" onclick="mudarTemaOnline(1)">1. ROMANCE 💖</button>
+                    <button class="btn-tema" onclick="mudarTemaOnline(2)">2. DIVERSAO 🎭</button>
+                    <button class="btn-tema" onclick="mudarTemaOnline(3)">3. MEMORIA 🧠</button>
+                    <button class="btn-tema" onclick="mudarTemaOnline(4)">4. FUTURO ✈️</button>
+                    <button class="btn-tema" onclick="mudarTemaOnline(5)">5. ESPECIAIS ✨</button>
+                    <button class="btn-tema" onclick="mudarTemaOnline(6)" style="background: linear-gradient(to bottom, #2980b9, #1f4e79);">6. TEMA "ELE" 🧔</button>
                 </div>
             </div>
+        </div>
 
-            <div id="aba-status" class="conteudo-aba">
-                <div class="painel">
-                    <div class="titulo-painel">LEADERBOARD / PONTOS</div>
-                    <div style="font-size: 0.85em; line-height: 1.6;">
-                        CASAL 1: <span style="color:#ffd700">125 PTS</span><br>
-                        CASAL 2: <span style="color:#ffd700">98 PTS</span><br>
-                        NOS: <span id="pts-nos" style="color:#2ecc71">78 PTS</span>
-                    </div>
-                    <button onclick="fazerLogoff()" style="background:#c0392b; color:white; border:none; padding:10px; border-radius:5px; margin-top:15px; font-family:inherit; cursor:pointer; font-size:0.8em; width:100%;">SAIR DA CONTA</button>
+        <div id="aba-status" class="conteudo-aba">
+            <div class="painel">
+                <div style="font-size: 0.8em; line-height: 1.6; text-align: center;">
+                    CASAL 1: <span style="color:#ffd700">125 PTS</span><br>
+                    CASAL 2: <span style="color:#ffd700">98 PTS</span><br>
+                    NOSSO PLACAR: <span id="pts-nos" style="color:#2ecc71">78 PTS</span>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- INSERIR SCRIPTS DO FIREBASE AQUI -->
+    <!-- Mantenha as tags de script <script src=".../firebase-app.js"> que você já usa no seu projeto original aqui -->
 
     <script>
-        // BANCO DE PERGUNTAS COMPLETO PRESERVADO
+        // Mantenha a sua configuração original do Firebase aqui:
+        // const firebaseConfig = { ... };
+        // firebase.initializeApp(firebaseConfig);
+        // const database = firebase.database();
+
         const bancoPerguntas = {
             1: [
                 { p: "Qual o melhor lugar para um encontro perfeito?", r: "A", o: ["Jantar à luz de velas 🕯️", "Piquenique no parque 🌳", "Ir ao cinema 🎬", "Ficar em casa vendo série 🍿"] },
                 { p: "Quem demonstrou interesse primeiro?", r: "B", o: ["Ela 👸", "Ele 🧔", "Os dois juntos ⚡", "Foi por mensagem 📱"] },
-                { p: "Qual o apelido carinhoso mais usado?", r: "A", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] },
-                { p: "Qual música define o romance de vocês?", r: "C", o: ["Uma romântica antiga 🎵", "Um pop chiclete 🎤", "Uma que toca no rádio 📻", "Não temos uma música ❌"] }
+                { p: "Qual o apelido carinhoso mais usado?", r: "A", o: ["Amor/Mô ❤️", "Bê/Baby 👶", "Vida 🌍", "Apelido secreto 🤫"] }
             ],
             2: [
-                { p: "Qual filme vocês mais assistiram juntos?", r: "B", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] },
-                { p: "Se pudessem virar personagens, quais seriam?", r: "A", o: ["Super-heróis 🦸‍♂️", "Vilões estilosos🦹", "Personagens de anime ⛩️", "Desenho animado 🧸"] }
+                { p: "Qual filme vocês mais assistiram juntos?", r: "B", o: ["Vingadores 🎬", "Star Wars 🚀", "Harry Potter ✨", "Shrek 💚"] }
             ],
             3: [
-                { p: "Qual a data exata do aniversário de namoro?", r: "A", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Sempre temos que olhar no celular 📱"] }
+                { p: "Qual a data exata do aniversário de namoro?", r: "A", o: ["Lembramos o dia exato 📅", "Sabemos o mês aproximado 🍂", "Confundimos o ano 🗓️", "Sempre olhar no celular 📱"] }
             ],
             4: [
-                { p: "Onde gostariam de morar no futuro?", r: "C", o: ["Apartamento na cidade grande 🏢", "Casa espaçosa em bairro calmo 🏡", "Chácara ou perto da natureza 🍃", "Ir para fora do país ✈️"] }
+                { p: "Onde gostariam de morar no futuro?", r: "C", o: ["Apartamento 🏢", "Casa Bairro Calmo 🏡", "Perto da natureza 🍃", "Fora do país ✈️"] }
             ],
             5: [
-                { p: "Qual a maior virtude do relacionamento de vocês?", r: "D", o: ["A confiança total 🤝", "O carinho diário 🥰", "A parceria para qualquer hora 🚀", "A amizade e as risadas bobas 😂"] }
+                { p: "Qual a maior virtude do relacionamento?", r: "D", o: ["Confiança total 🤝", "Carinho diário 🥰", "Parceria total 🚀", "Risadas bobas 😂"] }
             ],
             6: [
-                { p: "Qual o prato ou lanche favorito do Ele?", r: "A", o: ["Lasanha 🍝", "Pizza de calabresa 🍕", "Hambúrguer artesanal 🍔", "Churrasco com os amigos 🥩"] }
+                { p: "Qual o prato ou lanche favorito do Ele?", r: "A", o: ["Lasanha 🍝", "Pizza 🍕", "Hambúrguer 🍔", "Churrasco 🥩"] }
             ]
         };
 
-        let nomeUsuarioLogado = ""; 
+        let meuPerfil = ""; 
         let categoriaAtual = 1;
         let perguntaIndice = 0;
         let tempoRestante = 15;
         let timerInterval;
-        let pontosNos = 78;
-        let pontosBonus = 12;
-        let escolhaAtual = null;
-        
-        // ESTADOS DO JOGO: "jogando", "salvo", "revelado"
-        let estadoFase = "jogando"; 
+        let votadoNestaRodada = false;
 
         const elCaixaPergunta = document.getElementById("caixa-pergunta");
         const elTempo = document.getElementById("tempo");
         const elOpcoesJogador = document.getElementById("opcoes-jogador");
-        const elPontosNos = document.getElementById("pts-nos");
-        const elPontosBonus = document.getElementById("vlr-bonus");
+        const elAlertaStatus = document.getElementById("alerta-status");
         const elBtnConfirmar = document.getElementById("quiz-confirmar");
-        const elBloqueioEspera = document.getElementById("bloqueio-espera");
 
-        function fazerLoginDoCasal() {
-            const nomeInput = document.getElementById("campo-nome").value.trim();
-            if(nomeInput === "") { alert("POR FAVOR, INSIRA SEU NOME!"); return; }
-            nomeUsuarioLogado = nomeInput.toUpperCase();
+        function definirJogador(perfil) {
+            meuPerfil = perfil;
+            document.getElementById("lbl-jogador-atual").textContent = perfil.toUpperCase();
+            document.getElementById("tela-perfil").style.display = "none";
+            document.getElementById("main-container").style.display = "block";
             
-            document.getElementById("tela-login").style.display = "none";
-            document.getElementById("main-container").style.display = "grid";
-            document.getElementById("nome-logado-painel").textContent = nomeUsuarioLogado;
-            
-            renderizarPergunta();
+            // Inicia escuta em tempo real da sala no Firebase
+            database.ref("sala_quiz").on("value", (snapshot) => {
+                const dados = snapshot.val();
+                if (dados) {
+                    processarDadosFirebase(dados);
+                } else {
+                    // Inicialização padrão caso o banco esteja limpo
+                    database.ref("sala_quiz").set({
+                        categoria: 1,
+                        indice: 0,
+                        voto_ela: "",
+                        voto_ele: ""
+                    });
+                }
+            });
         }
 
-        function fazerLogoff() {
-            nomeUsuarioLogado = "";
-            clearInterval(timerInterval);
-            document.getElementById("campo-nome").value = "";
-            document.getElementById("main-container").style.display = "none";
-            document.getElementById("tela-login").style.display = "flex";
-        }
-
-        function renderizarPergunta() {
-            estadoFase = "jogando";
-            elBloqueioEspera.style.display = "none";
-            elBtnConfirmar.textContent = "CONFIRMAR";
-            elBtnConfirmar.style.backgroundColor = "#2980b9";
-
-            let catID = categoriaAtual === "aleatorio" ? Math.floor(Math.random() * 6) + 1 : categoriaAtual;
-            const pool = bancoPerguntas[catID] || bancoPerguntas[1];
-            
-            if (perguntaIndice >= pool.length) perguntaIndice = 0;
-            
-            const dados = pool[perguntaIndice];
-            elCaixaPergunta.textContent = dados.p.toUpperCase();
-            elCaixaPergunta.className = ""; 
-
-            elOpcoesJogador.innerHTML = "";
-            const alternativas = ["A", "B", "C", "D"];
-
-            for (let i = 0; i < 4; i++) {
-                const btn = document.createElement("button");
-                btn.className = "btn-opcao";
-                btn.id = `opt-user-${alternativas[i]}`;
-                btn.textContent = `${alternativas[i]}) ${dados.o[i]}`;
-                btn.onclick = () => selecionarAlternativa(alternativas[i]);
-                elOpcoesJogador.appendChild(btn);
+        function processarDadosFirebase(dados) {
+            // Verifica se a rodada ou tema mudou para resetar o estado de voto local
+            if (dados.categoria !== categoriaAtual || dados.indice !== perguntaIndice) {
+                categoriaAtual = dados.categoria;
+                perguntaIndice = dados.indice;
+                votadoNestaRodada = false;
+                resetTimer();
             }
 
-            escolhaAtual = null;
-            resetTimer();
-        }
-
-        function selecionarAlternativa(alt) {
-            if(estadoFase !== "jogando") return;
-            if (escolhaAtual) {
-                document.getElementById(`opt-user-${escolhaAtual}`).classList.remove("selecionado");
-            }
-            escolhaAtual = alt;
-            document.getElementById(`opt-user-${alt}`).classList.add("selecionado");
-        }
-
-        function acionarBotaoPrincipal() {
-            if (estadoFase === "jogando") {
-                if (!escolhaAtual) { alert("ESCOLHA UMA OPÇÃO ANTES DE CONFIRMAR!"); return; }
-                salvarEscolhaSecreta();
-            } else if (estadoFase === "salvo") {
-                revelarGabaritoDoCasal();
-            } else if (estadoFase === "revelado") {
-                perguntaIndice++;
-                renderizarPergunta();
-            }
-        }
-
-        function salvarEscolhaSecreta() {
-            clearInterval(timerInterval);
-            estadoFase = "salvo";
+            const pool = bancoPerguntas[categoriaAtual] || bancoPerguntas[1];
+            const dadosPergunta = pool[perguntaIndice];
             
-            // Oculta a resposta com a tela preta de privacidade
-            elBloqueioEspera.style.display = "flex";
-            
-            // Muda o botão para aguardar a revelação conjunta
-            elBtnConfirmar.textContent = "REVELAR RESULTADO";
-            elBtnConfirmar.style.backgroundColor = "#8e44ad";
+            elCaixaPergunta.textContent = dadosPergunta.p.toUpperCase();
+            elCaixaPergunta.className = "";
+
+            // Renderiza as alternativas se o usuário ainda não tiver votado
+            if (!votadoNestaRodada) {
+                elBtnConfirmar.style.display = "none";
+                elOpcoesJogador.innerHTML = "";
+                const alternativas = ["A", "B", "C", "D"];
+                
+                for (let i = 0; i < 4; i++) {
+                    const btn = document.createElement("button");
+                    btn.className = "btn-opcao";
+                    btn.id = `opt-${alternativas[i]}`;
+                    btn.textContent = `${alternativas[i]}) ${dadosPergunta.o[i]}`;
+                    btn.onclick = () => enviarVotoOnline(alternativas[i]);
+                    elOpcoesJogador.appendChild(btn);
+                }
+
+                // Exibe status de quem falta jogar
+                if (!dados.voto_ela && !dados.voto_ele) {
+                    elAlertaStatus.textContent = "NENHUM DOS DOIS RESPONDEU AINDA.";
+                } else {
+                    const pendente = !dados.voto_ela ? "ELA 👩‍🦰" : "ELE 🧔";
+                    elAlertaStatus.textContent = `AGUARDANDO RESPOSTA DE: ${pendente}`;
+                }
+            }
+
+            // SE OS DOIS JÁ JOGARAM: MOSTRA O RESULTADO NA HORA!
+            if (dados.voto_ela && dados.voto_ele) {
+                clearInterval(timerInterval);
+                votadoNestaRodada = true;
+                
+                const gabarito = dadosPergunta.r;
+                const meuVoto = meuPerfil === "ela" ? dados.voto_ela : dados.voto_ele;
+                const votoParceiro = meuPerfil === "ela" ? dados.voto_ele : dados.voto_ela;
+
+                elAlertaStatus.innerHTML = `SEU VOTO: ${meuVoto} | PARCEIRO: ${votoParceiro}`;
+
+                // Pinta as cores de acerto e erro baseadas nas escolhas de vocês
+                ["A", "B", "C", "D"].forEach(alt => {
+                    const btn = document.getElementById(`opt-${alt}`);
+                    if (btn) {
+                        if (alt === gabarito) {
+                            btn.className = "btn-opcao acerto";
+                        } else if (alt === meuVoto || alt === votoParceiro) {
+                            btn.className = "btn-opcao erro";
+                        }
+                    }
+                });
+
+                if (meuVoto === gabarito) {
+                    elCaixaPergunta.textContent = "VOCÊ ACERTOU! 🎉";
+                    elCaixaPergunta.className = "acerto";
+                } else {
+                    elCaixaPergunta.textContent = "VOCÊ ERROU! 💔";
+                    elCaixaPergunta.className = "erro";
+                }
+
+                // Libera o botão de avançar para a próxima
+                elBtnConfirmar.style.display = "block";
+            }
         }
 
-        function revelarGabaritoDoCasal() {
-            estadoFase = "revelado";
-            elBloqueioEspera.style.display = "none"; // Remove o escudo para os dois verem juntos
+        function enviarVotoOnline(letra) {
+            if (votadoNestaRodada) return;
+            votadoNestaRodada = true;
+            clearInterval(timerInterval); // Trava o tempo do jogador atual
 
-            let catID = categoriaAtual === "aleatorio" ? 1 : categoriaAtual;
-            const pool = bancoPerguntas[catID] || bancoPerguntas[1];
-            const respostaCorreta = pool[perguntaIndice].r;
+            document.getElementById(`opt-${letra}`).classList.add("selecionado");
+            elAlertaStatus.textContent = "SUA RESPOSTA FOI SALVA! AGUARDANDO ELE(A)...";
 
-            if (escolhaAtual === respostaCorreta) {
-                pontosNos += 10;
-                pontosBonus += 1;
-                elCaixaPergunta.textContent = "RESPOSTA CORRETA! 🎉";
-                elCaixaPergunta.className = "acerto";
-                document.getElementById(`opt-user-${escolhaAtual}`).className = "btn-opcao acerto";
+            // Envia estritamente o seu clique para o nó correspondente do Firebase
+            if (meuPerfil === "ela") {
+                database.ref("sala_quiz/voto_ela").set(letra);
             } else {
-                elCaixaPergunta.textContent = "INCORRETO! 💔";
-                elCaixaPergunta.className = "erro";
-                if(document.getElementById(`opt-user-${escolhaAtual}`)) {
-                    document.getElementById(`opt-user-${escolhaAtual}`).className = "btn-opcao erro";
-                }
-                if(document.getElementById(`opt-user-${respostaCorreta}`)) {
-                    document.getElementById(`opt-user-${respostaCorreta}`).className = "btn-opcao acerto";
-                }
+                database.ref("sala_quiz/voto_ele").set(letra);
             }
+        }
 
-            elPontosNos.textContent = `${pontosNos} PTS`;
-            elPontosBonus.textContent = pontosBonus;
+        function avancarRodadaOnline() {
+            // Limpa os votos anteriores no Firebase e pula o índice da pergunta
+            database.ref("sala_quiz").update({
+                voto_ela: "",
+                voto_ele: "",
+                indice: perguntaIndice + 1
+            });
+        }
 
-            // Agora sim vira Próxima Pergunta para avançar manualmente
-            elBtnConfirmar.textContent = "PRÓXIMA PERGUNTA";
-            elBtnConfirmar.style.backgroundColor = "#e67e22";
+        function mudarTemaOnline(temaId) {
+            // Permite mudar o tema sincronizado para ambos os celulares
+            database.ref("sala_quiz").update({
+                categoria: temaId,
+                indice: 0,
+                voto_ela: "",
+                voto_ele: ""
+            });
         }
 
         function resetTimer() {
@@ -556,33 +481,25 @@
                 elTempo.textContent = `${tempoRestante}S`;
                 if (tempoRestante <= 0) {
                     clearInterval(timerInterval);
-                    if (!escolhaAtual) escolhaAtual = "N/A";
-                    salvarEscolhaSecreta();
+                    if (!votadoNestaRodada) {
+                        enviarVotoOnline("N/A");
+                    }
                 }
             }, 1000);
         }
 
         function usarPistaDoQuiz() {
-            if(estadoFase !== "jogando") return;
-            let catID = categoriaAtual === "aleatorio" ? 1 : categoriaAtual;
-            const pool = bancoPerguntas[catID] || bancoPerguntas[1];
-            const dados = pool[perguntaIndice];
-            const erradas = ["A", "B", "C", "D"].filter(a => a !== dados.r);
-            const sorteadas = erradas.sort(() => 0.5 - Math.random()).slice(0, 2);
+            if (votadoNestaRodada) return;
+            const pool = bancoPerguntas[categoriaAtual] || bancoPerguntas[1];
+            const gabarito = pool[perguntaIndice].r;
+            const erradas = ["A", "B", "C", "D"].filter(a => a !== gabarito);
+            const sorteada = erradas[Math.floor(Math.random() * erradas.length)];
 
-            sorteadas.forEach(alt => {
-                const opt = document.getElementById(`opt-user-${alt}`);
-                if (opt) {
-                    opt.style.opacity = "0.3";
-                    opt.style.pointerEvents = "none";
-                }
-            });
-        }
-
-        function mudarTema(tema) {
-            categoriaAtual = tema;
-            perguntaIndice = 0;
-            renderizarPergunta();
+            const opt = document.getElementById(`opt-${sorteada}`);
+            if (opt) {
+                opt.style.opacity = "0.3";
+                opt.style.pointerEvents = "none";
+            }
         }
 
         function mudarAba(abaId) {
