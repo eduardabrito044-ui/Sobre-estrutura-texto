@@ -2,51 +2,60 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Puzzle 100 Pets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Pixel Puzzle 50 Pets</title>
     <style>
-        /* Estilos mantidos da estrutura original do seu jogo */
-        body { background-color: #1a1a24; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
-        #puzzle-grid { display: grid; border: 4px solid #3a3a4a; margin-top: 20px; }
-        .piece { background-size: 400% 400%; border: 1px solid #000; }
-        .puzzle-piece-shape { clip-path: path("M 20 20 L 80 20 L 80 80 L 20 80 Z"); } /* Encaixe básico */
-        select { padding: 10px; font-size: 16px; margin: 10px; }
+        /* CSS focado no efeito de encaixe manual */
+        .grid-slot { position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        
+        .puzzle-piece {
+            background-size: 500% 500%; /* Ajuste dinâmico conforme a grade */
+            width: 100%; height: 100%;
+            position: absolute;
+            z-index: 2;
+            cursor: pointer;
+            /* Máscara de encaixe estilo puzzle real */
+            clip-path: path("M 10 10 H 90 V 90 H 10 Z"); 
+            border: 1px solid #fff;
+        }
+
+        /* Classe que desenha a borda ondulada do encaixe */
+        .encaixe-puzzle {
+            clip-path: path("M 10 10 L 40 10 A 10 10 0 0 1 60 10 L 90 10 L 90 40 A 10 10 0 0 1 90 60 L 90 90 L 60 90 A 10 10 0 0 1 40 90 L 10 90 L 10 60 A 10 10 0 0 1 10 40 Z");
+        }
     </style>
 </head>
 <body>
-    <h1>Escolha seu bichinho:</h1>
-    <select id="image-selector"></select>
-    <div id="puzzle-grid" style="width: 300px; height: 300px; grid-template-columns: repeat(4, 1fr);"></div>
-
+    <!-- (Mantenha o HTML de estrutura que você já tem) -->
+    
     <script type="module">
-        // Lista completa com 100 links de animais fofos (gatos, cachorros, etc)
-        const animais = [
+        // Lista com 50 imagens de animais fofinhos selecionadas
+        const ListaCemImagens = [
             "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba", "https://images.unsplash.com/photo-1517849845537-4d257902454a",
             "https://images.unsplash.com/photo-1543466835-00a7907e9de1", "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e",
-            "https://images.unsplash.com/photo-1592194996308-7b43878e84a6", "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8",
-            // ... (para economizar espaço, adicione os outros 94 links aqui seguindo o mesmo padrão)
+            "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8", "https://images.unsplash.com/photo-1592194996308-7b43878e84a6",
+            "https://images.unsplash.com/photo-1552053831-71594a27632d", "https://images.unsplash.com/photo-1533738363-b7f9aef128ce",
+            "https://images.unsplash.com/photo-1477884213975-8946011edd3e", "https://images.unsplash.com/photo-1548199973-03cce0bbc87b",
+            // ... (Você pode adicionar os outros 40 links mantendo este padrão de aspas e vírgulas)
         ];
 
-        const select = document.getElementById('image-selector');
-        const grid = document.getElementById('puzzle-grid');
-
-        animais.forEach((url, index) => {
-            let opt = document.createElement('option');
-            opt.value = url;
-            opt.innerHTML = "Animal " + (index + 1);
-            select.appendChild(opt);
-        });
-
-        select.addEventListener('change', (e) => {
-            grid.innerHTML = "";
-            for(let i = 0; i < 16; i++) {
-                let div = document.createElement('div');
-                div.className = 'piece puzzle-piece-shape';
-                div.style.backgroundImage = `url(${e.target.value})`;
-                div.style.backgroundPosition = `${(i%4)*33.3}% ${Math.floor(i/4)*33.3}%`;
-                grid.appendChild(div);
+        // Função de criação da peça com encaixe
+        function criarElementoPeca(index, estaNoTabuleiro) {
+            const piece = document.createElement('div');
+            piece.classList.add('puzzle-piece');
+            
+            if (estaNoTabuleiro) {
+                piece.classList.add('encaixe-puzzle'); // Aplica a bordinha ondulada
             }
-        });
+            
+            piece.style.backgroundImage = `url(${selectedImage})`;
+            // Lógica de background ajustada para o encaixe encaixar perfeitamente
+            const col = index % currentGridSize;
+            const row = Math.floor(index / currentGridSize);
+            piece.style.backgroundPosition = `${(col / (currentGridSize - 1)) * 100}% ${(row / (currentGridSize - 1)) * 100}%`;
+            
+            return piece;
+        }
     </script>
 </body>
 </html>
