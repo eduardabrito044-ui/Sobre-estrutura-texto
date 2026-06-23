@@ -5,78 +5,482 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Pixel Puzzle Co-op Fofinho</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
     <style>
-        * { box-sizing: border-box; font-family: 'VT323', monospace; font-size: 24px; }
-        body { background-color: #1a1a24; color: #ecf0f1; margin: 0; padding: 8px; display: flex; justify-content: center; min-height: 100vh; }
-        #game-container { width: 100%; max-width: 480px; text-align: center; }
-        h1 { font-size: 42px; color: #f1c40f; margin: 5px 0; }
-        .pixel-box { background: #16a085; padding: 10px; border: 4px solid #117a65; border-radius: 8px; width: 100%; margin-bottom: 15px; }
-        .pixel-window { background-color: rgba(30, 30, 38, 0.95); border: 4px solid #3a3a4a; padding: 15px; margin-bottom: 15px; border-radius: 12px; }
-        .pixel-btn { background-color: #e67e22; border: 4px solid #d35400; color: white; padding: 10px 20px; cursor: pointer; border-radius: 8px; flex: 1; }
-        #puzzle-grid { width: 100%; max-width: 400px; height: 400px; background-color: #111; display: grid; border: 6px solid #3a3a4a; gap: 2px; }
-        .puzzle-piece { width: 100%; height: 100%; border: 1px solid rgba(255,255,255,0.2); background-size: 400% 400%; }
-        #pieces-container { display: flex; overflow-x: auto; gap: 10px; padding: 10px; }
-        #pieces-container .puzzle-piece { width: 75px; height: 75px; flex-shrink: 0; border: 3px solid #555; }
+        /* ==========================================================================
+           ESTILOS VISUAIS RETRÔ ADAPTADOS PARA CELULAR
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            font-family: 'VT323', monospace;
+            font-size: 24px;
+            image-rendering: pixelated;
+        }
+
+        body {
+            background-color: #1a1a24;
+            background-image: radial-gradient(#252530 20%, transparent 20%), radial-gradient(#252530 20%, transparent 20%);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            color: #ecf0f1;
+            margin: 0;
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 42px;
+            color: #f1c40f;
+            text-shadow: 3px 3px #000;
+            margin: 5px 0;
+        }
+
+        h2 { font-size: 32px; color: #f39c12; margin: 0 0 10px 0; }
+        
+        .pixel-window {
+            background-color: rgba(30, 30, 38, 0.95);
+            border: 4px solid #3a3a4a;
+            padding: 15px;
+            box-shadow: 0px 5px 0px #111;
+            margin-bottom: 15px;
+            border-radius: 12px;
+        }
+
+        .pixel-box {
+            background: #16a085;
+            padding: 6px 15px;
+            border: 4px solid #117a65;
+            display: inline-block;
+            margin-bottom: 15px;
+            color: white;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .setup-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .identity-container {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .pixel-btn {
+            background-color: #e67e22;
+            border: 4px solid #d35400;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            box-shadow: 0px 4px 0px #000;
+            font-size: 26px;
+            border-radius: 8px;
+            flex: 1;
+        }
+
+        .pixel-btn.blue { background-color: #2980b9; border-color: #1f618d; }
+        .pixel-btn.pink { background-color: #d81b60; border-color: #ad1457; }
+
+        .pixel-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0px 2px 0px #000;
+        }
+
+        .pixel-input {
+            background-color: #ecf0f1;
+            border: 4px solid #bdc3c7;
+            color: #2c3e50;
+            padding: 8px;
+            text-align: center;
+            font-size: 24px;
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        #board-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        #pieces-bank {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(20, 20, 28, 0.95);
+        }
+
+        #pieces-container {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            scroll-snap-type: x proximity;
+            gap: 10px;
+            padding: 10px 5px;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #pieces-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        #pieces-container::-webkit-scrollbar-thumb {
+            background: #3a3a4a;
+            border-radius: 4px;
+        }
+
+        #puzzle-board-wrapper { 
+            position: relative; 
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #puzzle-grid {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            background-color: #111;
+            display: grid;
+            padding: 0;
+            gap: 2px;
+            border: 6px solid #3a3a4a;
+            position: relative;
+        }
+
+        .grid-slot {
+            box-sizing: border-box;
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .puzzle-piece {
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #pieces-container .puzzle-piece {
+            position: relative;
+            width: 75px;
+            height: 75px;
+            flex-shrink: 0;
+            border: 3px solid #555;
+            border-radius: 6px;
+            scroll-snap-align: start;
+        }
+
+        .puzzle-piece.selecionada {
+            outline: 4px solid #f1c40f;
+            box-shadow: 0 0 12px #f1c40f;
+            transform: scale(0.95);
+        }
+
+        #turn-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 20, 30, 0.85);
+            backdrop-filter: blur(2px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10;
+        }
+
+        .overlay-text {
+            background-color: #c0392b;
+            border: 4px solid #922b21;
+            padding: 12px 24px;
+            color: white;
+            font-size: 26px;
+            box-shadow: 0px 4px 0px #000;
+            border-radius: 8px;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
+
     <div id="game-container">
-        <h1>PIXEL PUZZLE CO-OP 🐾</h1>
-        <div id="turn-indicator" class="pixel-box">Carregando...</div>
+        <header>
+            <h1>PIXEL PUZZLE CO-OP 🐾</h1>
+            <div id="turn-indicator" class="pixel-box">Identifique-se para jogar!</div>
+        </header>
+
+        <!-- TELA DE SELEÇÃO -->
         <div id="lobby-screen" class="pixel-window">
-            <button class="pixel-btn" onclick="iniciarJogo()">JOGAR COM BICHINHOS</button>
+            <h2>Quem está jogando?</h2>
+            <div class="setup-container">
+                <div style="width: 100%;">
+                    <label for="select-difficulty" style="display:block; margin-bottom:5px;">Dificuldade:</label>
+                    <select id="select-difficulty" class="pixel-input">
+                        <option value="facil">Fácil (16 Peças)</option>
+                        <option value="medio">Médio (25 Peças)</option>
+                        <option value="dificil">Difícil (36 Peças)</option>
+                    </select>
+                </div>
+                
+                <div class="identity-container">
+                    <button class="pixel-btn blue" data-player="player_1">O ELE 🧔</button>
+                    <button class="pixel-btn pink" data-player="player_2">A ELA 👩‍🦰</button>
+                </div>
+            </div>
         </div>
+
+        <!-- TELA DO QUEBRA CABEÇA -->
         <div id="game-screen" class="hidden">
-            <div id="pieces-container"></div>
-            <div id="puzzle-grid"></div>
+            <div id="room-info" class="pixel-window" style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                <span>Modo: <strong id="display-difficulty">Fácil</strong></span>
+                <button id="btn-reset-game" class="pixel-btn" style="font-size:18px; padding:4px 12px; background-color:#d35400;">Novo Bichinho 🔄</button>
+            </div>
+            
+            <div id="board-layout">
+                <!-- BANCO DE PEÇAS EM CARROSSEL -->
+                <div id="pieces-bank" class="pixel-window">
+                    <div style="font-size: 16px; margin: 0 0 5px 0; color: #f1c40f;">Deslize para o lado ➡️ Toque na peça e depois na vaga!</div>
+                    <div id="pieces-container"></div>
+                </div>
+
+                <!-- TABULEIRO PRINCIPAL -->
+                <div id="puzzle-board-wrapper">
+                    <div id="puzzle-grid"></div>
+                    <div id="turn-overlay" class="hidden">
+                        <div class="overlay-text" id="overlay-message">AGUARDANDO JOGADA...</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        // Lista de 50 animais fofos verificada individualmente
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
+            authDomain: "dddua-81207.firebaseapp.com",
+            databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com",
+            projectId: "dddua-81207",
+            storageBucket: "dddua-81207.firebasestorage.app",
+            messagingSenderId: "844138746278",
+            appId: "1:844138746278:web:341f704f22c106473d7f67",
+            measurementId: "G-F4SC83V4KB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // NOVA SALA DO ZERO PARA FORÇAR ATUALIZAÇÃO COMPLETA
+        const NOSSA_SALA_FIXA = "PARTIDA_COOP_FOFURA";
+        let myPlayerId = null; 
+        let currentTurn = null;
+        let selectedImage = "";
+        let currentGridSize = 4;
+        let pecaSelecionadaId = null; 
+
+        // LISTA HAND-PICKED COM ANIMAIS DEFLEXOS TOTALMENTE CONFIRMADOS (UNSPLASH)
         const ListaCemImagens = [
-            "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba", "https://images.unsplash.com/photo-1517849845537-4d257902454a",
-            "https://images.unsplash.com/photo-1543466835-00a7907e9de1", "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e",
-            "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8", "https://images.unsplash.com/photo-1592194996308-7b43878e84a6",
-            "https://images.unsplash.com/photo-1552053831-71594a27632d", "https://images.unsplash.com/photo-1533738363-b7f9aef128ce",
-            "https://images.unsplash.com/photo-1477884213975-8946011edd3e", "https://images.unsplash.com/photo-1548199973-03cce0bbc87b",
-            "https://images.unsplash.com/photo-1561037404-61cd46aa615b", "https://images.unsplash.com/photo-1518791841217-8f162f1e1131",
-            "https://images.unsplash.com/photo-1507146426996-ef05306b995a", "https://images.unsplash.com/photo-1574158622643-69d34d72650a",
-            "https://images.unsplash.com/photo-1601758228041-f3b2795255f1", "https://images.unsplash.com/photo-1506755855567-92ff770e8d30",
-            "https://images.unsplash.com/photo-1535268647977-a403b69eed7e", "https://images.unsplash.com/photo-1589883661923-6476cb0ae3f2",
-            "https://images.unsplash.com/photo-1581888227599-779811939961", "https://images.unsplash.com/photo-1527380905442-5eecd3d6092c",
-            "https://images.unsplash.com/photo-1535930749574-1399327ce78f", "https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a",
-            "https://images.unsplash.com/photo-1548336109-0268a735628b", "https://images.unsplash.com/photo-1560114928-40f941b4c95f",
-            "https://images.unsplash.com/photo-1555685812-4b74301a2f64", "https://images.unsplash.com/photo-1586671267735-866380c55716",
-            "https://images.unsplash.com/photo-1588943211346-65551f33918a", "https://images.unsplash.com/photo-1557461762-d27e7706d87e",
-            "https://images.unsplash.com/photo-1563464977936-39d6715f3350", "https://images.unsplash.com/photo-1549449343-4e44f8490a18",
-            "https://images.unsplash.com/photo-1502675135487-e9710cdc7569", "https://images.unsplash.com/photo-1531326233513-81e095400d08",
-            "https://images.unsplash.com/photo-1526336024174-e58f5c38e265", "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7",
-            "https://images.unsplash.com/photo-1525253086316-d0c936c814f8", "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce",
-            "https://images.unsplash.com/photo-1514984879728-be0aff75a6e8", "https://images.unsplash.com/photo-1511044568932-338cba0ad83d",
-            "https://images.unsplash.com/photo-1515405295579-87b653457a8a", "https://images.unsplash.com/photo-1513245543132-31f507417b26",
-            "https://images.unsplash.com/photo-1509205469837-372998634861", "https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8",
-            "https://images.unsplash.com/photo-1481349518771-20055b2a7b24", "https://images.unsplash.com/photo-1505628346881-b72b27e84530",
-            "https://images.unsplash.com/photo-1520763185298-0b43bc0bbcaa", "https://images.unsplash.com/photo-1504595403659-908598093653",
-            "https://images.unsplash.com/photo-1516467508483-376044439c27", "https://images.unsplash.com/photo-1472491235688-bdc81a63246f",
-            "https://images.unsplash.com/photo-1504208420200-f04d7c1751d8", "https://images.unsplash.com/photo-1518791841217-8f162f1e1131"
+            "https://images.unsplash.com/photo-1543466835-00a7907e9de1?q=80&w=500&auto=format&fit=crop", // Golden Retriver filhote
+            "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=500&auto=format&fit=crop", // Gatinho fofo olhando fixo
+            "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?q=80&w=500&auto=format&fit=crop", // Cãozinho branco felpudo
+            "https://images.unsplash.com/photo-1573865526739-10659fec78a5?q=80&w=500&auto=format&fit=crop", // Gato deitado dengoso
+            "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?q=80&w=500&auto=format&fit=crop", // Filhote de gato brincando
+            "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?q=80&w=500&auto=format&fit=crop", // Pug de óculos fofo
+            "https://images.unsplash.com/photo-1507146426996-ef05306b995a?q=80&w=500&auto=format&fit=crop", // Cãozinho bebê deitado
+            "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=500&auto=format&fit=crop", // Dois doguinhos correndo
+            "https://images.unsplash.com/photo-1561037404-61cd46aa615b?q=80&w=500&auto=format&fit=crop", // Cãozinho feliz da vida
+            "https://images.unsplash.com/photo-1517849845537-4d257902454a?q=80&w=500&auto=format&fit=crop"  // Bulldog filhotinho fofo
         ];
 
-        window.iniciarJogo = () => {
+        const selectDifficulty = document.getElementById('select-difficulty');
+        const turnIndicator = document.getElementById('turn-indicator');
+        const puzzleGrid = document.getElementById('puzzle-grid');
+        const piecesContainer = document.getElementById('pieces-container');
+        const turnOverlay = document.getElementById('turn-overlay');
+        const overlayMessage = document.getElementById('overlay-message');
+        const btnReset = document.getElementById('btn-reset-game');
+
+        document.querySelectorAll('.identity-container button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                myPlayerId = e.target.getAttribute('data-player');
+                conectarAoJogo();
+            });
+        });
+
+        btnReset.addEventListener('click', () => {
+            resetarPartidaCompleta(selectDifficulty.value);
+        });
+
+        async function conectarAoJogo() {
+            try {
+                const diff = selectDifficulty.value;
+                const snapshot = await get(ref(db, 'partidas/' + NOSSA_SALA_FIXA));
+                const data = snapshot.val();
+                
+                if (!data || data.dificuldade !== diff) {
+                    await resetarPartidaCompleta(diff);
+                }
+                setupGameSession();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function resetarPartidaCompleta(diff) {
+            const indexAleatorio = Math.floor(Math.random() * ListaCemImagens.length);
+            const urlImagemAleatoria = ListaCemImagens[indexAleatorio];
+            let tamanhoGrade = diff === "facil" ? 4 : (diff === "medio" ? 5 : 6);
+
+            let listaIndices = [];
+            for(let i = 0; i < tamanhoGrade * tamanhoGrade; i++) {
+                listaIndices.push(i);
+            }
+            
+            // Fisher-Yates shuffle ativo
+            for (let i = listaIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [listaIndices[i], listaIndices[j]] = [listaIndices[j], listaIndices[i]];
+            }
+
+            await set(ref(db, 'partidas/' + NOSSA_SALA_FIXA), {
+                id: NOSSA_SALA_FIXA, 
+                imagem: urlImagemAleatoria, 
+                dificuldade: diff,
+                tamanho_grade: tamanhoGrade, 
+                turno_atual: "player_1", 
+                status: "jogando", 
+                ordem_pecas: listaIndices,
+                pecas_encaixadas: { "init": true } 
+            });
+        }
+
+        function setupGameSession() {
             document.getElementById('lobby-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
-            document.getElementById('turn-indicator').innerText = "Divirtam-se com os bichinhos!";
-            const grid = document.getElementById('puzzle-grid');
-            const img = ListaCemImagens[Math.floor(Math.random() * ListaCemImagens.length)];
-            for(let i=0; i<16; i++) {
-                const p = document.createElement('div');
-                p.className = 'puzzle-piece';
-                p.style.backgroundImage = `url(${img})`;
-                p.style.backgroundPosition = `${(i%4)*33.3}% ${Math.floor(i/4)*33.3}%`;
-                grid.appendChild(p);
+
+            onValue(ref(db, 'partidas/' + NOSSA_SALA_FIXA), (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
+                
+                currentTurn = data.turno_atual; 
+                selectedImage = data.imagem; 
+                currentGridSize = data.tamanho_grade;
+                
+                document.getElementById('display-difficulty').innerText = data.dificuldade.toUpperCase();
+                
+                if (currentTurn === myPlayerId) {
+                    turnIndicator.innerText = "SUA VEZ DE MOVER!"; 
+                    turnOverlay.classList.add('hidden');
+                } else {
+                    const nomeParceiro = myPlayerId === "player_1" ? "A ELA 👩‍🦰" : "O ELE 🧔";
+                    turnIndicator.innerText = `VEZ DE ${nomeParceiro}...`; 
+                    overlayMessage.innerText = `AGUARDANDO A JOGADA DE ${nomeParceiro}...`;
+                    turnOverlay.classList.remove('hidden');
+                }
+                
+                renderizarPainel(data.pecas_encaixadas || {}, data.ordem_pecas || []);
+            });
+        }
+
+        function renderizarPainel(pecasEncaixadas, ordemPecas) {
+            puzzleGrid.style.gridTemplateColumns = `repeat(${currentGridSize}, 1fr)`;
+            puzzleGrid.style.gridTemplateRows = `repeat(${currentGridSize}, 1fr)`;
+            puzzleGrid.innerHTML = ""; 
+            piecesContainer.innerHTML = "";
+
+            const totalPecas = currentGridSize * currentGridSize;
+
+            for (let i = 0; i < totalPecas; i++) {
+                const slot = document.createElement('div');
+                slot.classList.add('grid-slot');
+                slot.dataset.index = i;
+                slot.addEventListener('click', handleSlotClick);
+
+                if (pecasEncaixadas[i]) {
+                    const piece = criarElementoPeca(i, true);
+                    slot.appendChild(piece);
+                }
+                puzzleGrid.appendChild(slot);
             }
-        };
+
+            if (!ordemPecas || ordemPecas.length !== totalPecas) {
+                ordemPecas = Array.from({length: totalPecas}, (_, k) => k);
+            }
+
+            ordemPecas.forEach((originalIndex) => {
+                if (!pecasEncaixadas[originalIndex]) {
+                    const piece = criarElementoPeca(originalIndex, false);
+                    piecesContainer.appendChild(piece);
+                }
+            });
+        }
+
+        function criarElementoPeca(index, estaNoTabuleiro) {
+            const piece = document.createElement('div');
+            piece.classList.add('puzzle-piece');
+            piece.style.backgroundImage = `url(${selectedImage})`;
+            
+            const row = Math.floor(index / currentGridSize);
+            const col = index % currentGridSize;
+            
+            const percentX = (currentGridSize > 1) ? (col / (currentGridSize - 1)) * 100 : 0;
+            const percentY = (currentGridSize > 1) ? (row / (currentGridSize - 1)) * 100 : 0;
+            
+            piece.style.backgroundSize = `${currentGridSize * 100}% ${currentGridSize * 100}%`;
+            piece.style.backgroundPosition = `${percentX}% ${percentY}%`;
+            
+            if (!estaNoTabuleiro) {
+                piece.dataset.pieceId = index;
+                if (pecaSelecionadaId === index) {
+                    piece.classList.add('selecionada');
+                }
+                piece.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (currentTurn !== myPlayerId) return;
+                    
+                    document.querySelectorAll('#pieces-container .puzzle-piece').forEach(p => p.classList.remove('selecionada'));
+                    pecaSelecionadaId = index;
+                    piece.classList.add('selecionada');
+                });
+            }
+            return piece;
+        }
+
+        function handleSlotClick(e) {
+            if (currentTurn !== myPlayerId || pecaSelecionadaId === null) return;
+            const slotId = parseInt(e.currentTarget.dataset.index);
+
+            if (pecaSelecionadaId === slotId) {
+                const proximoTurno = myPlayerId === "player_1" ? "player_2" : "player_1";
+                const updates = {};
+                updates[`partidas/${NOSSA_SALA_FIXA}/pecas_encaixadas/${pecaSelecionadaId}`] = true;
+                updates[`partidas/${NOSSA_SALA_FIXA}/turno_atual`] = proximoTurno;
+                
+                pecaSelecionadaId = null; 
+                update(ref(db), updates);
+            } else {
+                alert("Posição errada! Procure o quadrado certo para esse pedaço da imagem.");
+            }
+        }
     </script>
 </body>
 </html>
