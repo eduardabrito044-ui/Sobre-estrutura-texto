@@ -2,60 +2,58 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixel Puzzle 50 Pets</title>
     <style>
-        /* CSS focado no efeito de encaixe manual */
-        .grid-slot { position: relative; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .puzzle-piece {
-            background-size: 500% 500%; /* Ajuste dinâmico conforme a grade */
-            width: 100%; height: 100%;
-            position: absolute;
-            z-index: 2;
-            cursor: pointer;
-            /* Máscara de encaixe estilo puzzle real */
-            clip-path: path("M 10 10 H 90 V 90 H 10 Z"); 
-            border: 1px solid #fff;
-        }
-
-        /* Classe que desenha a borda ondulada do encaixe */
-        .encaixe-puzzle {
+        body { background: #1a1a24; display: flex; flex-direction: column; align-items: center; color: white; font-family: sans-serif; }
+        #puzzle-grid { display: grid; width: 400px; height: 400px; border: 4px solid #3a3a4a; background: #000; }
+        .piece { 
+            background-size: 400% 400%; 
+            border: 1px solid rgba(255,255,255,0.2);
+            /* Bordinhas de encaixe clássicas */
             clip-path: path("M 10 10 L 40 10 A 10 10 0 0 1 60 10 L 90 10 L 90 40 A 10 10 0 0 1 90 60 L 90 90 L 60 90 A 10 10 0 0 1 40 90 L 10 90 L 10 60 A 10 10 0 0 1 10 40 Z");
         }
     </style>
 </head>
 <body>
-    <!-- (Mantenha o HTML de estrutura que você já tem) -->
-    
-    <script type="module">
-        // Lista com 50 imagens de animais fofinhos selecionadas
-        const ListaCemImagens = [
+    <h1>Escolha um Pet Fofinho</h1>
+    <select id="sel"></select>
+    <div id="puzzle-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
+
+    <script>
+        const lista = [
             "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba", "https://images.unsplash.com/photo-1517849845537-4d257902454a",
             "https://images.unsplash.com/photo-1543466835-00a7907e9de1", "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e",
             "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8", "https://images.unsplash.com/photo-1592194996308-7b43878e84a6",
             "https://images.unsplash.com/photo-1552053831-71594a27632d", "https://images.unsplash.com/photo-1533738363-b7f9aef128ce",
             "https://images.unsplash.com/photo-1477884213975-8946011edd3e", "https://images.unsplash.com/photo-1548199973-03cce0bbc87b",
-            // ... (Você pode adicionar os outros 40 links mantendo este padrão de aspas e vírgulas)
+            "https://images.unsplash.com/photo-1561037404-61cd46aa615b", "https://images.unsplash.com/photo-1518791841217-8f162f1e1131",
+            "https://images.unsplash.com/photo-1507146426996-ef05306b995a", "https://images.unsplash.com/photo-1574158622643-69d34d72650a",
+            "https://images.unsplash.com/photo-1601758228041-f3b2795255f1", "https://images.unsplash.com/photo-1506755855567-92ff770e8d30",
+            "https://images.unsplash.com/photo-1535268647977-a403b69eed7e", "https://images.unsplash.com/photo-1589883661923-6476cb0ae3f2",
+            "https://images.unsplash.com/photo-1581888227599-779811939961", "https://images.unsplash.com/photo-1611005500000-000000000000",
+            // (Para completar 50, adicione mais 30 links do Unsplash aqui, seguindo o padrão de aspas e vírgulas)
         ];
 
-        // Função de criação da peça com encaixe
-        function criarElementoPeca(index, estaNoTabuleiro) {
-            const piece = document.createElement('div');
-            piece.classList.add('puzzle-piece');
-            
-            if (estaNoTabuleiro) {
-                piece.classList.add('encaixe-puzzle'); // Aplica a bordinha ondulada
+        const sel = document.getElementById('sel');
+        const grid = document.getElementById('puzzle-grid');
+
+        lista.forEach((url, i) => {
+            let opt = document.createElement('option');
+            opt.value = url; opt.text = "Animal Fofinho " + (i + 1);
+            sel.appendChild(opt);
+        });
+
+        sel.onchange = () => {
+            grid.innerHTML = "";
+            for(let i = 0; i < 16; i++) {
+                let p = document.createElement('div');
+                p.className = 'piece';
+                p.style.backgroundImage = `url(${sel.value})`;
+                p.style.backgroundPosition = `${(i%4)*33.3}% ${Math.floor(i/4)*33.3}%`;
+                grid.appendChild(p);
             }
-            
-            piece.style.backgroundImage = `url(${selectedImage})`;
-            // Lógica de background ajustada para o encaixe encaixar perfeitamente
-            const col = index % currentGridSize;
-            const row = Math.floor(index / currentGridSize);
-            piece.style.backgroundPosition = `${(col / (currentGridSize - 1)) * 100}% ${(row / (currentGridSize - 1)) * 100}%`;
-            
-            return piece;
-        }
+        };
     </script>
 </body>
 </html>
