@@ -189,8 +189,7 @@
             box-shadow: 0 4px 0px #111;
         }
 
-        #quiz-confirmar { background-color: #2980b9; display: none; }
-        #quiz-pista { background-color: #27ae60; }
+        #quiz-confirmar { background-color: #e67e22; display: none; }
         .btn-acao-quiz:active { transform: translateY(2px); box-shadow: 0 2px 0px #111; }
 
         .grid-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -220,7 +219,6 @@
 </head>
 <body>
 
-    <!-- SELEÇÃO DE QUEM É QUEM -->
     <div id="tela-perfil">
         <div class="caixa-perfil">
             <h2 style="color: #ffd700; font-size: 1.2em;">QUEM ESTÁ JOGANDO AGORA?</h2>
@@ -229,7 +227,6 @@
         </div>
     </div>
 
-    <!-- TELA PRINCIPAL DO JOGO -->
     <div id="main-container">
         <div id="header-quiz">
             <h1 id="titulo-principal">QUIZ DE CASAL - NOSSO MUNDO</h1>
@@ -237,7 +234,7 @@
         </div>
         
         <div id="quadro-jogo">
-            <div id="caixa-pergunta">CARREGANDO...</div>
+            <div id="caixa-pergunta">CONECTANDO AO BANCO...</div>
             <div id="cronometro">TEMPO RESTANTE: <span id="tempo">15S</span></div>
             
             <div id="zona-respostas">
@@ -246,11 +243,10 @@
                 </div>
             </div>
 
-            <div id="alerta-status">CONECTANDO AO BANCO...</div>
+            <div id="alerta-status">SABOTANDO ERROS DE SINCRONIZAÇÃO...</div>
 
             <div class="controles-quiz-container">
                 <button class="btn-acao-quiz" id="quiz-confirmar" onclick="avancarRodadaOnline()">PRÓXIMA PERGUNTA</button>
-                <button class="btn-acao-quiz" id="quiz-pista" onclick="usarPistaDoQuiz()">USAR PISTA</button>
             </div>
         </div>
 
@@ -294,14 +290,26 @@
         </div>
     </div>
 
-    <!-- INSERIR SCRIPTS DO FIREBASE AQUI -->
-    <!-- Mantenha as tags de script <script src=".../firebase-app.js"> que você já usa no seu projeto original aqui -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-    <script>
-        // Mantenha a sua configuração original do Firebase aqui:
-        // const firebaseConfig = { ... };
-        // firebase.initializeApp(firebaseConfig);
-        // const database = firebase.database();
+        // CREDENCIAIS EXTRAÍDAS DO SEU SITE DE SOCIOLOGIA
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
+            authDomain: "dddua-81207.firebaseapp.com",
+            databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com",
+            projectId: "dddua-81207",
+            storageBucket: "dddua-81207.firebasestorage.app",
+            messagingSenderId: "844138746278",
+            appId: "1:844138746278:web:341f704f22c106473d7f67",
+            measurementId: "G-F4SC83V4KB"
+        };
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const salaQuizRef = ref(db, "sala_quiz");
 
         const bancoPerguntas = {
             1: [
@@ -339,20 +347,19 @@
         const elAlertaStatus = document.getElementById("alerta-status");
         const elBtnConfirmar = document.getElementById("quiz-confirmar");
 
-        function definirJogador(perfil) {
+        window.definirJogador = function(perfil) {
             meuPerfil = perfil;
             document.getElementById("lbl-jogador-atual").textContent = perfil.toUpperCase();
             document.getElementById("tela-perfil").style.display = "none";
             document.getElementById("main-container").style.display = "block";
             
-            // Inicia escuta em tempo real da sala no Firebase
-            database.ref("sala_quiz").on("value", (snapshot) => {
+            // Ouvinte em tempo real do Firebase
+            onValue(salaQuizRef, (snapshot) => {
                 const dados = snapshot.val();
                 if (dados) {
                     processarDadosFirebase(dados);
                 } else {
-                    // Inicialização padrão caso o banco esteja limpo
-                    database.ref("sala_quiz").set({
+                    set(salaQuizRef, {
                         categoria: 1,
                         indice: 0,
                         voto_ela: "",
@@ -363,7 +370,6 @@
         }
 
         function processarDadosFirebase(dados) {
-            // Verifica se a rodada ou tema mudou para resetar o estado de voto local
             if (dados.categoria !== categoriaAtual || dados.indice !== perguntaIndice) {
                 categoriaAtual = dados.categoria;
                 perguntaIndice = dados.indice;
@@ -374,10 +380,18 @@
             const pool = bancoPerguntas[categoriaAtual] || bancoPerguntas[1];
             const dadosPergunta = pool[perguntaIndice];
             
+            if (!dadosPergunta) {
+                elCaixaPergunta.textContent = "FIM DAS PERGUNTAS DESTE TEMA! MUDEM DE CATEGORIA ABAIXO.";
+                elOpcoesJogador.innerHTML = "";
+                elAlertaStatus.textContent = "";
+                elBtnConfirmar.style.display = "none";
+                clearInterval(timerInterval);
+                return;
+            }
+
             elCaixaPergunta.textContent = dadosPergunta.p.toUpperCase();
             elCaixaPergunta.className = "";
 
-            // Renderiza as alternativas se o usuário ainda não tiver votado
             if (!votadoNestaRodada) {
                 elBtnConfirmar.style.display = "none";
                 elOpcoesJogador.innerHTML = "";
@@ -392,7 +406,6 @@
                     elOpcoesJogador.appendChild(btn);
                 }
 
-                // Exibe status de quem falta jogar
                 if (!dados.voto_ela && !dados.voto_ele) {
                     elAlertaStatus.textContent = "NENHUM DOS DOIS RESPONDEU AINDA.";
                 } else {
@@ -401,7 +414,7 @@
                 }
             }
 
-            // SE OS DOIS JÁ JOGARAM: MOSTRA O RESULTADO NA HORA!
+            // SE OS DOIS JOGARAM: EXIBE NA HORA O VERDE OU VERMELHO
             if (dados.voto_ela && dados.voto_ele) {
                 clearInterval(timerInterval);
                 votadoNestaRodada = true;
@@ -412,7 +425,6 @@
 
                 elAlertaStatus.innerHTML = `SEU VOTO: ${meuVoto} | PARCEIRO: ${votoParceiro}`;
 
-                // Pinta as cores de acerto e erro baseadas nas escolhas de vocês
                 ["A", "B", "C", "D"].forEach(alt => {
                     const btn = document.getElementById(`opt-${alt}`);
                     if (btn) {
@@ -432,7 +444,6 @@
                     elCaixaPergunta.className = "erro";
                 }
 
-                // Libera o botão de avançar para a próxima
                 elBtnConfirmar.style.display = "block";
             }
         }
@@ -440,31 +451,29 @@
         function enviarVotoOnline(letra) {
             if (votadoNestaRodada) return;
             votadoNestaRodada = true;
-            clearInterval(timerInterval); // Trava o tempo do jogador atual
+            clearInterval(timerInterval);
 
-            document.getElementById(`opt-${letra}`).classList.add("selecionado");
+            const opt = document.getElementById(`opt-${letra}`);
+            if (opt) opt.classList.add("selecionado");
             elAlertaStatus.textContent = "SUA RESPOSTA FOI SALVA! AGUARDANDO ELE(A)...";
 
-            // Envia estritamente o seu clique para o nó correspondente do Firebase
             if (meuPerfil === "ela") {
-                database.ref("sala_quiz/voto_ela").set(letra);
+                update(salaQuizRef, { voto_ela: letra });
             } else {
-                database.ref("sala_quiz/voto_ele").set(letra);
+                update(salaQuizRef, { voto_ele: letra });
             }
         }
 
-        function avancarRodadaOnline() {
-            // Limpa os votos anteriores no Firebase e pula o índice da pergunta
-            database.ref("sala_quiz").update({
+        window.avancarRodadaOnline = function() {
+            update(salaQuizRef, {
                 voto_ela: "",
                 voto_ele: "",
                 indice: perguntaIndice + 1
             });
         }
 
-        function mudarTemaOnline(temaId) {
-            // Permite mudar o tema sincronizado para ambos os celulares
-            database.ref("sala_quiz").update({
+        window.mudarTemaOnline = function(temaId) {
+            update(salaQuizRef, {
                 categoria: temaId,
                 indice: 0,
                 voto_ela: "",
@@ -488,21 +497,7 @@
             }, 1000);
         }
 
-        function usarPistaDoQuiz() {
-            if (votadoNestaRodada) return;
-            const pool = bancoPerguntas[categoriaAtual] || bancoPerguntas[1];
-            const gabarito = pool[perguntaIndice].r;
-            const erradas = ["A", "B", "C", "D"].filter(a => a !== gabarito);
-            const sorteada = erradas[Math.floor(Math.random() * erradas.length)];
-
-            const opt = document.getElementById(`opt-${sorteada}`);
-            if (opt) {
-                opt.style.opacity = "0.3";
-                opt.style.pointerEvents = "none";
-            }
-        }
-
-        function mudarAba(abaId) {
+        window.mudarAba = function(abaId) {
             document.querySelectorAll('.conteudo-aba').forEach(el => el.classList.remove('ativa'));
             document.querySelectorAll('.aba-btn').forEach(el => el.classList.remove('ativa'));
             document.getElementById(abaId).classList.add('ativa');
