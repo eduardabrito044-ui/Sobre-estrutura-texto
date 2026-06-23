@@ -2,50 +2,32 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Pixel Puzzle Co-op Fofinho</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Puzzle Co-op</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; font-family: 'VT323', monospace; font-size: 24px; image-rendering: pixelated; }
-        body { background-color: #1a1a24; margin: 0; padding: 8px; display: flex; justify-content: center; min-height: 100vh; color: #ecf0f1; }
+        * { box-sizing: border-box; font-family: 'VT323', monospace; }
+        body { background: #1a1a24; color: #fff; margin: 0; padding: 10px; display: flex; justify-content: center; }
         #game-container { width: 100%; max-width: 480px; text-align: center; }
-        h1 { font-size: 40px; color: #f1c40f; text-shadow: 3px 3px #000; margin: 10px 0; }
-        .pixel-window { background-color: #2c3e50; border: 4px solid #34495e; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .pixel-btn { background-color: #e67e22; border: 4px solid #d35400; color: white; padding: 10px; cursor: pointer; border-radius: 8px; width: 100%; font-size: 24px; }
-        .pixel-btn:active { transform: translateY(2px); }
+        .pixel-window { background: #2c3e50; border: 4px solid #34495e; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        .pixel-btn { background: #27ae60; border: 4px solid #1e8449; color: white; padding: 12px; cursor: pointer; border-radius: 8px; width: 100%; font-size: 24px; }
         
-        /* ESTILO DAS PEÇAS "JIGSAW" */
-        #puzzle-grid { display: grid; gap: 4px; background: #111; padding: 4px; border: 4px solid #3a3a4a; margin: 0 auto; width: 100%; max-width: 400px; }
+        /* Grade e Peças */
+        #puzzle-grid { display: grid; gap: 4px; background: #111; padding: 5px; border: 4px solid #34495e; margin: 0 auto; width: 100%; max-width: 400px; }
         .grid-slot { aspect-ratio: 1; background: rgba(0,0,0,0.3); border: 2px dashed rgba(255,255,255,0.1); }
-        .puzzle-piece { 
-            width: 100%; height: 100%; background-repeat: no-repeat; 
-            border-radius: 8px; border: 2px solid #fff; cursor: pointer;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 2px 2px 4px rgba(0,0,0,0.4);
-        }
-        .puzzle-piece.selecionada { outline: 4px solid #f1c40f; transform: scale(1.05); z-index: 10; }
+        .puzzle-piece { width: 100%; height: 100%; background-repeat: no-repeat; border-radius: 6px; border: 2px solid #fff; cursor: pointer; box-shadow: 2px 2px 0px rgba(0,0,0,0.5); }
+        .puzzle-piece.selecionada { outline: 4px solid #f1c40f; transform: scale(1.05); }
         
-        #pieces-container { display: flex; gap: 10px; overflow-x: auto; padding: 10px; background: #2c3e50; border-radius: 8px; }
-        #turn-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20, 20, 30, 0.85); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        #pieces-container { display: flex; gap: 10px; overflow-x: auto; padding: 10px; background: #2c3e50; border-radius: 8px; min-height: 80px; margin-bottom: 15px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
     <div id="game-container">
         <h1>PIXEL PUZZLE CO-OP 🐾</h1>
-        <div id="lobby-screen" class="pixel-window">
-            <select id="select-difficulty" class="pixel-btn" style="background:#fff; color:#333; margin-bottom:10px;">
-                <option value="facil">Fácil (16 Peças)</option>
-                <option value="medio">Médio (25 Peças)</option>
-                <option value="dificil">Difícil (36 Peças)</option>
-            </select>
-            <button class="pixel-btn" style="background:#2980b9;" onclick="definirJogador('player_1')">O ELE 🧔</button>
-            <button class="pixel-btn" style="background:#d81b60; margin-top:10px;" onclick="definirJogador('player_2')">A ELA 👩‍🦰</button>
-        </div>
-
-        <div id="game-screen" class="hidden">
-            <button id="btn-reset-game" class="pixel-btn" style="background:#27ae60; border-color:#1e8449; margin-bottom:15px;">Novo Bichinho 🔄</button>
-            <div id="pieces-container" class="pixel-window"></div>
+        <div id="game-screen">
+            <button id="btn-novo" class="pixel-btn">Novo Bichinho 🔄</button>
+            <div id="pieces-container"></div>
             <div id="puzzle-grid"></div>
         </div>
     </div>
@@ -55,45 +37,42 @@
         import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
         const db = getDatabase(initializeApp({ apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA", databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com" }));
-        const imgs = ["https://images.unsplash.com/photo-1543466835-00a7907e9de1","https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba","https://images.unsplash.com/photo-1537151608828-ea2b11777ee8","https://images.unsplash.com/photo-1573865526739-10659fec78a5","https://images.unsplash.com/photo-1592194996308-7b43878e84a6","https://images.unsplash.com/photo-1583511655857-d19b40a7a54e","https://images.unsplash.com/photo-1507146426996-ef05306b995a","https://images.unsplash.com/photo-1548199973-03cce0bbc87b","https://images.unsplash.com/photo-1561037404-61cd46aa615b","https://images.unsplash.com/photo-1517849845537-4d257902454a"];
+        const fotos = ["https://images.unsplash.com/photo-1543466835-00a7907e9de1","https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba","https://images.unsplash.com/photo-1537151608828-ea2b11777ee8","https://images.unsplash.com/photo-1573865526739-10659fec78a5"];
         
-        let meuId, pecaSel = null, grade = 4, urlImg = "";
+        let pecaSel = null, grade = 4;
 
-        window.definirJogador = (id) => { meuId = id; document.getElementById('lobby-screen').classList.add('hidden'); document.getElementById('game-screen').classList.remove('hidden'); carregarJogo(); };
-
-        document.getElementById('btn-reset-game').onclick = () => {
-            const diff = document.getElementById('select-difficulty').value;
-            grade = diff === "facil" ? 4 : (diff === "medio" ? 5 : 6);
-            set(ref(db, 'partida'), { img: imgs[Math.floor(Math.random()*imgs.length)], size: grade, ordem: Array.from({length: grade**2}, (_,i) => i).sort(() => Math.random() - 0.5) });
+        document.getElementById('btn-novo').onclick = () => {
+            set(ref(db, 'partida'), { 
+                img: fotos[Math.floor(Math.random()*fotos.length)], 
+                ordem: Array.from({length: grade**2}, (_,i) => i).sort(() => Math.random() - 0.5),
+                encaixadas: { "init": true }
+            });
         };
 
-        function carregarJogo() {
-            onValue(ref(db, 'partida'), (snap) => {
-                const d = snap.val(); if(!d) return;
-                grade = d.size; urlImg = d.img;
-                const grid = document.getElementById('puzzle-grid'), cont = document.getElementById('pieces-container');
-                grid.innerHTML = ""; cont.innerHTML = ""; grid.style.gridTemplateColumns = `repeat(${grade}, 1fr)`;
-                
-                for(let i=0; i<grade**2; i++) {
-                    const slot = document.createElement('div'); slot.className = 'grid-slot';
-                    if(d.encaixadas?.[i]) slot.appendChild(criarPeca(i));
-                    slot.onclick = () => { if(pecaSel === i) { update(ref(db, 'partida/encaixadas'), {[i]: true}); pecaSel = null; } };
-                    grid.appendChild(slot);
+        onValue(ref(db, 'partida'), (snap) => {
+            const d = snap.val(); if(!d) return;
+            const grid = document.getElementById('puzzle-grid'), cont = document.getElementById('pieces-container');
+            grid.innerHTML = ""; cont.innerHTML = ""; grid.style.gridTemplateColumns = `repeat(${grade}, 1fr)`;
+            
+            for(let i=0; i<grade**2; i++) {
+                const slot = document.createElement('div'); slot.className = 'grid-slot';
+                if(d.encaixadas?.[i]) slot.appendChild(criarPeca(i, d.img));
+                slot.onclick = () => { if(pecaSel === i) { update(ref(db, 'partida/encaixadas'), {[i]: true}); pecaSel = null; } };
+                grid.appendChild(slot);
+            }
+            d.ordem.forEach(id => {
+                if(!d.encaixadas?.[id]) {
+                    const p = criarPeca(id, d.img);
+                    if(pecaSel === id) p.classList.add('selecionada');
+                    p.onclick = () => { pecaSel = id; render(); };
+                    cont.appendChild(p);
                 }
-                d.ordem.forEach(id => {
-                    if(!d.encaixadas?.[id]) {
-                        const p = criarPeca(id);
-                        if(pecaSel === id) p.classList.add('selecionada');
-                        p.onclick = () => { pecaSel = id; carregarJogo(); };
-                        cont.appendChild(p);
-                    }
-                });
             });
-        }
+        });
 
-        function criarPeca(id) {
+        function criarPeca(id, url) {
             const p = document.createElement('div'); p.className = 'puzzle-piece';
-            p.style.backgroundImage = `url(${urlImg})`;
+            p.style.backgroundImage = `url(${url})`;
             p.style.backgroundSize = `${grade*100}% ${grade*100}%`;
             p.style.backgroundPosition = `${(id%grade)/(grade-1)*100}% ${Math.floor(id/grade)/(grade-1)*100}%`;
             return p;
