@@ -34,7 +34,7 @@
 
         #game-container {
             width: 100%;
-            max-width: 480px; /* Largura focada para telas mobile */
+            max-width: 480px;
             text-align: center;
         }
 
@@ -118,9 +118,6 @@
             width: 100%;
         }
 
-        /* ==========================================================================
-           NOVO CARROSSEL HORIZONTAL DE PEÇAS (FICA EM CIMA DA IMAGEM)
-           ========================================================================== */
         #pieces-bank {
             width: 100%;
             padding: 10px;
@@ -130,12 +127,11 @@
         #pieces-container {
             display: flex;
             flex-direction: row;
-            overflow-x: auto; /* Permite arrastar o dedo de lado */
+            overflow-x: auto;
             scroll-snap-type: x proximity;
             gap: 10px;
             padding: 10px 5px;
             width: 100%;
-            /* Estilização da barra de rolagem sumir ou ficar discreta */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -173,9 +169,6 @@
             border: 1px dashed rgba(255, 255, 255, 0.15);
         }
 
-        /* ==========================================================================
-           CORREÇÃO DAS BORDAS DAS PEÇAS (IMAGEM COMPLETA SEM BURACOS)
-           ========================================================================== */
         .puzzle-piece {
             background-repeat: no-repeat;
             width: 100%;
@@ -184,16 +177,14 @@
             top: 0;
             left: 0;
             box-sizing: border-box;
-            /* Máscara limpa quadrada clássica para as peças se juntarem sem furos pretos */
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* Peças dentro do carrossel horizontal embaixo */
         #pieces-container .puzzle-piece {
             position: relative;
             width: 75px;
             height: 75px;
-            flex-shrink: 0; /* Impede que as peças amassem no carrossel */
+            flex-shrink: 0;
             border: 3px solid #555;
             border-radius: 6px;
             scroll-snap-align: start;
@@ -301,14 +292,14 @@
         let currentGridSize = 4;
         let pecaSelecionadaId = null; 
 
-        // BANCO DE 100 IMAGENS FIXAS REAIS QUE NÃO QUEBRAM (Carros JDM de cinema, Gatos, Pugs, Alimentos e Pixel Art)
+        // BANCO ATUALIZADO DE 100 IMAGENS REAIS
         const ListaCemImagens = [
             "https://picsum.photos/id/1071/500/500", "https://picsum.photos/id/1025/500/500", "https://picsum.photos/id/1062/500/500",
             "https://picsum.photos/id/237/500/500", "https://picsum.photos/id/433/500/500", "https://picsum.photos/id/577/500/500",
             "https://picsum.photos/id/582/500/500", "https://picsum.photos/id/659/500/500", "https://picsum.photos/id/1024/500/500",
             "https://picsum.photos/id/1069/500/500", "https://picsum.photos/id/1084/500/500", "https://picsum.photos/id/219/500/500",
             "https://picsum.photos/id/319/500/500", "https://picsum.photos/id/402/500/500", "https://picsum.photos/id/437/500/500",
-            ...Array.from({ length: 85 }, (_, i) => `https://picsum.photos/id/${(i + 10) * 4}/500/500`)
+            ...Array.from({ length: 85 }, (_, i) => `https://picsum.photos/id/${(i + 15) * 4}/500/500`)
         ];
 
         const selectDifficulty = document.getElementById('select-difficulty');
@@ -349,6 +340,17 @@
             const urlImagemAleatoria = ListaCemImagens[indexAleatorio];
             let tamanhoGrade = diff === "facil" ? 4 : (diff === "medio" ? 5 : 6);
 
+            // GERA A ORDEM EMBARALHADA DAS PEÇAS PARA ENVIAR AO FIREBASE
+            let listaIndices = [];
+            for(let i = 0; i < tamanhoGrade * tamanhoGrade; i++) {
+                listaIndices.push(i);
+            }
+            // Algoritmo de Fisher-Yates para misturar de verdade
+            for (let i = listaIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [listaIndices[i], listaIndices[j]] = [listaIndices[j], listaIndices[i]];
+            }
+
             await set(ref(db, 'partidas/' + NOSSA_SALA_FIXA), {
                 id: NOSSA_SALA_FIXA, 
                 imagem: urlImagemAleatoria, 
@@ -356,6 +358,7 @@
                 tamanho_grade: tamanhoGrade, 
                 turno_atual: "player_1", 
                 status: "jogando", 
+                ordem_pecas: listaIndices, // Salva a ordem bagunçada no banco
                 pecas_encaixadas: {}
             });
         }
@@ -384,11 +387,11 @@
                     turnOverlay.classList.remove('hidden');
                 }
                 
-                renderizarPainel(data.pecas_encaixadas || {});
+                renderizarPainel(data.pecas_encaixadas || {}, data.ordem_pecas || []);
             });
         }
 
-        function renderizarPainel(pecasEncaixadas) {
+        function renderizarPainel(pecasEncaixadas, ordemPecas) {
             puzzleGrid.style.gridTemplateColumns = `repeat(${currentGridSize}, 1fr)`;
             puzzleGrid.style.gridTemplateRows = `repeat(${currentGridSize}, 1fr)`;
             puzzleGrid.innerHTML = ""; 
@@ -396,6 +399,7 @@
 
             const totalPecas = currentGridSize * currentGridSize;
 
+            // Renderiza o tabuleiro fixo com os slots vazios ou preenchidos
             for (let i = 0; i < totalPecas; i++) {
                 const slot = document.createElement('div');
                 slot.classList.add('grid-slot');
@@ -409,12 +413,18 @@
                 puzzleGrid.appendChild(slot);
             }
 
-            for (let i = 0; i < totalPecas; i++) {
-                if (!pecasEncaixadas[i]) {
-                    const piece = criarElementoPeca(i, false);
+            // Se o banco não tiver a ordem salva ainda (antigo), cria uma padrão rápida
+            if (ordemPecas.length !== totalPecas) {
+                ordemPecas = Array.from({length: totalPecas}, (_, k) => k);
+            }
+
+            // Renderiza o carrossel usando a ordem EMBARALHADA salva no Firebase
+            ordemPecas.forEach((originalIndex) => {
+                if (!pecasEncaixadas[originalIndex]) {
+                    const piece = criarElementoPeca(originalIndex, false);
                     piecesContainer.appendChild(piece);
                 }
-            }
+            });
         }
 
         function criarElementoPeca(index, estaNoTabuleiro) {
@@ -424,8 +434,8 @@
             
             const row = Math.floor(index / currentGridSize);
             const col = index % currentGridSize;
-            const percentX = (col / (currentGridSize - 1)) * 100;
-            const percentY = (row / (currentGridSize - 1)) * 100;
+            const percentX = (currentGridSize > 1) ? (col / (currentGridSize - 1)) * 100 : 0;
+            const percentY = (currentGridSize > 1) ? (row / (currentGridSize - 1)) * 100 : 0;
             
             piece.style.backgroundSize = `${currentGridSize * 100}% ${currentGridSize * 100}%`;
             piece.style.backgroundPosition = `${percentX}% ${percentY}%`;
@@ -451,6 +461,7 @@
             if (currentTurn !== myPlayerId || pecaSelecionadaId === null) return;
             const slotId = parseInt(e.currentTarget.dataset.index);
 
+            // Só aceita se a peça selecionada corresponder exatamente à posição real correta
             if (pecaSelecionadaId === slotId) {
                 const proximoTurno = myPlayerId === "player_1" ? "player_2" : "player_1";
                 const updates = {};
@@ -459,6 +470,8 @@
                 
                 pecaSelecionadaId = null;
                 update(ref(db), updates);
+            } else {
+                alert("Errou a vaga! Tente encontrar o quadrado certo para esta peça.");
             }
         }
     </script>
