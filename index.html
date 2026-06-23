@@ -157,7 +157,7 @@
             background-color: #111;
             display: grid;
             padding: 0;
-            gap: 1px;
+            gap: 2px;
             border: 6px solid #3a3a4a;
             position: relative;
         }
@@ -285,21 +285,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const NOSSA_SALA_FIXA = "NOSSA_PARTIDA_COOP";
+        // MUDADO PARA FORÇAR RESET COMPLETO DE SALA E EVITAR BUFFER VELHO DO BANCO
+        const NOSSA_SALA_FIXA = "PARTIDA_COOP_V2";
         let myPlayerId = null; 
         let currentTurn = null;
         let selectedImage = "";
         let currentGridSize = 4;
         let pecaSelecionadaId = null; 
 
-        // BANCO ATUALIZADO DE 100 IMAGENS REAIS
+        // BANCO SEGURO DE 100 IMAGENS REAIS VARIADAS (Carros, caninos e paisagens estéticas)
         const ListaCemImagens = [
             "https://picsum.photos/id/1071/500/500", "https://picsum.photos/id/1025/500/500", "https://picsum.photos/id/1062/500/500",
             "https://picsum.photos/id/237/500/500", "https://picsum.photos/id/433/500/500", "https://picsum.photos/id/577/500/500",
             "https://picsum.photos/id/582/500/500", "https://picsum.photos/id/659/500/500", "https://picsum.photos/id/1024/500/500",
             "https://picsum.photos/id/1069/500/500", "https://picsum.photos/id/1084/500/500", "https://picsum.photos/id/219/500/500",
             "https://picsum.photos/id/319/500/500", "https://picsum.photos/id/402/500/500", "https://picsum.photos/id/437/500/500",
-            ...Array.from({ length: 85 }, (_, i) => `https://picsum.photos/id/${(i + 15) * 4}/500/500`)
+            ...Array.from({ length: 85 }, (_, i) => `https://picsum.photos/id/${(i + 16) * 3}/500/500`)
         ];
 
         const selectDifficulty = document.getElementById('select-difficulty');
@@ -326,7 +327,9 @@
                 const diff = selectDifficulty.value;
                 const snapshot = await get(ref(db, 'partidas/' + NOSSA_SALA_FIXA));
                 const data = snapshot.val();
-                if (!data) {
+                
+                // Se a sala não existir ou for de dificuldade diferente da atual do menu, força um reset
+                if (!data || data.dificuldade !== diff) {
                     await resetarPartidaCompleta(diff);
                 }
                 setupGameSession();
@@ -340,17 +343,19 @@
             const urlImagemAleatoria = ListaCemImagens[indexAleatorio];
             let tamanhoGrade = diff === "facil" ? 4 : (diff === "medio" ? 5 : 6);
 
-            // GERA A ORDEM EMBARALHADA DAS PEÇAS PARA ENVIAR AO FIREBASE
+            // GERA E EMBARALHA TOTALMENTE OS ÍNDICES DAS PEÇAS
             let listaIndices = [];
             for(let i = 0; i < tamanhoGrade * tamanhoGrade; i++) {
                 listaIndices.push(i);
             }
-            // Algoritmo de Fisher-Yates para misturar de verdade
+            
+            // Algoritmo de Fisher-Yates para bagunçar de verdade de forma aleatória
             for (let i = listaIndices.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [listaIndices[i], listaIndices[j]] = [listaIndices[j], listaIndices[i]];
             }
 
+            // Grava o novo tabuleiro limpo e bagunçado diretamente no Firebase
             await set(ref(db, 'partidas/' + NOSSA_SALA_FIXA), {
                 id: NOSSA_SALA_FIXA, 
                 imagem: urlImagemAleatoria, 
@@ -358,8 +363,8 @@
                 tamanho_grade: tamanhoGrade, 
                 turno_atual: "player_1", 
                 status: "jogando", 
-                ordem_pecas: listaIndices, // Salva a ordem bagunçada no banco
-                pecas_encaixadas: {}
+                ordem_pecas: listaIndices,
+                pecas_encaixadas: { "placeholder": true } // Evita que o nó suma do Firebase
             });
         }
 
@@ -399,7 +404,7 @@
 
             const totalPecas = currentGridSize * currentGridSize;
 
-            // Renderiza o tabuleiro fixo com os slots vazios ou preenchidos
+            // 1. Monta as vagas do tabuleiro superior
             for (let i = 0; i < totalPecas; i++) {
                 const slot = document.createElement('div');
                 slot.classList.add('grid-slot');
@@ -413,12 +418,12 @@
                 puzzleGrid.appendChild(slot);
             }
 
-            // Se o banco não tiver a ordem salva ainda (antigo), cria uma padrão rápida
-            if (ordemPecas.length !== totalPecas) {
+            // 2. Se a lista veio vazia por delay, cria uma padrão temporária
+            if (!ordemPecas || ordemPecas.length !== totalPecas) {
                 ordemPecas = Array.from({length: totalPecas}, (_, k) => k);
             }
 
-            // Renderiza o carrossel usando a ordem EMBARALHADA salva no Firebase
+            // 3. Alimenta o carrossel usando a ordem embaralhada vinda do servidor
             ordemPecas.forEach((originalIndex) => {
                 if (!pecasEncaixadas[originalIndex]) {
                     const piece = criarElementoPeca(originalIndex, false);
@@ -434,6 +439,7 @@
             
             const row = Math.floor(index / currentGridSize);
             const col = index % currentGridSize;
+            
             const percentX = (currentGridSize > 1) ? (col / (currentGridSize - 1)) * 100 : 0;
             const percentY = (currentGridSize > 1) ? (row / (currentGridSize - 1)) * 100 : 0;
             
@@ -461,17 +467,17 @@
             if (currentTurn !== myPlayerId || pecaSelecionadaId === null) return;
             const slotId = parseInt(e.currentTarget.dataset.index);
 
-            // Só aceita se a peça selecionada corresponder exatamente à posição real correta
+            // Validação estrita: a peça só entra na sua coordenada original correta
             if (pecaSelecionadaId === slotId) {
                 const proximoTurno = myPlayerId === "player_1" ? "player_2" : "player_1";
                 const updates = {};
                 updates[`partidas/${NOSSA_SALA_FIXA}/pecas_encaixadas/${pecaSelecionadaId}`] = true;
                 updates[`partidas/${NOSSA_SALA_FIXA}/turno_atual`] = proximoTurno;
                 
-                pecaSelecionadaId = null;
+                pecaSelecionadaId = null; 
                 update(ref(db), updates);
             } else {
-                alert("Errou a vaga! Tente encontrar o quadrado certo para esta peça.");
+                alert("Posição errada! Procure o quadrado certo para esse pedaço da imagem.");
             }
         }
     </script>
