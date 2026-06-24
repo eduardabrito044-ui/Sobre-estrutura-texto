@@ -2,96 +2,82 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pixel Grimoire 🔮</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Grimoire RPG ⚔️</title>
     <style>
-        body { 
-            background: #0a0a0c; color: #d4af37; 
-            font-family: 'Courier New', monospace; text-align: center; 
-            padding: 10px; margin: 0;
-        }
-        
-        .grimoire { 
-            border: 4px solid #d4af37; padding: 20px; max-width: 100%; 
-            width: 95%; margin: 10px auto; 
-            background: #16161a; box-sizing: border-box;
-        }
-
-        h1 { font-size: 24px; text-transform: uppercase; margin-bottom: 20px; }
-
-        .btn-game {
-            background: #2a2a35; border: 3px solid #d4af37;
-            color: #d4af37; padding: 15px 30px;
-            cursor: pointer; font-weight: bold; width: 100%;
-            margin: 10px 0; font-size: 18px;
-        }
-
-        .mission { 
-            border: 2px solid #333; padding: 15px; margin: 10px 0; 
-            text-align: left; font-size: 16px; display: flex; 
-            justify-content: space-between; align-items: center;
-            background: #1e1e24;
-        }
-
-        .seal-btn {
-            background: #4a3a10; border: 2px solid #d4af37; 
-            color: #d4af37; padding: 10px 15px; 
-            font-size: 14px; font-weight: bold;
-        }
-        
-        .hidden { display: none; }
+        body { background: #0a0a0c; color: #d4af37; font-family: 'Courier New', monospace; text-align: center; padding: 10px; }
+        .card { border: 2px solid #d4af37; padding: 20px; max-width: 400px; margin: 10px auto; background: #16161a; }
+        .mission-box { border: 2px solid #d4af37; padding: 15px; margin: 10px 0; background: #222; }
+        .sword { font-size: 50px; margin: 20px; text-shadow: 0 0 10px #d4af37; }
+        button { background: #d4af37; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="login" class="grimoire">
-        <h1>Pixel Grimoire 🔮</h1>
-        <button class="btn-game" onclick="entrar('Ele')">🧔 ENTRAR: ELE</button>
-        <button class="btn-game" onclick="entrar('Ela')">👩‍🦰 ENTRAR: ELA</button>
+    <div id="login" class="card">
+        <h1>Pixel Grimoire</h1>
+        <button onclick="iniciar()">Iniciar Aventura</button>
     </div>
 
-    <div id="game" class="grimoire hidden">
-        <h2 id="user-title">Grimório de Missões</h2>
-        <div id="mission-area"></div>
+    <div id="game" class="card" style="display:none;">
+        <div id="current-sword" class="sword">🗡️</div>
+        <div id="mission-list"></div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+    <script>
+        // Lista completa com 50 missões descritivas
+        const missoes = [
+            "1. Dê um bom dia especial e diga algo que admira nele(a).", "2. Arrumem o quarto juntos hoje.", 
+            "3. Envie uma foto de um momento feliz de vocês.", "4. Pergunte sinceramente: 'Como posso te fazer mais feliz hoje?'",
+            "5. Lave a louça hoje como um presente.", "6. Escolham uma música que seja 'a música de vocês'.",
+            "7. Mande um áudio de voz dizendo o quanto ama.", "8. Prepare um café ou bebida favorita do outro.",
+            "9. Faça um elogio sincero sobre a aparência.", "10. Planejem juntos o próximo lanche especial.",
+            "11. Esconda um bilhete escrito à mão em algum lugar.", "12. Ajude o parceiro em uma tarefa chata.",
+            "13. Assistam a um filme escolhido pelo parceiro.", "14. Dê uma massagem de 10 minutos nos ombros.",
+            "15. Relembre como foi o primeiro encontro.", "16. Diga 3 motivos pelos quais escolheu ficar com ele(a).",
+            "17. Traga um copo de água sem ninguém pedir.", "18. Elogie o cheiro do perfume do parceiro.",
+            "19. Dê atenção total, sem celular, por 30 minutos.", "20. Preparem o ambiente para uma noite calma.",
+            "21. Escolham uma foto para revelar e guardar.", "22. Diga algo que ninguém sabe que você admira no outro.",
+            "23. Mande um meme que só vocês dois entenderiam.", "24. Faça carinho nos pés ou mãos após o dia cansativo.",
+            "25. Tirem uma selfie boba juntos hoje.", "26. Escreva uma mensagem: 'Estou com saudade agora'.",
+            "27. Elogie o sorriso do parceiro intensamente.", "28. Faça um cafuné longo enquanto conversam.",
+            "29. Leiam um poema ou texto curto um para o outro.", "30. Planejem o próximo passeio de fim de semana.",
+            "31. Dê um beijo demorado de boas-vindas.", "32. Elogie o bom gosto dele(a) para se vestir.",
+            "33. Dê um abraço apertado de 20 segundos.", "34. Faça um pequeno favor que o parceiro pediu.",
+            "35. Olhe nos olhos do outro e segure as mãos.", "36. Diga como se sente seguro(a) ao lado dele(a).",
+            "37. Preparem um banho relaxante juntos.", "38. Diga 'você é a pessoa mais linda que conheço'.",
+            "39. Dê um beijo carinhoso no rosto.", "40. Sussurre algo que desperte curiosidade.",
+            "41. Convide para algo diferente do comum.", "42. Explore um toque novo que o parceiro gosta.",
+            "43. Envie uma mensagem provocante.", "44. Prepare o clima no quarto com luz baixa.",
+            "45. Elogie algo que ninguém vê.", "46. Beijos apaixonados e demorados.",
+            "47. Use palavras que expressem seu desejo.", "48. Foque 100% no prazer do outro.",
+            "49. Compartilhe um segredo íntimo.", "50. Realize um desejo especial do seu parceiro."
+        ];
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
-            authDomain: "dddua-81207.firebaseapp.com",
-            databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com",
-            projectId: "dddua-81207",
-            storageBucket: "dddua-81207.firebasestorage.app",
-            messagingSenderId: "844138746278",
-            appId: "1:844138746278:web:341f704f22c106473d7f67",
-            measurementId: "G-F4SC83V4KB"
-        };
-        initializeApp(firebaseConfig);
+        const espadas = ["🗡️", "⚔️", "🛡️", "✨⚔️", "🔥⚔️", "👑🗡️"];
+        let index = 0;
+        let level = 0;
 
-        // Listas com 50 missões cada
-        const missoesEle = Array.from({length: 50}, (_, i) => `${i+1}. Missão ${i+1} para Ele`);
-        const missoesEla = Array.from({length: 50}, (_, i) => `${i+1}. Missão ${i+1} para Ela`);
+        function iniciar() {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            renderizar();
+        }
 
-        window.entrar = (nome) => {
-            document.getElementById('login').classList.add('hidden');
-            document.getElementById('game').classList.remove('hidden');
-            document.getElementById('user-title').innerText = "Grimório de " + nome;
-            
-            const lista = nome === 'Ele' ? missoesEle : missoesEla;
-            const container = document.getElementById('mission-area');
-            container.innerHTML = "";
-            
-            lista.forEach((m) => {
-                container.innerHTML += `
-                    <div class="mission">
-                        <span>${m}</span> 
-                        <button class="seal-btn" onclick="this.innerText='✓'; this.style.background='#d4af37'; this.style.color='#000'">✒️</button>
-                    </div>`;
-            });
-        };
+        function renderizar() {
+            const list = document.getElementById('mission-list');
+            list.innerHTML = "";
+            for(let i = index; i < index + 2 && i < missoes.length; i++) {
+                list.innerHTML += `<div class="mission-box"><p>${missoes[i]}</p><button onclick="proximo()">Cumpri!</button></div>`;
+            }
+        }
+
+        function proximo() {
+            index += 2;
+            level = Math.min(level + 1, espadas.length - 1);
+            document.getElementById('current-sword').innerText = espadas[level];
+            renderizar();
+        }
     </script>
 </body>
 </html>
