@@ -2,13 +2,35 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosso Pandinha Virtual 🐼</title>
+    <title>Nosso Pandinha 3D 🐼</title>
     <style>
         body { font-family: 'Arial', sans-serif; text-align: center; background: #1a1a24; color: white; padding: 20px; }
-        #panda-img { width: 250px; margin: 20px; border-radius: 50%; border: 5px solid #fff; }
-        .stats { font-size: 1.5em; margin: 20px; }
-        button { padding: 15px 25px; margin: 5px; cursor: pointer; font-size: 18px; border-radius: 10px; border: none; background: #e67e22; color: white; }
+        
+        /* Efeito Boneco 3D */
+        #panda-img { 
+            width: 200px; 
+            margin: 20px auto; 
+            display: block;
+            /* Sombra que dá profundidade 3D */
+            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.5));
+            /* Suaviza as bordas */
+            transition: transform 0.2s;
+        }
+        
+        /* Animação de pulo ao clicar */
+        #panda-img:active { transform: scale(0.95); }
+
+        .stats { font-size: 1.5em; margin: 20px; font-weight: bold; text-shadow: 2px 2px #000; }
+        
+        button { 
+            padding: 15px 25px; width: 80%; cursor: pointer; font-size: 18px; 
+            border-radius: 15px; border: none; 
+            background: #e67e22; color: white; font-weight: bold;
+            /* Sombra 3D no botão */
+            box-shadow: 0 5px #d35400;
+            transition: all 0.1s;
+        }
+        button:active { transform: translateY(4px); box-shadow: 0 1px #d35400; }
         .hidden { display: none; }
     </style>
 </head>
@@ -21,8 +43,8 @@
     </div>
 
     <div id="pet-area" class="hidden">
-        <h1 id="boas-vindas">Nosso Pandinha</h1>
-        <img id="panda-img" src="panda_normal.png" alt="Pandinha">
+        <h1 id="boas-vindas">Olá!</h1>
+        <img id="panda-img" src="1000079336.png" alt="Pandinha">
         <div class="stats">
             Energia: <span id="energia">100</span>% | Amor: <span id="amor">100</span>%
         </div>
@@ -35,9 +57,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-        // Credenciais integradas conforme solicitado
         const firebaseConfig = {
             apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
             authDomain: "dddua-81207.firebaseapp.com",
@@ -59,17 +80,26 @@
             document.getElementById('pet-area').classList.remove('hidden');
         };
 
-        window.acao = (tipo) => {
-            let updates = {};
-            if(tipo === 'alimentar') updates['energia'] = 100;
-            update(petRef, updates);
+        // Lógica corrigida para garantir que os dados atualizam no Firebase
+        window.acao = async (tipo) => {
+            const snapshot = await get(petRef);
+            let dados = snapshot.val() || { energia: 100, amor: 100 };
+            
+            if(tipo === 'alimentar') dados.energia = Math.min(dados.energia + 10, 100);
+            if(tipo === 'limpar') dados.amor = Math.min(dados.amor + 10, 100);
+            if(tipo === 'brincar') { 
+                dados.energia = Math.max(dados.energia - 5, 0); 
+                dados.amor = Math.min(dados.amor + 5, 100); 
+            }
+
+            await update(petRef, dados);
         };
 
         onValue(petRef, (snapshot) => {
             const dados = snapshot.val();
             if(dados) {
-                document.getElementById('energia').innerText = dados.energia || 100;
-                document.getElementById('amor').innerText = dados.amor || 100;
+                document.getElementById('energia').innerText = dados.energia;
+                document.getElementById('amor').innerText = dados.amor;
             }
         });
     </script>
