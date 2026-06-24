@@ -2,63 +2,62 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Pixel Quest: Casal 🎮</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Indie+Flower&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pixel Grimoire 🔮</title>
     <style>
-        body { background: #fdf6e3; color: #5d4037; font-family: 'Indie Flower', cursive; text-align: center; padding: 20px; }
-        .caderno-window { 
-            background: #ffffff; border: 2px solid #ddd; padding: 25px; 
-            border-radius: 15px; max-width: 400px; margin: 0 auto;
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
+        body { 
+            background: #0a0a0c; color: #d4af37; 
+            font-family: 'Courier New', monospace; text-align: center; 
+            padding: 10px; margin: 0;
         }
-        h1 { font-size: 40px; color: #ff80ab; text-shadow: 2px 2px #ffebee; }
         
-        .mission-item { 
-            background: #fff3e0; border: 2px dashed #ffcc80; padding: 15px; 
-            margin: 15px 0; border-radius: 10px; display: flex; 
-            justify-content: space-between; align-items: center;
+        .grimoire { 
+            border: 4px solid #d4af37; padding: 20px; max-width: 100%; 
+            width: 95%; margin: 10px auto; 
+            background: #16161a; box-sizing: border-box;
         }
 
-        /* Botão super fofo e estilizado */
-        .btn-check { 
-            background: #b2dfdb; border: none; padding: 10px 20px; 
-            border-radius: 50px; cursor: pointer; font-family: 'Indie Flower';
-            font-size: 20px; color: #004d40; box-shadow: 0 4px #80cbc4;
-            transition: all 0.2s;
+        h1 { font-size: 24px; text-transform: uppercase; margin-bottom: 20px; }
+
+        .btn-game {
+            background: #2a2a35; border: 3px solid #d4af37;
+            color: #d4af37; padding: 15px 30px;
+            cursor: pointer; font-weight: bold; width: 100%;
+            margin: 10px 0; font-size: 18px;
         }
-        .btn-check:hover { background: #80cbc4; transform: scale(1.1); }
+
+        .mission { 
+            border: 2px solid #333; padding: 15px; margin: 10px 0; 
+            text-align: left; font-size: 16px; display: flex; 
+            justify-content: space-between; align-items: center;
+            background: #1e1e24;
+        }
+
+        .seal-btn {
+            background: #4a3a10; border: 2px solid #d4af37; 
+            color: #d4af37; padding: 10px 15px; 
+            font-size: 14px; font-weight: bold;
+        }
         
-        .emoji-art { font-size: 30px; margin: 5px; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="caderno-window">
-        <h1>Pixel Quest ✍️</h1>
-        <p>Quem vai completar missão hoje?</p>
-        <button class="btn-check" onclick="entrar('Ele')">🧔 Ele</button>
-        <button class="btn-check" onclick="entrar('Ela')">👩‍🦰 Ela</button>
+    <div id="login" class="grimoire">
+        <h1>Pixel Grimoire 🔮</h1>
+        <button class="btn-game" onclick="entrar('Ele')">🧔 ENTRAR: ELE</button>
+        <button class="btn-game" onclick="entrar('Ela')">👩‍🦰 ENTRAR: ELA</button>
     </div>
 
-    <div id="game-screen" class="caderno-window hidden">
-        <h1 id="user-title">Missões do Dia ✨</h1>
-        <div id="mission-list">
-            <div class="mission-item">
-                <span>Enviar elogio criativo 💌</span>
-                <button class="btn-check" onclick="completar('elogio')">OK! ✅</button>
-            </div>
-            <div class="mission-item">
-                <span>Foto de um momento fofo 📸</span>
-                <button class="btn-check" onclick="completar('foto')">OK! ✅</button>
-            </div>
-        </div>
-        <p class="emoji-art">🌟 Pontos de Conexão: <span id="pontos">0</span> 🌟</p>
+    <div id="game" class="grimoire hidden">
+        <h2 id="user-title">Grimório de Missões</h2>
+        <div id="mission-area"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
@@ -70,27 +69,29 @@
             appId: "1:844138746278:web:341f704f22c106473d7f67",
             measurementId: "G-F4SC83V4KB"
         };
+        initializeApp(firebaseConfig);
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const gameRef = ref(db, 'pixel_quest');
+        // Listas com 50 missões cada
+        const missoesEle = Array.from({length: 50}, (_, i) => `${i+1}. Missão ${i+1} para Ele`);
+        const missoesEla = Array.from({length: 50}, (_, i) => `${i+1}. Missão ${i+1} para Ela`);
 
         window.entrar = (nome) => {
-            document.getElementById('user-title').innerText = "Olá, " + nome + "! ✨";
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('login').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+            document.getElementById('user-title').innerText = "Grimório de " + nome;
+            
+            const lista = nome === 'Ele' ? missoesEle : missoesEla;
+            const container = document.getElementById('mission-area');
+            container.innerHTML = "";
+            
+            lista.forEach((m) => {
+                container.innerHTML += `
+                    <div class="mission">
+                        <span>${m}</span> 
+                        <button class="seal-btn" onclick="this.innerText='✓'; this.style.background='#d4af37'; this.style.color='#000'">✒️</button>
+                    </div>`;
+            });
         };
-
-        window.completar = (id) => {
-            alert("Missão completada com sucesso! ✨💖");
-            update(gameRef, { [id]: true });
-        };
-
-        onValue(gameRef, (snapshot) => {
-            const data = snapshot.val() || {};
-            let score = Object.keys(data).length;
-            document.getElementById('pontos').innerText = score;
-        });
     </script>
 </body>
 </html>
