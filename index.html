@@ -2,26 +2,22 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixel Grimoire RPG ⚔️</title>
     <style>
         body { background: #0a0a0c; color: #d4af37; font-family: 'Courier New', monospace; text-align: center; padding: 10px; }
         .card { border: 2px solid #d4af37; padding: 20px; max-width: 400px; margin: 10px auto; background: #16161a; }
         .mission-box { border: 2px solid #d4af37; padding: 15px; margin: 10px 0; background: #222; }
-        .sword { font-size: 50px; margin: 20px; filter: drop-shadow(0 0 10px #d4af37); }
+        .sword { font-size: 50px; margin: 20px; }
         button { background: #d4af37; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; color: black; }
-        button:disabled { background: #555; color: #ccc; cursor: not-allowed; }
         .done { opacity: 0.5; background: #000; }
     </style>
 </head>
 <body>
-
     <div id="login" class="card">
         <h1>Pixel Grimoire</h1>
         <button onclick="iniciar('Ele')">Entrar: Ele 🧔</button>
         <button onclick="iniciar('Ela')">Entrar: Ela 👩‍🦰</button>
     </div>
-
     <div id="game" class="card" style="display:none;">
         <h2 id="user-title"></h2>
         <div id="current-sword" class="sword">🗡️</div>
@@ -43,43 +39,46 @@
         };
         const db = getDatabase(initializeApp(firebaseConfig));
 
-        // Suas listas de missões
-        const missoesEle = ["1. Dê bom dia elogiando o sorriso dela.", "2. Envie uma foto do seu café.", /* ... preencha até 50 ... */];
-        const missoesEla = ["1. Dê um bom dia com carinho.", "2. Envie uma selfie fofa.", /* ... preencha até 50 ... */];
+        const missoesEle = [
+            "1. Dê um bom dia especial e diga algo que admira nela.", "2. Envie uma foto do seu dia agora.", "3. Pergunte: 'Como posso te fazer sorrir hoje?'.", "4. Elogie algo que ela fez esta semana.", "5. Mande um áudio dizendo que está pensando nela.", "6. Planeje mentalmente o próximo encontro.", "7. Dê 3 motivos por que ela é sua favorita.", "8. Envie uma música que te faz lembrar dela.", "9. Mande um 'boa noite' carinhoso.", "10. Diga o que mais admira no jeito dela.", 
+            "11. Mande uma mensagem de 'estou com saudade'.", "12. Elogie o sorriso dela em uma foto antiga.", "13. Faça um plano divertido para quando se virem.", "14. Envie um meme só para ela rir.", "15. Diga algo que te faz sentir sortudo.", "16. Escreva um elogio sobre a inteligência dela.", "17. Mande um 'bom trabalho' no dia dela.", "18. Diga qual é sua roupa favorita nela.", "19. Mande uma mensagem de apoio se ela estiver cansada.", "20. Diga o que mais te atrai nela.",
+            "21. Mande uma mensagem dizendo que ela é linda.", "22. Diga um sonho que você tem com ela.", "23. Envie uma foto de algo que você viu e lembrou dela.", "24. Diga o quanto valoriza a conversa de vocês.", "25. Mande um 'bom descanso' carinhoso.", "26. Diga algo que ela faz que te deixa feliz.", "27. Mande uma mensagem perguntando como foi o dia.", "28. Elogie a dedicação dela com as coisas.", "29. Diga que mal pode esperar pelo próximo encontro.", "30. Mande uma mensagem de carinho inesperada.",
+            "31. Diga o que você mais gosta no abraço dela.", "32. Mande uma mensagem de bom dia com um 'te amo'.", "33. Diga algo engraçado para descontrair.", "34. Elogie o gosto musical dela.", "35. Mande um 'estou orgulhoso de você'.", "36. Diga qual foi o momento mais feliz com ela.", "37. Mande uma foto sua fazendo algo que ela gosta.", "38. Diga o que você aprendeu com ela.", "39. Mande um desejo de uma semana incrível.", "40. Diga por que ela é importante para você.",
+            "41. Mande uma mensagem ousada sobre saudade.", "42. Diga algo que você adoraria fazer com ela.", "43. Mande um elogio sobre o olhar dela.", "44. Diga que ela é sua inspiração.", "45. Mande uma mensagem de total carinho.", "46. Diga algo que você mudou por causa dela.", "47. Mande uma mensagem cheia de desejo.", "48. Elogie a personalidade dela.", "49. Diga o quanto ela é única.", "50. Mande um 'você é meu tudo'."
+        ];
 
-        let userType = "";
-        let index = 0;
-        let progresso = [false, false];
+        const missoesEla = [
+            "1. Dê um bom dia com carinho.", "2. Envie uma selfie para ele.", "3. Pergunte: 'O que te deixa mais feliz hoje?'.", "4. Elogie o esforço que ele faz.", "5. Mande um áudio dizendo que se importa.", "6. Pense em uma surpresa para o próximo encontro.", "7. Dê 3 motivos por que ele é especial.", "8. Envie uma música para ele ouvir.", "9. Mande um 'boa noite' doce.", "10. Diga o que mais gosta na companhia dele.",
+            "11. Mande uma mensagem dizendo que pensa nele.", "12. Elogie o jeito dele de resolver as coisas.", "13. Fale sobre algo que você quer fazer com ele.", "14. Envie um vídeo ou meme divertido.", "15. Diga por que ele te faz bem.", "16. Escreva um elogio sobre a determinação dele.", "17. Mande uma mensagem de motivação para o dia dele.", "18. Elogie a voz ou jeito de falar dele.", "19. Mande um abraço virtual quando ele estiver estressado.", "20. Diga o que mais te atrai nele.",
+            "21. Mande uma mensagem dizendo que ele é incrível.", "22. Diga um desejo que você quer realizar com ele.", "23. Envie uma foto de algo que te fez lembrar dele.", "24. Diga o quanto valoriza o apoio dele.", "25. Mande um 'bom descanso' carinhoso.", "26. Diga algo que ele faz que te deixa boba.", "27. Mande uma mensagem interessada no dia dele.", "28. Elogie a inteligência dele.", "29. Diga que está contando os dias para ver ele.", "30. Mande uma mensagem de carinho sem motivo.",
+            "31. Diga o que você mais gosta no beijo dele.", "32. Mande uma mensagem de bom dia especial.", "33. Diga algo fofo para ele sorrir.", "34. Elogie o cuidado dele com você.", "35. Mande um 'você é meu orgulho'.", "36. Diga qual foi o momento mais inesquecível com ele.", "37. Mande uma foto sua sorrindo para ele.", "38. Diga o que você mais admira no caráter dele.", "39. Mande um beijo carinhoso.", "40. Diga por que você o escolheu.",
+            "41. Mande uma mensagem provocante e carinhosa.", "42. Diga algo que você não vê a hora de fazer com ele.", "43. Elogie como ele te faz sentir protegida.", "44. Diga que ele é seu porto seguro.", "45. Mande uma mensagem cheia de afeto.", "46. Diga algo que mudou em você desde que o conheceu.", "47. Mande uma mensagem expressando sua paixão.", "48. Elogie o senso de humor dele.", "49. Diga o quanto ele é maravilhoso.", "50. Mande um 'você é meu amor'."
+        ];
+
+        let userType = ""; let index = 0; let progresso = [false, false];
 
         window.iniciar = (tipo) => {
             userType = tipo;
             document.getElementById('login').style.display = 'none';
             document.getElementById('game').style.display = 'block';
             document.getElementById('user-title').innerText = "Grimório de " + tipo;
-
             onValue(ref(db, 'progresso/' + tipo), (snapshot) => {
                 const data = snapshot.val();
-                if(data) {
-                    index = data.index || 0;
-                    progresso = data.status || [false, false];
-                }
+                if(data) { index = data.index; progresso = data.status; }
                 renderizar();
-            });
+            }, { onlyOnce: true });
         };
 
         window.renderizar = () => {
             const list = document.getElementById('mission-list');
             list.innerHTML = "";
             const lista = userType === 'Ele' ? missoesEle : missoesEla;
-            
             for(let i = 0; i < 2; i++) {
                 if(index + i < lista.length) {
                     list.innerHTML += `
-                        <div class="mission-box ${progresso[i] ? 'done' : ''}" id="m${i}">
+                        <div class="mission-box ${progresso[i] ? 'done' : ''}">
                             <p>${lista[index + i]}</p>
-                            <button onclick="cumprir(${i})" ${progresso[i] ? 'disabled' : ''}>
-                                ${progresso[i] ? 'Concluído' : 'Cumpri!'}
-                            </button>
+                            <button onclick="cumprir(${i})" ${progresso[i] ? 'disabled' : ''}>${progresso[i] ? 'Feito' : 'Cumpri!'}</button>
                         </div>`;
                 }
             }
@@ -87,10 +86,8 @@
 
         window.cumprir = (i) => {
             progresso[i] = true;
-            if(progresso[0] && progresso[1]) {
-                index += 2;
-                progresso = [false, false];
-            }
+            if(progresso[0] && progresso[1]) { index += 2; progresso = [false, false]; }
+            renderizar();
             update(ref(db, 'progresso/' + userType), { index: index, status: progresso });
         };
     </script>
