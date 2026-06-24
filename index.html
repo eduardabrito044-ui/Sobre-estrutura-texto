@@ -27,45 +27,43 @@
         <div id="mission-list"></div>
     </div>
 
-    <script>
-        // O nível de "calor" das missões aumenta conforme o index aumenta
-        const missoesEle = [
-            // Leve (1-10)
-            "1. Dê bom dia elogiando o sorriso dela.", "2. Envie uma foto do seu café.", "3. Pergunte como ela está agora.", "4. Elogie a dedicação dela.", "5. Mande um áudio de carinho.", "6. Planeje um encontro futuro.", "7. Diga 3 motivos de admiração.", "8. Envie uma música fofa.", "9. Mande um 'boa noite' carinhoso.", "10. Diga que ela é sua prioridade.",
-            // Romântico (11-20)
-            "11. Escreva sobre o que você sente ao vê-la.", "12. Diga um sonho que teve com ela.", "13. Fale sobre o futuro de vocês.", "14. Elogie a inteligência dela.", "15. Mande um 'estou com saudade'.", "16. Diga por que ela é sua inspiração.", "17. Mande uma mensagem de apoio.", "18. Diga o que mudou na sua vida.", "19. Fale de um momento marcante.", "20. Diga o que ela trouxe de bom.",
-            // Intenso (21-30)
-            "21. Escreva um elogio sobre a força dela.", "22. Diga qual hábito dela você ama.", "23. Mande um texto de gratidão.", "24. Fale de uma meta de casal.", "25. Prometa suporte total.", "26. Diga qual detalhe dela te deixa bobo.", "27. Mande algo sobre sua lealdade.", "28. Diga o que admira no temperamento dela.", "29. Proponha um tema de estudo a dois.", "30. Mande uma mensagem de proteção.",
-            // Provocante (31-40)
-            "31. Sussurre algo ousado sobre saudade.", "32. Diga um desejo que você quer realizar.", "33. Elogie o olhar dela intensamente.", "34. Descreva como seria a noite de vocês.", "35. Mande algo que te deixa inquieto.", "36. Diga que ela é sua musa.", "37. Mande algo sobre o beijo dela.", "38. Diga o que você faria se estivesse lá.", "39. Mande uma mensagem sobre desejo.", "40. Fale sobre o que mais te atrai.",
-            // Hot (41-50)
-            "41. Mande uma mensagem sobre seus toques favoritos.", "42. Descreva um desejo íntimo.", "43. Diga como ela te deixa sem ar.", "44. Mande uma mensagem de total entrega.", "45. Fale o que mais gosta de sentir nela.", "46. Mande algo sobre suas intenções quentes.", "47. Diga como seria o encontro perfeito a sós.", "48. Fale sobre suas fantasias com ela.", "49. Diga o quanto ela é sua perdição.", "50. Prometa o seu melhor momento a dois."
-        ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
-        const missoesEla = [
-            // Leve (1-10)
-            "1. Dê um bom dia com carinho.", "2. Envie uma selfie fofa.", "3. Pergunte o que ele pensa.", "4. Elogie o esforço dele.", "5. Mande áudio demonstrando cuidado.", "6. Pense numa surpresa leve.", "7. Dê 3 motivos por que ele é especial.", "8. Envie uma música romântica.", "9. Mande um 'boa noite' doce.", "10. Diga o que mais gosta nele.",
-            // Romântico (11-20)
-            "11. Mande mensagem pensando nele.", "12. Elogie a forma como ele resolve tudo.", "13. Fale sobre seus planos com ele.", "14. Envie um vídeo carinhoso.", "15. Diga por que ele te faz bem.", "16. Elogie a determinação dele.", "17. Mande uma mensagem motivacional.", "18. Elogie o jeito dele de falar.", "19. Ofereça um abraço virtual.", "20. Diga o que te faz confiar nele.",
-            // Intenso (21-30)
-            "21. Escreva o que você mais admira nele.", "22. Mande um texto sobre a sua confiança.", "23. Diga o que ele mudou em você.", "24. Proponha um tema para planos futuros.", "25. Mande um 'estou sempre aqui'.", "26. Fale sobre a segurança que ele traz.", "27. Mande um agradecimento profundo.", "28. Diga qual detalhe dele te traz paz.", "29. Mande algo sobre o apoio mútuo.", "30. Diga o que te faz se sentir única.",
-            // Provocante (31-40)
-            "31. Mande algo sobre suas vontades quando estiverem juntos.", "32. Diga um desejo que você quer explorar.", "33. Elogie o efeito que ele tem em você.", "34. Descreva seu toque favorito nele.", "35. Mande uma mensagem provocante.", "36. Fale sobre o que ele te desperta.", "37. Diga como ele te faz sentir mulher.", "38. Mande algo sobre o seu desejo.", "39. Diga o que você faria hoje.", "40. Planeje uma noite de entrega.",
-            // Hot (41-50)
-            "41. Mande algo sobre o que ele te causa.", "42. Diga seus desejos mais íntimos.", "43. Explore uma ideia ousada a dois.", "44. Mande uma mensagem de entrega total.", "45. Diga o que você mais quer sentir.", "46. Fale sobre suas fantasias quentes.", "47. Diga como ele te domina.", "48. Mande uma mensagem sobre sua paixão.", "49. Diga o quanto ele é o seu tudo.", "50. Prometa uma noite inesquecível."
-        ];
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
+            authDomain: "dddua-81207.firebaseapp.com",
+            databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com",
+            projectId: "dddua-81207",
+            storageBucket: "dddua-81207.firebasestorage.app",
+            messagingSenderId: "844138746278",
+            appId: "1:844138746278:web:341f704f22c106473d7f67"
+        };
+        const db = getDatabase(initializeApp(firebaseConfig));
+
+        const missoesEle = ["1. Bom dia e elogio.", /* ... preencha as 50 ... */];
+        const missoesEla = ["1. Bom dia e carinho.", /* ... preencha as 50 ... */];
 
         let userType = "";
         let index = 0;
-        let progressoIndividual = [false, false];
+        let progresso = [false, false];
 
-        function iniciar(tipo) {
+        window.iniciar = (tipo) => {
             userType = tipo;
             document.getElementById('login').style.display = 'none';
             document.getElementById('game').style.display = 'block';
             document.getElementById('user-title').innerText = "Grimório de " + tipo;
-            renderizar();
-        }
+
+            onValue(ref(db, 'progresso/' + tipo), (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    index = data.index;
+                    progresso = data.status;
+                }
+                renderizar();
+            });
+        };
 
         function renderizar() {
             const list = document.getElementById('mission-list');
@@ -73,31 +71,24 @@
             const lista = userType === 'Ele' ? missoesEle : missoesEla;
             
             for(let i = 0; i < 2; i++) {
-                let mIndex = index + i;
-                if(mIndex < lista.length) {
+                if(index + i < lista.length) {
                     list.innerHTML += `
-                        <div class="mission-box ${progressoIndividual[i] ? 'done' : ''}" id="m${i}">
-                            <p>${lista[mIndex]}</p>
-                            <button onclick="cumprir(${i})" ${progressoIndividual[i] ? 'disabled' : ''}>Cumpri!</button>
+                        <div class="mission-box ${progresso[i] ? 'done' : ''}" id="m${i}">
+                            <p>${lista[index + i]}</p>
+                            <button onclick="cumprir(${i})" ${progresso[i] ? 'disabled' : ''}>Cumpri!</button>
                         </div>`;
                 }
             }
         }
 
-        function cumprir(i) {
-            progressoIndividual[i] = true;
-            document.getElementById('m' + i).classList.add('done');
-            
-            if(progressoIndividual[0] && progressoIndividual[1]) {
+        window.cumprir = (i) => {
+            progresso[i] = true;
+            if(progresso[0] && progresso[1]) {
                 index += 2;
-                progressoIndividual = [false, false];
-                // Evolui a espada
-                const espadas = ["🗡️", "⚔️", "🛡️", "✨⚔️", "🔥⚔️", "👑🗡️"];
-                const level = Math.min(Math.floor(index / 10), espadas.length - 1);
-                document.getElementById('current-sword').innerText = espadas[level];
-                renderizar();
+                progresso = [false, false];
             }
-        }
+            update(ref(db, 'progresso/' + userType), { index: index, status: progresso });
+        };
     </script>
 </body>
 </html>
