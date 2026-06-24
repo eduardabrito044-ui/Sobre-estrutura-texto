@@ -8,9 +8,9 @@
         body { background: #0a0a0c; color: #d4af37; font-family: 'Courier New', monospace; text-align: center; padding: 10px; }
         .card { border: 2px solid #d4af37; padding: 20px; max-width: 400px; margin: 10px auto; background: #16161a; }
         .mission-box { border: 2px solid #d4af37; padding: 15px; margin: 10px 0; background: #222; }
-        .sword { font-size: 50px; margin: 20px; }
+        .sword { font-size: 50px; margin: 20px; filter: drop-shadow(0 0 10px #d4af37); }
         button { background: #d4af37; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; }
-        .done { opacity: 0.5; background: #444; }
+        .done { opacity: 0.3; background: #000; }
     </style>
 </head>
 <body>
@@ -22,25 +22,37 @@
     </div>
 
     <div id="game" class="card" style="display:none;">
+        <h2 id="user-title"></h2>
         <div id="current-sword" class="sword">🗡️</div>
         <div id="mission-list"></div>
     </div>
 
     <script>
+        // O nível de "calor" das missões aumenta conforme o index aumenta
         const missoesEle = [
-            "1. Dê um bom dia com um elogio especial.", "2. Envie uma foto do seu dia.", "3. Pergunte: 'Como posso te fazer sorrir hoje?'", "4. Elogie algo que ela fez.", "5. Mande um áudio dizendo que ama.", "6. Planeje um encontro futuro.", "7. Dê 3 motivos por que ela é especial.", "8. Envie uma música que lembra ela.", "9. Mande um 'boa noite' carinhoso.", "10. Diga o que admira no jeito dela.",
-            "11. Mande mensagem de 'estou com saudade'.", "12. Elogie o sorriso dela.", "13. Faça um plano divertido.", "14. Envie um meme engraçado.", "15. Diga por que é sortudo.", "16. Elogie a inteligência dela.", "17. Mande 'bom trabalho'.", "18. Diga qual roupa prefere nela.", "19. Apoie ela se estiver cansada.", "20. Diga o que te atrai.",
-            "21. Diga que ela é linda.", "22. Diga um sonho com ela.", "23. Envie foto de algo que lembrou ela.", "24. Valorize a conversa de vocês.", "25. Mande um 'bom descanso'.", "26. Diga algo que ela faz que te faz feliz.", "27. Pergunte como foi o dia.", "28. Elogie a dedicação dela.", "29. Diga que espera o encontro.", "30. Mande carinho inesperado.",
-            "31. Diga o que gosta no abraço dela.", "32. Mande bom dia com 'te amo'.", "33. Diga algo engraçado.", "34. Elogie o gosto dela.", "35. Mande um 'estou orgulhoso'.", "36. Diga seu momento feliz com ela.", "37. Mande foto sua fazendo algo que ela gosta.", "38. Diga o que aprendeu com ela.", "39. Mande desejo de boa semana.", "40. Diga por que ela é importante.",
-            "41. Mande algo ousado sobre saudade.", "42. Diga algo que quer fazer com ela.", "43. Elogie o olhar dela.", "44. Diga que ela é sua inspiração.", "45. Mande mensagem de total carinho.", "46. Diga o que mudou por ela.", "47. Mande mensagem com desejo.", "48. Elogie a personalidade dela.", "49. Diga o quanto ela é única.", "50. Mande um 'você é meu tudo'."
+            // Leve (1-10)
+            "1. Dê bom dia elogiando o sorriso dela.", "2. Envie uma foto do seu café.", "3. Pergunte como ela está agora.", "4. Elogie a dedicação dela.", "5. Mande um áudio de carinho.", "6. Planeje um encontro futuro.", "7. Diga 3 motivos de admiração.", "8. Envie uma música fofa.", "9. Mande um 'boa noite' carinhoso.", "10. Diga que ela é sua prioridade.",
+            // Romântico (11-20)
+            "11. Escreva sobre o que você sente ao vê-la.", "12. Diga um sonho que teve com ela.", "13. Fale sobre o futuro de vocês.", "14. Elogie a inteligência dela.", "15. Mande um 'estou com saudade'.", "16. Diga por que ela é sua inspiração.", "17. Mande uma mensagem de apoio.", "18. Diga o que mudou na sua vida.", "19. Fale de um momento marcante.", "20. Diga o que ela trouxe de bom.",
+            // Intenso (21-30)
+            "21. Escreva um elogio sobre a força dela.", "22. Diga qual hábito dela você ama.", "23. Mande um texto de gratidão.", "24. Fale de uma meta de casal.", "25. Prometa suporte total.", "26. Diga qual detalhe dela te deixa bobo.", "27. Mande algo sobre sua lealdade.", "28. Diga o que admira no temperamento dela.", "29. Proponha um tema de estudo a dois.", "30. Mande uma mensagem de proteção.",
+            // Provocante (31-40)
+            "31. Sussurre algo ousado sobre saudade.", "32. Diga um desejo que você quer realizar.", "33. Elogie o olhar dela intensamente.", "34. Descreva como seria a noite de vocês.", "35. Mande algo que te deixa inquieto.", "36. Diga que ela é sua musa.", "37. Mande algo sobre o beijo dela.", "38. Diga o que você faria se estivesse lá.", "39. Mande uma mensagem sobre desejo.", "40. Fale sobre o que mais te atrai.",
+            // Hot (41-50)
+            "41. Mande uma mensagem sobre seus toques favoritos.", "42. Descreva um desejo íntimo.", "43. Diga como ela te deixa sem ar.", "44. Mande uma mensagem de total entrega.", "45. Fale o que mais gosta de sentir nela.", "46. Mande algo sobre suas intenções quentes.", "47. Diga como seria o encontro perfeito a sós.", "48. Fale sobre suas fantasias com ela.", "49. Diga o quanto ela é sua perdição.", "50. Prometa o seu melhor momento a dois."
         ];
 
         const missoesEla = [
-            "1. Dê um bom dia com carinho.", "2. Envie uma selfie.", "3. Pergunte: 'O que te deixa feliz hoje?'", "4. Elogie o esforço dele.", "5. Mande áudio dizendo que se importa.", "6. Pense em surpresa para ele.", "7. Dê 3 motivos por que ele é especial.", "8. Envie uma música para ele.", "9. Mande um 'boa noite' doce.", "10. Diga o que gosta na companhia dele.",
-            "11. Mande mensagem pensando nele.", "12. Elogie o jeito dele resolver coisas.", "13. Fale o que quer fazer com ele.", "14. Envie vídeo engraçado.", "15. Diga por que ele te faz bem.", "16. Elogie a determinação dele.", "17. Mande mensagem de motivação.", "18. Elogie a voz dele.", "19. Mande abraço virtual.", "20. Diga o que te atrai nele.",
-            "21. Diga que ele é incrível.", "22. Diga desejo com ele.", "23. Envie foto que lembrou ele.", "24. Valorize o apoio dele.", "25. Mande um 'bom descanso'.", "26. Diga algo que ele faz que te faz rir.", "27. Pergunte sobre o dia dele.", "28. Elogie a inteligência dele.", "29. Diga que espera o encontro.", "30. Mande carinho sem motivo.",
-            "31. Diga o que gosta no beijo dele.", "32. Mande bom dia especial.", "33. Diga algo fofo.", "34. Elogie o cuidado dele.", "35. Mande um 'você é meu orgulho'.", "36. Diga o momento com ele.", "37. Mande selfie sorrindo.", "38. Elogie o caráter dele.", "39. Mande um beijo.", "40. Diga por que escolheu ele.",
-            "41. Mande mensagem provocante.", "42. Diga o que quer fazer com ele.", "43. Elogie como ele te protege.", "44. Diga que ele é seu porto seguro.", "45. Mande mensagem de afeto.", "46. Diga o que mudou desde que o conheceu.", "47. Mande mensagem expressando paixão.", "48. Elogie o humor dele.", "49. Diga o quanto ele é maravilhoso.", "50. Mande um 'você é meu amor'."
+            // Leve (1-10)
+            "1. Dê um bom dia com carinho.", "2. Envie uma selfie fofa.", "3. Pergunte o que ele pensa.", "4. Elogie o esforço dele.", "5. Mande áudio demonstrando cuidado.", "6. Pense numa surpresa leve.", "7. Dê 3 motivos por que ele é especial.", "8. Envie uma música romântica.", "9. Mande um 'boa noite' doce.", "10. Diga o que mais gosta nele.",
+            // Romântico (11-20)
+            "11. Mande mensagem pensando nele.", "12. Elogie a forma como ele resolve tudo.", "13. Fale sobre seus planos com ele.", "14. Envie um vídeo carinhoso.", "15. Diga por que ele te faz bem.", "16. Elogie a determinação dele.", "17. Mande uma mensagem motivacional.", "18. Elogie o jeito dele de falar.", "19. Ofereça um abraço virtual.", "20. Diga o que te faz confiar nele.",
+            // Intenso (21-30)
+            "21. Escreva o que você mais admira nele.", "22. Mande um texto sobre a sua confiança.", "23. Diga o que ele mudou em você.", "24. Proponha um tema para planos futuros.", "25. Mande um 'estou sempre aqui'.", "26. Fale sobre a segurança que ele traz.", "27. Mande um agradecimento profundo.", "28. Diga qual detalhe dele te traz paz.", "29. Mande algo sobre o apoio mútuo.", "30. Diga o que te faz se sentir única.",
+            // Provocante (31-40)
+            "31. Mande algo sobre suas vontades quando estiverem juntos.", "32. Diga um desejo que você quer explorar.", "33. Elogie o efeito que ele tem em você.", "34. Descreva seu toque favorito nele.", "35. Mande uma mensagem provocante.", "36. Fale sobre o que ele te desperta.", "37. Diga como ele te faz sentir mulher.", "38. Mande algo sobre o seu desejo.", "39. Diga o que você faria hoje.", "40. Planeje uma noite de entrega.",
+            // Hot (41-50)
+            "41. Mande algo sobre o que ele te causa.", "42. Diga seus desejos mais íntimos.", "43. Explore uma ideia ousada a dois.", "44. Mande uma mensagem de entrega total.", "45. Diga o que você mais quer sentir.", "46. Fale sobre suas fantasias quentes.", "47. Diga como ele te domina.", "48. Mande uma mensagem sobre sua paixão.", "49. Diga o quanto ele é o seu tudo.", "50. Prometa uma noite inesquecível."
         ];
 
         let userType = "";
@@ -51,6 +63,7 @@
             userType = tipo;
             document.getElementById('login').style.display = 'none';
             document.getElementById('game').style.display = 'block';
+            document.getElementById('user-title').innerText = "Grimório de " + tipo;
             renderizar();
         }
 
@@ -78,6 +91,10 @@
             if(progressoIndividual[0] && progressoIndividual[1]) {
                 index += 2;
                 progressoIndividual = [false, false];
+                // Evolui a espada
+                const espadas = ["🗡️", "⚔️", "🛡️", "✨⚔️", "🔥⚔️", "👑🗡️"];
+                const level = Math.min(Math.floor(index / 10), espadas.length - 1);
+                document.getElementById('current-sword').innerText = espadas[level];
                 renderizar();
             }
         }
