@@ -2,62 +2,63 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Nosso Pandinha 3D 🐼</title>
+    <title>Pixel Quest: Casal 🎮</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Indie+Flower&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Arial', sans-serif; text-align: center; background: #1a1a24; color: white; padding: 20px; }
-        
-        /* Efeito Boneco 3D */
-        #panda-img { 
-            width: 200px; 
-            margin: 20px auto; 
-            display: block;
-            /* Sombra que dá profundidade 3D */
-            filter: drop-shadow(0px 10px 15px rgba(0,0,0,0.5));
-            /* Suaviza as bordas */
-            transition: transform 0.2s;
+        body { background: #fdf6e3; color: #5d4037; font-family: 'Indie Flower', cursive; text-align: center; padding: 20px; }
+        .caderno-window { 
+            background: #ffffff; border: 2px solid #ddd; padding: 25px; 
+            border-radius: 15px; max-width: 400px; margin: 0 auto;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
         }
+        h1 { font-size: 40px; color: #ff80ab; text-shadow: 2px 2px #ffebee; }
         
-        /* Animação de pulo ao clicar */
-        #panda-img:active { transform: scale(0.95); }
+        .mission-item { 
+            background: #fff3e0; border: 2px dashed #ffcc80; padding: 15px; 
+            margin: 15px 0; border-radius: 10px; display: flex; 
+            justify-content: space-between; align-items: center;
+        }
 
-        .stats { font-size: 1.5em; margin: 20px; font-weight: bold; text-shadow: 2px 2px #000; }
-        
-        button { 
-            padding: 15px 25px; width: 80%; cursor: pointer; font-size: 18px; 
-            border-radius: 15px; border: none; 
-            background: #e67e22; color: white; font-weight: bold;
-            /* Sombra 3D no botão */
-            box-shadow: 0 5px #d35400;
-            transition: all 0.1s;
+        /* Botão super fofo e estilizado */
+        .btn-check { 
+            background: #b2dfdb; border: none; padding: 10px 20px; 
+            border-radius: 50px; cursor: pointer; font-family: 'Indie Flower';
+            font-size: 20px; color: #004d40; box-shadow: 0 4px #80cbc4;
+            transition: all 0.2s;
         }
-        button:active { transform: translateY(4px); box-shadow: 0 1px #d35400; }
+        .btn-check:hover { background: #80cbc4; transform: scale(1.1); }
+        
+        .emoji-art { font-size: 30px; margin: 5px; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <h1>Quem está entrando?</h1>
-        <button onclick="entrar('Ele')">Entrar como Ele 🧔</button>
-        <button onclick="entrar('Ela')">Entrar como Ela 👩‍🦰</button>
+    <div id="login-screen" class="caderno-window">
+        <h1>Pixel Quest ✍️</h1>
+        <p>Quem vai completar missão hoje?</p>
+        <button class="btn-check" onclick="entrar('Ele')">🧔 Ele</button>
+        <button class="btn-check" onclick="entrar('Ela')">👩‍🦰 Ela</button>
     </div>
 
-    <div id="pet-area" class="hidden">
-        <h1 id="boas-vindas">Olá!</h1>
-        <img id="panda-img" src="1000079336.png" alt="Pandinha">
-        <div class="stats">
-            Energia: <span id="energia">100</span>% | Amor: <span id="amor">100</span>%
+    <div id="game-screen" class="caderno-window hidden">
+        <h1 id="user-title">Missões do Dia ✨</h1>
+        <div id="mission-list">
+            <div class="mission-item">
+                <span>Enviar elogio criativo 💌</span>
+                <button class="btn-check" onclick="completar('elogio')">OK! ✅</button>
+            </div>
+            <div class="mission-item">
+                <span>Foto de um momento fofo 📸</span>
+                <button class="btn-check" onclick="completar('foto')">OK! ✅</button>
+            </div>
         </div>
-        <div class="menu">
-            <button onclick="acao('alimentar')">Dar Bambu 🎋</button>
-            <button onclick="acao('limpar')">Dar Banho 🚿</button>
-            <button onclick="acao('brincar')">Brincar 🎮</button>
-        </div>
+        <p class="emoji-art">🌟 Pontos de Conexão: <span id="pontos">0</span> 🌟</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
@@ -72,35 +73,23 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const petRef = ref(db, 'pandinha_do_casal');
+        const gameRef = ref(db, 'pixel_quest');
 
         window.entrar = (nome) => {
-            document.getElementById('boas-vindas').innerText = "Olá, " + nome + "!";
+            document.getElementById('user-title').innerText = "Olá, " + nome + "! ✨";
             document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('pet-area').classList.remove('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
         };
 
-        // Lógica corrigida para garantir que os dados atualizam no Firebase
-        window.acao = async (tipo) => {
-            const snapshot = await get(petRef);
-            let dados = snapshot.val() || { energia: 100, amor: 100 };
-            
-            if(tipo === 'alimentar') dados.energia = Math.min(dados.energia + 10, 100);
-            if(tipo === 'limpar') dados.amor = Math.min(dados.amor + 10, 100);
-            if(tipo === 'brincar') { 
-                dados.energia = Math.max(dados.energia - 5, 0); 
-                dados.amor = Math.min(dados.amor + 5, 100); 
-            }
-
-            await update(petRef, dados);
+        window.completar = (id) => {
+            alert("Missão completada com sucesso! ✨💖");
+            update(gameRef, { [id]: true });
         };
 
-        onValue(petRef, (snapshot) => {
-            const dados = snapshot.val();
-            if(dados) {
-                document.getElementById('energia').innerText = dados.energia;
-                document.getElementById('amor').innerText = dados.amor;
-            }
+        onValue(gameRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            let score = Object.keys(data).length;
+            document.getElementById('pontos').innerText = score;
         });
     </script>
 </body>
