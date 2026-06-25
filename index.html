@@ -3,17 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pixel Grimoire RPG</title>
     <style>
         body { background: #0a0a0c; color: #d4af37; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 20px; }
-        .card { border: 2px solid #d4af37; padding: 20px; max-width: 100%; width: 90%; margin: 10px auto; background: #16161a; box-sizing: border-box; }
+        .card { border: 2px solid #d4af37; padding: 20px; width: 90%; margin: 10px auto; background: #16161a; border-radius: 10px; }
         .mission-box { border: 1px solid #d4af37; padding: 15px; margin: 15px 0; background: #222; border-radius: 8px; }
-        .sword { font-size: 40px; margin: 10px; }
-        button { background: #d4af37; border: none; padding: 15px 30px; font-weight: bold; cursor: pointer; color: black; font-size: 16px; border-radius: 5px; width: 100%; margin-top: 10px; }
+        button { background: #d4af37; border: none; padding: 15px; font-weight: bold; cursor: pointer; color: black; width: 100%; border-radius: 5px; }
         button:disabled { background: #555; color: #ccc; }
         .done { opacity: 0.5; background: #000; }
-        h1, h2 { font-size: 20px; }
     </style>
 </head>
 <body>
@@ -22,44 +19,38 @@
         <button onclick="iniciar('Ele')">Entrar: Ele 🧔</button>
         <button onclick="iniciar('Ela')">Entrar: Ela 👩‍🦰</button>
     </div>
-
     <div id="game" class="card" style="display:none;">
         <h2 id="user-title"></h2>
-        <div id="current-sword" class="sword">🗡️</div>
         <div id="mission-list"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
-        import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
+        import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBTmhs9bZp-IuBzqwTxQZlrHu9IHsDmJQA",
-            authDomain: "dddua-81207.firebaseapp.com",
             databaseURL: "https://dddua-81207-default-rtdb.firebaseio.com",
-            projectId: "dddua-81207",
-            storageBucket: "dddua-81207.firebasestorage.app",
-            messagingSenderId: "844138746278",
-            appId: "1:844138746278:web:341f704f22c106473d7f67"
+            projectId: "dddua-81207"
         };
         const db = getDatabase(initializeApp(firebaseConfig));
 
-        // Listas com 50 missões
-        const missoesEle = ["1. Dê um bom dia especial e diga algo que admira nela.", "2. Envie uma foto do seu dia agora.", /* ... continue até 50 ... */];
-        const missoesEla = ["1. Dê um bom dia com carinho.", "2. Envie uma selfie para ele.", /* ... continue até 50 ... */];
+        // Suas listas completas aqui
+        const missoesEle = ["1. Dê bom dia e elogio.", "2. Envie foto do dia.", "3. Pergunte: 'Como sorrir hoje?'.", "4. Elogie algo que ela fez.", "5. Mande um áudio.", "6. Planeje um encontro.", "7. Dê 3 motivos por que ela é sua.", "8. Envie uma música.", "9. 'Boa noite'.", "10. Admire o jeito dela.", "11. 'Saudade'.", "12. Elogie o sorriso.", "13. Plano divertido.", "14. Meme engraçado.", "15. Sinta-se sortudo.", "16. Elogie a inteligência.", "17. 'Bom trabalho'.", "18. Roupa favorita.", "19. Apoio total.", "20. O que te atrai.", "21. Ela é linda.", "22. Sonho com ela.", "23. Algo que lembrou ela.", "24. Valorize conversa.", "25. 'Bom descanso'.", "26. O que te faz feliz.", "27. Como foi o dia.", "28. Dedicação dela.", "29. Encontro logo.", "30. Carinho do nada.", "31. Abraço dela.", "32. Bom dia 'te amo'.", "33. Algo engraçado.", "34. Gosto musical.", "35. 'Orgulhoso'.", "36. Momento feliz.", "37. Foto sua.", "38. Aprendi com ela.", "39. Boa semana.", "40. Por que é importante.", "41. Saudade ousada.", "42. O que quero fazer.", "43. Olhar dela.", "44. Inspiração.", "45. Carinho total.", "46. Mudei por ela.", "47. Mensagem desejo.", "48. Personalidade.", "49. Única.", "50. Meu tudo."];
+        const missoesEla = ["1. Bom dia carinhoso.", "2. Selfie fofa.", "3. 'O que te faz feliz?'.", "4. Elogie o esforço dele.", "5. Áudio de cuidado.", "6. Surpresa futura.", "7. 3 motivos especiais.", "8. Música para ele.", "9. 'Boa noite'.", "10. Companhia dele.", "11. 'Pensei em você'.", "12. Jeito dele resolver.", "13. O que fazer juntos.", "14. Vídeo divertido.", "15. Ele te faz bem.", "16. Determinação dele.", "17. Motivação.", "18. Voz dele.", "19. Abraço virtual.", "20. O que te atrai.", "21. Ele é incrível.", "22. Desejo com ele.", "23. Lembrou dele.", "24. Valoriza apoio.", "25. 'Bom descanso'.", "26. Ele te faz rir.", "27. Dia dele.", "28. Inteligência.", "29. Encontro logo.", "30. Carinho sem motivo.", "31. Beijo dele.", "32. Bom dia especial.", "33. Coisa fofa.", "34. Cuidado dele.", "35. 'Orgulho'.", "36. Inesquecível.", "37. Selfie sorrindo.", "38. Caráter dele.", "39. Beijo.", "40. Por que escolheu.", "41. Provocante.", "42. Fuga da rotina.", "43. Proteção.", "44. Porto seguro.", "45. Afeto.", "46. O que mudou.", "47. Paixão.", "48. Humor.", "49. Maravilhoso.", "50. Meu amor."];
 
         let userType = ""; let index = 0; let progresso = [false, false];
 
-        window.iniciar = (tipo) => {
+        window.iniciar = async (tipo) => {
             userType = tipo;
             document.getElementById('login').style.display = 'none';
             document.getElementById('game').style.display = 'block';
             document.getElementById('user-title').innerText = "Grimório de " + tipo;
-            onValue(ref(db, 'progresso/' + tipo), (snapshot) => {
-                const data = snapshot.val();
-                if(data) { index = data.index; progresso = data.status; }
-                renderizar();
-            }, { onlyOnce: true });
+            
+            const snapshot = await get(ref(db, 'progresso/' + tipo));
+            const data = snapshot.val();
+            if(data) { index = data.index; progresso = data.status; }
+            renderizar();
         };
 
         window.renderizar = () => {
@@ -68,11 +59,7 @@
             const lista = userType === 'Ele' ? missoesEle : missoesEla;
             for(let i = 0; i < 2; i++) {
                 if(index + i < lista.length) {
-                    list.innerHTML += `
-                        <div class="mission-box ${progresso[i] ? 'done' : ''}">
-                            <p>${lista[index + i]}</p>
-                            <button onclick="cumprir(${i})" ${progresso[i] ? 'disabled' : ''}>${progresso[i] ? 'Concluído' : 'Cumpri!'}</button>
-                        </div>`;
+                    list.innerHTML += `<div class="mission-box ${progresso[i] ? 'done' : ''}"><p>${lista[index+i]}</p><button onclick="cumprir(${i})" ${progresso[i] ? 'disabled' : ''}>${progresso[i] ? 'Feito' : 'Cumpri!'}</button></div>`;
                 }
             }
         };
@@ -81,7 +68,7 @@
             progresso[i] = true;
             if(progresso[0] && progresso[1]) { index += 2; progresso = [false, false]; }
             renderizar();
-            update(ref(db, 'progresso/' + userType), { index: index, status: progresso });
+            update(ref(db, 'progresso/' + userType), { index, status: progresso });
         };
     </script>
 </body>
